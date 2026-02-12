@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Presence - Create Your Online Space</title>
+    <link rel="stylesheet" href="a.css">
+</head>
+<body>
+    <div class="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">◉</div>
+                    <span class="logo-text">Presence</span>
+                </div>
+                <nav class="nav">
+                    <a href="#" class="nav-link">Help</a>
+                </nav>
+            </div>
+        </header>
+
+        <!-- Main Container -->
+        <main class="main">
+            <!-- Step Indicator -->
+            <div class="step-indicator">
+                <span class="step-label" id="stepLabel">Step 1 of 4</span>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+
+            <!-- Step 1: Welcome -->
+            <section class="step" id="step1" data-step="1">
+                <div class="step-content">
+                    <h1 class="step-title">Welcome to Presence</h1>
+                    <p class="step-description">
+                        Let's create your online space. We'll walk you through it step by step—no technical skills needed.
+                    </p>
+                    <div class="step-icon">✨</div>
+                    <button class="button button-primary" onclick="nextStep()">Let's Get Started</button>
+                </div>
+            </section>
+
+            <!-- Step 2: Basic Info -->
+            <section class="step hidden" id="step2" data-step="2">
+                <div class="step-content">
+                    <h1 class="step-title">Tell Us About You</h1>
+                    <p class="step-description">
+                        Start with the basics. You can always change this later.
+                    </p>
+
+                    <form class="form" onsubmit="nextStep(event)">
+                        <div class="form-group">
+                            <label for="siteName" class="label">
+                                What's your name or business name?
+                            </label>
+                            <input
+                                type="text"
+                                id="siteName"
+                                class="input"
+                                placeholder="e.g., Sarah's Photography"
+                                onchange="updatePreview()"
+                            />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="siteTagline" class="label">
+                                One-line description (what do you do?)
+                            </label>
+                            <input
+                                type="text"
+                                id="siteTagline"
+                                class="input"
+                                placeholder="e.g., Creating beautiful moments"
+                                onchange="updatePreview()"
+                            />
+                        </div>
+
+                        <div class="form-group">
+                            <label class="label">Your profile photo <span class="optional">(optional)</span></label>
+                            <div class="file-upload">
+                                <input type="file" id="logo" accept=".png,.jpg,.jpeg" onchange="handleImageUpload(event)">
+                                <span class="upload-text">Click to upload or drag and drop</span>
+                            </div>
+                        </div>
+
+                        <div class="button-group">
+                            <button type="button" class="button button-secondary" onclick="prevStep()">Back</button>
+                            <button type="submit" class="button button-primary">Next</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Step 3: Content -->
+            <section class="step hidden" id="step3" data-step="3">
+                <div class="step-content">
+                    <h1 class="step-title">Add Your Story</h1>
+                    <p class="step-description">
+                        Tell visitors what you're about. Keep it simple and genuine.
+                    </p>
+
+                    <form class="form" onsubmit="nextStep(event)">
+                        <div class="form-group">
+                            <label for="bio" class="label">
+                                Your story (2-3 sentences)
+                            </label>
+                            <textarea
+                                id="bio"
+                                class="input input-textarea"
+                                placeholder="Tell people about yourself. What makes you unique? What are you passionate about?"
+                                rows="4"
+                                onchange="updatePreview()"
+                            ></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="cta" class="label">
+                                What would you like visitors to do?
+                            </label>
+                            <input
+                                type="text"
+                                id="cta"
+                                class="input"
+                                placeholder="e.g., Book a session, Get in touch, Learn more"
+                                onchange="updatePreview()"
+                            />
+                        </div>
+
+                        <div class="button-group">
+                            <button type="button" class="button button-secondary" onclick="prevStep()">Back</button>
+                            <button type="submit" class="button button-primary">Next</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Step 4: Contact -->
+            <section class="step hidden" id="step4" data-step="4">
+                <div class="step-content">
+                    <h1 class="step-title">How Can People Reach You?</h1>
+                    <p class="step-description">
+                        Add your contact info so visitors can get in touch.
+                    </p>
+
+                    <form class="form" onsubmit="publishSite(event)">
+                        <div class="form-group">
+                            <label for="email" class="label">
+                                Email address
+                            </label>
+                            <input
+                                type="email"
+                                id="email"
+                                class="input"
+                                placeholder="your@email.com"
+                                onchange="updatePreview()"
+                            />
+                        </div>
+
+                        <div class="form-group">
+                            <label class="label">
+                                Social links <span class="optional">(optional)</span>
+                            </label>
+                            <input
+                                type="text"
+                                id="instagram"
+                                class="input"
+                                placeholder="Instagram profile URL"
+                                onchange="updatePreview()"
+                            />
+                            <input
+                                type="text"
+                                id="linkedin"
+                                class="input"
+                                placeholder="LinkedIn profile URL"
+                                onchange="updatePreview()"
+                            />
+                        </div>
+
+                        <div class="button-group">
+                            <button type="button" class="button button-secondary" onclick="prevStep()">Back</button>
+                            <button type="submit" class="button button-primary">Publish My Site</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Success Screen -->
+            <section class="step hidden" id="stepSuccess" data-step="5">
+                <div class="step-content">
+                    <div class="success-icon">🎉</div>
+                    <h1 class="step-title">You're Live!</h1>
+                    <p class="step-description">
+                        Your online presence is now live. Share your link with the world!
+                    </p>
+
+                    <div class="success-link">
+                        <p class="link-label">Your site:</p>
+                        <div class="link-display" id="siteLink">
+                            https://presence.app/yourname
+                        </div>
+                        <button type="button" class="button button-secondary" onclick="copySiteLink()">Copy Link</button>
+                    </div>
+
+                    <div class="next-steps">
+                        <p class="next-steps-title">Next steps:</p>
+                        <ul class="next-steps-list">
+                            <li>Share your link on social media</li>
+                            <li>Add your link to your email signature</li>
+                            <li>Come back anytime to update your info</li>
+                        </ul>
+                    </div>
+
+                    <button class="button button-primary" onclick="resetFlow()">Create Another Site</button>
+                </div>
+            </section>
+        </main>
+
+        <!-- Preview Panel (Desktop) -->
+        <aside class="preview-panel" id="previewPanel">
+            <div class="preview-container">
+                <div class="preview-header">
+                    <span class="preview-title">Preview</span>
+                </div>
+                <div class="preview-content" id="previewContent">
+                    <div class="preview-placeholder">
+                        <p>Your site preview will appear here</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <a href="#" class="footer-link">Help & Support</a>
+            <span class="footer-divider">•</span>
+            <a href="#" class="footer-link">Privacy Policy</a>
+            <span class="footer-divider">•</span>
+            <a href="#" class="footer-link">Terms</a>
+        </div>
+    </footer>
+
+    <script src="a.js"></script>
+</body>
+</html>
