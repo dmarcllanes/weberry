@@ -6,6 +6,7 @@ from core.billing.trial import days_remaining as trial_days_remaining
 from core.errors import CoreError
 from user_app import db
 from user_app.routes import error_page
+from core.billing.entitlements import can_create_project
 from user_app.services.project_service import (
     create_project_for_user,
     get_user_projects,
@@ -24,9 +25,19 @@ from user_app.frontend.pages.site_detail import site_detail_page
 def dashboard(req):
     user = req.scope["user"]
     projects = get_user_projects(user)
-    if len(projects) == 1:
+    if len(projects) == 1 and projects[0].state != ProjectState.PUBLISHED:
         return RedirectResponse(f"/projects/{projects[0].id}", status_code=303)
-    return dashboard_page(user, projects)
+    show_new = can_create_project(user, len(projects))
+    return dashboard_page(user, projects, show_new_button=show_new)
+
+
+def show_user_profile(req):
+    """Top-level /profile — show profile for user's first project."""
+    user = req.scope["user"]
+    projects = get_user_projects(user)
+    if not projects:
+        return RedirectResponse("/", status_code=303)
+    return profile_page(projects[0])
 
 
 def create_project(req):
@@ -63,8 +74,8 @@ async def show_project(req, project_id: str):
         return preview_page(project)
 
     if state == ProjectState.PUBLISHED:
-        pub = db.get_latest_published_site(project_id)
-        public_url = pub["public_url"] if pub else ""
+        base = str(req.url.scheme) + "://" + req.headers.get("host", "localhost")
+        public_url = f"{base}/sites/{project_id}"
         row = db.get_project_row(project_id)
         trial_info = None
         if row and row.get("trial_ends_at"):
@@ -110,8 +121,8 @@ async def show_site(req, project_id: str):
     public_url = None
     trial_info = None
     if project.state == ProjectState.PUBLISHED:
-        pub = db.get_latest_published_site(project_id)
-        public_url = pub["public_url"] if pub else None
+        base = str(req.url.scheme) + "://" + req.headers.get("host", "localhost")
+        public_url = f"{base}/sites/{project_id}"
         row = db.get_project_row(project_id)
         if row and row.get("trial_ends_at"):
             from datetime import datetime
@@ -119,6 +130,17 @@ async def show_site(req, project_id: str):
             trial_info = {"days_remaining": trial_days_remaining(trial_ends)}
 
     return site_detail_page(project, public_url, trial_info)
+
+
+async def delete_project(req, project_id: str):
+    """Delete a project and redirect to dashboard."""
+    user = req.scope["user"]
+    project = db.get_project(project_id)
+    if project is None or project.user_id != user.id:
+        return error_page("Project not found", 404)
+
+    db.delete_project(project_id)
+    return RedirectResponse("/", status_code=303)
 
 
 async def save_memory(req, project_id: str):

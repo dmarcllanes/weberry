@@ -1,79 +1,223 @@
 // Okenaba - Client-side step navigation and utilities
 
 document.addEventListener('DOMContentLoaded', function() {
-    updateProgress();
+    updateStepIndicator();
     updatePreview();
+    initOnboardingExitGuard();
+
+    // Keyboard navigation: Enter advances step (except on textarea/button)
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            var tag = e.target.tagName.toLowerCase();
+            if (tag === 'textarea' || tag === 'button') return;
+
+            // Allow Enter/Space on step indicator circles
+            if (e.target.classList.contains('si-circle') && e.target.classList.contains('si-completed')) {
+                e.target.click();
+                return;
+            }
+
+            var wizard = document.querySelector('.wizard');
+            if (!wizard) return;
+
+            e.preventDefault();
+            if (currentStep < totalSteps) {
+                nextStep();
+            }
+        }
+        if (e.key === ' ' && e.target.classList.contains('si-circle') && e.target.classList.contains('si-completed')) {
+            e.preventDefault();
+            e.target.click();
+        }
+    });
 });
 
 // --- Step Navigation ---
 
 var currentStep = 1;
 var totalSteps = 4;
+var isTransitioning = false;
 
 function nextStep(event) {
     if (event) event.preventDefault();
+    if (isTransitioning) return;
     if (!validateCurrentStep()) return;
 
     if (currentStep < totalSteps) {
         currentStep++;
-        updateUI();
+        updateUI('forward');
     }
 }
 
 function prevStep() {
+    if (isTransitioning) return;
     if (currentStep > 1) {
         currentStep--;
-        updateUI();
+        updateUI('backward');
     }
 }
 
 function goToStep(step) {
-    if (step >= 1 && step <= totalSteps) {
+    if (isTransitioning) return;
+    if (step >= 1 && step <= totalSteps && step !== currentStep) {
+        var direction = step > currentStep ? 'forward' : 'backward';
         currentStep = step;
-        updateUI();
+        updateUI(direction);
     }
 }
 
-function updateUI() {
-    var steps = document.querySelectorAll('.step');
-    steps.forEach(function(step) {
-        step.classList.add('hidden');
-    });
+function updateUI(direction) {
+    var wizard = document.querySelector('.wizard');
+    if (!wizard) {
+        // Fallback for non-wizard pages
+        var steps = document.querySelectorAll('.step');
+        steps.forEach(function(s) { s.classList.remove('step-active'); });
+        var current = document.getElementById('step' + currentStep);
+        if (current) current.classList.add('step-active');
+        updateStepIndicator();
+        updatePreview();
+        return;
+    }
 
-    var current = document.getElementById('step' + currentStep);
-    if (current) current.classList.remove('hidden');
+    isTransitioning = true;
 
-    updateProgress();
+    var steps = wizard.querySelectorAll(':scope > .step');
+    var oldStep = wizard.querySelector(':scope > .step.step-active');
+    var newStep = document.getElementById('step' + currentStep);
+
+    if (!newStep) {
+        isTransitioning = false;
+        return;
+    }
+
+    // Apply exit class to old step
+    if (oldStep && oldStep !== newStep) {
+        var exitClass = direction === 'forward' ? 'step-exit' : 'step-exit-reverse';
+        oldStep.classList.remove('step-active');
+        oldStep.classList.add(exitClass);
+
+        // Clean up exit class after transition
+        var cleanup = function() {
+            oldStep.classList.remove(exitClass);
+        };
+        oldStep.addEventListener('transitionend', function handler() {
+            oldStep.removeEventListener('transitionend', handler);
+            cleanup();
+        });
+        // Safety timeout
+        setTimeout(cleanup, 500);
+    }
+
+    // Activate new step with entry animation
+    var entryTransform = direction === 'forward' ? 'translateX(30px)' : 'translateX(-30px)';
+    newStep.style.transform = entryTransform;
+    newStep.classList.add('step-active');
+
+    // Force reflow then animate to final position
+    newStep.offsetHeight;
+    newStep.style.transform = '';
+
+    // Clear transitioning guard
+    setTimeout(function() {
+        isTransitioning = false;
+    }, 400);
+
+    updateStepIndicator();
     updatePreview();
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function updateProgress() {
-    var progressFill = document.getElementById('progressFill');
-    var stepLabel = document.getElementById('stepLabel');
+function updateStepIndicator() {
+    var indicator = document.getElementById('stepIndicator');
+    if (!indicator) return;
 
-    if (progressFill) {
-        var pct = (currentStep / totalSteps) * 100;
-        progressFill.style.width = pct + '%';
-    }
-    if (stepLabel) {
-        stepLabel.textContent = 'Step ' + currentStep + ' of ' + totalSteps;
-    }
+    var circles = indicator.querySelectorAll('.si-circle');
+    var connectors = indicator.querySelectorAll('.si-connector');
+    var labels = indicator.querySelectorAll('.si-label');
+
+    circles.forEach(function(circle, i) {
+        var step = i + 1;
+        circle.classList.remove('si-active', 'si-completed');
+
+        if (step < currentStep) {
+            circle.classList.add('si-completed');
+            circle.setAttribute('tabindex', '0');
+            circle.setAttribute('role', 'button');
+            circle.style.cursor = 'pointer';
+        } else if (step === currentStep) {
+            circle.classList.add('si-active');
+            circle.removeAttribute('tabindex');
+            circle.removeAttribute('role');
+            circle.style.cursor = '';
+        } else {
+            circle.removeAttribute('tabindex');
+            circle.removeAttribute('role');
+            circle.style.cursor = '';
+        }
+    });
+
+    connectors.forEach(function(conn, i) {
+        if (i + 1 < currentStep) {
+            conn.classList.add('si-connector-done');
+        } else {
+            conn.classList.remove('si-connector-done');
+        }
+    });
+
+    labels.forEach(function(label, i) {
+        if (i + 1 <= currentStep) {
+            label.classList.add('si-label-active');
+        } else {
+            label.classList.remove('si-label-active');
+        }
+    });
 }
 
 // --- Validation ---
 
+function showFieldError(fieldId, msg) {
+    var field = document.getElementById(fieldId);
+    var errorSpan = document.getElementById(fieldId + '_error');
+    if (field) field.classList.add('input-error');
+    if (errorSpan) {
+        errorSpan.textContent = msg;
+        errorSpan.classList.add('field-error-visible');
+    }
+}
+
+function clearFieldError(field) {
+    field.classList.remove('input-error');
+    var errorSpan = document.getElementById(field.id + '_error');
+    if (errorSpan) {
+        errorSpan.textContent = '';
+        errorSpan.classList.remove('field-error-visible');
+    }
+}
+
+function clearAllFieldErrors() {
+    var errors = document.querySelectorAll('.field-error');
+    errors.forEach(function(el) {
+        el.textContent = '';
+        el.classList.remove('field-error-visible');
+    });
+    var inputs = document.querySelectorAll('.input-error');
+    inputs.forEach(function(el) {
+        el.classList.remove('input-error');
+    });
+}
+
 function validateCurrentStep() {
+    clearAllFieldErrors();
     if (currentStep === 2) {
         var name = document.getElementById('business_name');
         if (name && !name.value.trim()) {
-            showError('Please enter your business name');
+            showFieldError('business_name', 'Please enter your business or personal name');
             name.focus();
             return false;
         }
         var type = document.getElementById('website_type');
         if (type && !type.value) {
-            showError('Please select a website type');
+            showFieldError('website_type', 'Please select a website type');
             type.focus();
             return false;
         }
@@ -81,7 +225,7 @@ function validateCurrentStep() {
     if (currentStep === 3) {
         var goal = document.getElementById('primary_goal');
         if (goal && !goal.value) {
-            showError('Please select a primary goal');
+            showFieldError('primary_goal', 'Please select a primary goal');
             goal.focus();
             return false;
         }
@@ -90,25 +234,24 @@ function validateCurrentStep() {
 }
 
 function validateBeforeSubmit() {
-    // Run validation for current step before form submit
-    // Steps 1-3 validated by nextStep; step 4 validated here
+    clearAllFieldErrors();
     var name = document.getElementById('business_name');
     if (name && !name.value.trim()) {
-        showError('Business name is required');
+        showFieldError('business_name', 'Business name is required');
         goToStep(2);
         name.focus();
         return false;
     }
     var type = document.getElementById('website_type');
     if (type && !type.value) {
-        showError('Website type is required');
+        showFieldError('website_type', 'Website type is required');
         goToStep(2);
         type.focus();
         return false;
     }
     var goal = document.getElementById('primary_goal');
     if (goal && !goal.value) {
-        showError('Primary goal is required');
+        showFieldError('primary_goal', 'Primary goal is required');
         goToStep(3);
         goal.focus();
         return false;
@@ -133,18 +276,30 @@ function updatePreview() {
     var emailVal = email ? email.value.trim() : '';
 
     if (!nameVal && !taglineVal && !descVal) {
-        previewContent.innerHTML = '<div class="preview-placeholder"><p>Your site preview will appear here</p></div>';
+        previewContent.innerHTML =
+            '<div class="preview-placeholder"><p>Your site preview will appear here</p></div>';
         return;
     }
 
     var html = '<div class="preview-site">';
-    html += '<div class="preview-image">' + escapeHtml(nameVal ? nameVal.charAt(0).toUpperCase() : '?') + '</div>';
-    if (nameVal) html += '<div class="preview-name">' + escapeHtml(nameVal) + '</div>';
-    if (taglineVal) html += '<div class="preview-tagline">' + escapeHtml(taglineVal) + '</div>';
-    if (descVal) html += '<div class="preview-bio">' + escapeHtml(descVal) + '</div>';
+    // Mini navbar bar
+    html += '<div style="height:6px;background:' + 'var(--color-primary)' + ';border-radius:3px;opacity:0.3;margin-bottom:8px"></div>';
+    // Hero section
+    if (nameVal) {
+        html += '<div class="preview-name">' + escapeHtml(nameVal) + '</div>';
+    }
+    if (taglineVal) {
+        html += '<div class="preview-tagline">' + escapeHtml(taglineVal) + '</div>';
+    }
+    // Body content
+    if (descVal) {
+        html += '<div class="preview-bio">' + escapeHtml(descVal) + '</div>';
+    }
     if (emailVal) {
         html += '<div class="preview-contact"><div class="preview-email">' + escapeHtml(emailVal) + '</div></div>';
     }
+    // Mini footer bar
+    html += '<div style="height:4px;background:var(--color-border);border-radius:2px;margin-top:12px"></div>';
     html += '</div>';
     previewContent.innerHTML = html;
 }
@@ -194,4 +349,41 @@ function showNotification(message, isError) {
 function escapeHtml(text) {
     var map = {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'};
     return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+}
+
+// --- Loading Overlay ---
+
+function showLoading(message) {
+    var overlay = document.createElement('div');
+    overlay.className = 'loading-overlay';
+    overlay.innerHTML =
+        '<div class="loading-card">' +
+            '<div class="loading-dots"><span></span><span></span><span></span></div>' +
+            '<div class="loading-message">' + escapeHtml(message) + '</div>' +
+            '<div class="loading-subtext">This may take a moment</div>' +
+        '</div>';
+    document.body.appendChild(overlay);
+    return true;
+}
+
+// --- Onboarding Exit Guard ---
+
+function initOnboardingExitGuard() {
+    if (!document.getElementById('onboarding-active')) return;
+
+    // Warn on browser back / tab close
+    window.addEventListener('beforeunload', function(e) {
+        e.preventDefault();
+        e.returnValue = '';
+    });
+
+    // Intercept nav links with a confirm dialog
+    var navLinks = document.querySelectorAll('.nav-link, .logo');
+    navLinks.forEach(function(link) {
+        link.addEventListener('click', function(e) {
+            if (!confirm('You have unsaved changes. Are you sure you want to leave?')) {
+                e.preventDefault();
+            }
+        });
+    });
 }

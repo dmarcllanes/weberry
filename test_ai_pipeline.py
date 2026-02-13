@@ -35,7 +35,7 @@ print("\n--- config/settings.py ---")
 
 def test_settings_loads():
     from config.settings import (
-        ANTHROPIC_API_KEY, ANTHROPIC_MODEL, AI_LIMITS,
+        NVIDIA_API_KEY, NVIDIA_MODEL, AI_LIMITS,
         RATE_LIMIT_MAX_CALLS, RATE_LIMIT_WINDOW_SECONDS,
         AI_COOLDOWN_SECONDS,
     )

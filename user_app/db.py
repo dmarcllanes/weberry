@@ -155,6 +155,8 @@ def _row_to_project(row: dict) -> Project:
 
 
 def get_project(project_id: str) -> Project | None:
+    if not project_id:
+        return None
     result = get_client().table("projects").select("*").eq("id", project_id).execute()
     if not result.data:
         return None
@@ -202,10 +204,17 @@ def update_project_trial(project_id: str, trial_ends_at: datetime, is_paused: bo
 
 def get_project_row(project_id: str) -> dict | None:
     """Get raw project row (includes trial_ends_at, is_paused)."""
+    if not project_id:
+        return None
     result = get_client().table("projects").select("*").eq("id", project_id).execute()
     if not result.data:
         return None
     return result.data[0]
+
+
+def delete_project(project_id: str) -> None:
+    """Delete a project by ID."""
+    get_client().table("projects").delete().eq("id", project_id).execute()
 
 
 def set_project_paused(project_id: str, paused: bool) -> None:
@@ -233,6 +242,8 @@ def save_published_site(
 
 
 def get_latest_published_site(project_id: str) -> dict | None:
+    if not project_id:
+        return None
     result = (
         get_client()
         .table("published_sites")

@@ -49,11 +49,23 @@ async def post(req):
     return projects.create_project(req)
 
 
+# --- Routes: Profile (top-level) ---
+
+@rt("/profile")
+def get(req):
+    return projects.show_user_profile(req)
+
+
 # --- Routes: Project detail ---
 
 @rt("/projects/{project_id}")
 async def get(req, project_id: str):
     return await projects.show_project(req, project_id)
+
+
+@rt("/projects/{project_id}/delete")
+async def post(req, project_id: str):
+    return await projects.delete_project(req, project_id)
 
 
 @rt("/projects/{project_id}/memory")
@@ -100,8 +112,18 @@ async def post(req, project_id: str):
 # --- Routes: Editing ---
 
 @rt("/projects/{project_id}/edit")
+async def get(req, project_id: str):
+    return await editing.show_edit_page(req, project_id)
+
+
+@rt("/projects/{project_id}/edit")
 async def post(req, project_id: str):
     return await editing.edit_text(req, project_id)
+
+
+@rt("/projects/{project_id}/edit-content")
+async def post(req, project_id: str):
+    return await editing.edit_content(req, project_id)
 
 
 # --- Routes: Publishing ---

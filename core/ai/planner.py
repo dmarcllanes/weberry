@@ -1,9 +1,9 @@
 import json
 from pathlib import Path
 
-import anthropic
+from openai import OpenAI
 
-from config.settings import ANTHROPIC_API_KEY, ANTHROPIC_MODEL
+from config.settings import NVIDIA_API_KEY, NVIDIA_MODEL, NVIDIA_BASE_URL
 from core.models.brand_memory import BrandMemory
 from core.ai.schemas import SitePlan, SectionPlan, validate_site_plan
 from core.errors import AIGenerationError
@@ -47,8 +47,8 @@ def _parse_response(raw: str) -> SitePlan:
             SectionPlan(
                 id=s["id"],
                 title=s["title"],
-                purpose=s["purpose"],
-                content_notes=s["content_notes"],
+                purpose=s.get("purpose", ""),
+                content_notes=s.get("content_notes", ""),
             )
             for s in data["sections"]
         ]
@@ -64,20 +64,19 @@ def _parse_response(raw: str) -> SitePlan:
 
 
 def run_planner(memory: BrandMemory) -> SitePlan:
-    """Call Claude to generate a site plan from brand memory."""
+    """Call LLM via OpenRouter to generate a site plan from brand memory."""
     prompt = _build_prompt(memory)
 
-    client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+    client = OpenAI(base_url=NVIDIA_BASE_URL, api_key=NVIDIA_API_KEY, max_retries=5)
     try:
-        response = client.messages.create(
-            model=ANTHROPIC_MODEL,
-            max_tokens=2048,
+        response = client.chat.completions.create(
+            model=NVIDIA_MODEL,
             messages=[{"role": "user", "content": prompt}],
         )
-    except anthropic.APIError as e:
+    except Exception as e:
         raise AIGenerationError("planner", str(e)) from e
 
-    raw_text = response.content[0].text
+    raw_text = response.choices[0].message.content
     plan = _parse_response(raw_text)
     validate_site_plan(plan)
     return plan

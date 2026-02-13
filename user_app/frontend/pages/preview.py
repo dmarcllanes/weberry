@@ -1,6 +1,6 @@
 """Preview page (SITE_GENERATED / PREVIEW states)."""
 
-from fasthtml.common import Div, H1, P, Form, Button, Section, Iframe
+from fasthtml.common import Div, H1, P, Form, Button, Section, Iframe, A
 
 from user_app.frontend.layout import page_layout
 
@@ -23,10 +23,16 @@ def preview_page(project):
                     cls="site-preview-frame",
                     title="Site preview",
                 ),
-                Form(
-                    Button("Publish My Site", cls="button button-primary", type="submit",
-                           style="margin-top:2rem"),
-                    method="post", action=f"/projects/{pid}/publish",
+                Div(
+                    Form(
+                        Button("Publish My Site", cls="button button-primary", type="submit",
+                               onclick="return showLoading('Publishing your site...')"),
+                        method="post", action=f"/projects/{pid}/publish",
+                    ),
+                    A("Edit Content", href=f"/projects/{pid}/edit", cls="button button-secondary"),
+                    A("Exit", href="/", cls="button button-secondary"),
+                    cls="button-group",
+                    style="margin-top:2rem",
                 ),
                 cls="step-content",
             ),
@@ -35,4 +41,4 @@ def preview_page(project):
         cls="project-page",
     )
 
-    return page_layout(content, title="Okenaba - Preview", project_id=pid, active_nav="overview")
+    return page_layout(content, title="Okenaba - Preview", project_id=pid, active_nav="projects")

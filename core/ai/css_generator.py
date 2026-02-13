@@ -1,8 +1,8 @@
 from pathlib import Path
 
-import anthropic
+from openai import OpenAI
 
-from config.settings import ANTHROPIC_API_KEY, ANTHROPIC_MODEL
+from config.settings import NVIDIA_API_KEY, NVIDIA_MODEL, NVIDIA_BASE_URL
 from core.models.brand_memory import BrandMemory
 from core.ai.schemas import CSSOutput
 from core.errors import AIGenerationError, AIValidationError
@@ -51,19 +51,18 @@ def _validate_css(css: str) -> None:
 
 
 def run_css_generator(html: str, memory: BrandMemory) -> CSSOutput:
-    """Call Claude to generate CSS for the given HTML and brand memory."""
+    """Call LLM via OpenRouter to generate CSS for the given HTML and brand memory."""
     prompt = _build_prompt(html, memory)
 
-    client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+    client = OpenAI(base_url=NVIDIA_BASE_URL, api_key=NVIDIA_API_KEY, max_retries=5)
     try:
-        response = client.messages.create(
-            model=ANTHROPIC_MODEL,
-            max_tokens=4096,
+        response = client.chat.completions.create(
+            model=NVIDIA_MODEL,
             messages=[{"role": "user", "content": prompt}],
         )
-    except anthropic.APIError as e:
+    except Exception as e:
         raise AIGenerationError("css_generator", str(e)) from e
 
-    raw_text = _strip_markdown_fences(response.content[0].text)
+    raw_text = _strip_markdown_fences(response.choices[0].message.content)
     _validate_css(raw_text)
     return CSSOutput(css=raw_text)

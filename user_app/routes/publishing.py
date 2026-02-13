@@ -2,6 +2,7 @@ from fasthtml.common import RedirectResponse, Response
 
 from core.errors import CoreError
 from core.publishing.pauser import should_pause_site, get_paused_html
+from core.publishing.renderer import render_final_page
 from user_app import db
 from user_app.routes import error_page
 from user_app.services.publish_service import publish_project
@@ -44,9 +45,10 @@ async def view_published(req, project_id: str):
         name = project.brand_memory.business_name if project and project.brand_memory else ""
         return Response(get_paused_html(name), media_type="text/html")
 
-    # Serve the published site
-    published = db.get_latest_published_site(project_id)
-    if published is None:
+    # Serve the published site directly
+    project = db.get_project(project_id)
+    if project is None or project.site_version is None or not project.site_version.html:
         return Response("Published site not found", status_code=404)
 
-    return RedirectResponse(published["public_url"], status_code=302)
+    rendered = render_final_page(project.site_version.html, project.site_version.css or "")
+    return Response(rendered, media_type="text/html")

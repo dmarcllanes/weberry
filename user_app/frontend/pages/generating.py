@@ -1,6 +1,6 @@
 """Generating page (PLAN_APPROVED state)."""
 
-from fasthtml.common import Div, H1, P, Form, Button, Section
+from fasthtml.common import Div, H1, P, Form, Button, Section, A
 
 from user_app.frontend.layout import page_layout
 
@@ -18,13 +18,18 @@ def generating_page(project):
                 "your website. This may take a moment.",
                 cls="step-description",
             ),
-            Form(
-                Button("Generate My Site", cls="button button-primary", type="submit"),
-                method="post", action=f"/projects/{pid}/generate",
+            Div(
+                Form(
+                    Button("Generate My Site", cls="button button-primary", type="submit",
+                           onclick="return showLoading('Building your website...')"),
+                    method="post", action=f"/projects/{pid}/generate",
+                ),
+                A("Exit", href="/", cls="button button-secondary"),
+                cls="button-group",
             ),
             cls="step-content action-page",
         ),
         cls="step",
     )
 
-    return page_layout(content, title="Okenaba - Generate Site", project_id=pid, active_nav="overview")
+    return page_layout(content, title="Okenaba - Generate Site", project_id=pid, active_nav="projects")

@@ -117,4 +117,4 @@ def site_detail_page(project, public_url=None, trial_info=None):
 
     content = Div(*sections, cls="project-page")
 
-    return page_layout(content, title=f"Okenaba - {name} Site", project_id=pid, active_nav="site")
+    return page_layout(content, title=f"Okenaba - {name} Site", project_id=pid, active_nav="projects")

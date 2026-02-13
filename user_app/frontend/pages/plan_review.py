@@ -1,6 +1,6 @@
 """Plan review page (PLAN_READY state)."""
 
-from fasthtml.common import Div, H1, H3, P, Form, Button, Section
+from fasthtml.common import Div, H1, H3, P, Form, Button, Section, A
 
 from user_app.frontend.layout import page_layout
 
@@ -37,13 +37,17 @@ def plan_review_page(project):
             ),
             meta,
             Div(*section_cards, cls="plan-sections"),
-            Form(
-                Button("Approve & Continue", cls="button button-primary", type="submit"),
-                method="post", action=f"/projects/{pid}/approve",
+            Div(
+                Form(
+                    Button("Approve & Continue", cls="button button-primary", type="submit"),
+                    method="post", action=f"/projects/{pid}/approve",
+                ),
+                A("Exit", href="/", cls="button button-secondary"),
+                cls="button-group",
             ),
             cls="step-content",
         ),
         cls="step",
     )
 
-    return page_layout(content, title="Okenaba - Review Plan", project_id=pid, active_nav="overview")
+    return page_layout(content, title="Okenaba - Review Plan", project_id=pid, active_nav="projects")

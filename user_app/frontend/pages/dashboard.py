@@ -17,7 +17,7 @@ _FRIENDLY_STATE = {
 }
 
 
-def dashboard_page(user, projects):
+def dashboard_page(user, projects, show_new_button=True):
     """Show welcome CTA if no projects, otherwise project cards."""
     if not projects:
         content = Section(
@@ -44,25 +44,36 @@ def dashboard_page(user, projects):
             state = p.state.value
             friendly = _FRIENDLY_STATE.get(state, state.replace("_", " "))
             cards.append(
-                A(
-                    Div(name, cls="project-card-name"),
-                    Span(friendly, cls=f"state-badge state-badge--{state}"),
-                    href=f"/projects/{p.id}",
+                Div(
+                    A(
+                        Div(name, cls="project-card-name"),
+                        Span(friendly, cls=f"state-badge state-badge--{state}"),
+                        href=f"/projects/{p.id}",
+                        cls="project-card-link",
+                    ),
+                    Form(
+                        Button("Delete", cls="button-delete", type="submit",
+                               onclick="return confirm('Delete this project? This cannot be undone.')"),
+                        method="post", action=f"/projects/{p.id}/delete",
+                    ),
                     cls="project-card",
                 ),
             )
-        content = Div(
-            Div(
-                H1("Your Projects", cls="step-title"),
-                Div(*cards, cls="project-grid"),
+        children = [
+            H1("Your Projects", cls="step-title"),
+            Div(*cards, cls="project-grid"),
+        ]
+        if show_new_button:
+            children.append(
                 Form(
                     Button("New Project", cls="button button-primary", type="submit",
                            style="margin-top:2rem;max-width:300px"),
                     method="post", action="/projects",
                 ),
-                cls="step-content",
-            ),
+            )
+        content = Div(
+            Div(*children, cls="step-content"),
             cls="dashboard-content",
         )
 
-    return page_layout(content, title="Okenaba - Dashboard")
+    return page_layout(content, title="Okenaba - Dashboard", active_nav="projects")

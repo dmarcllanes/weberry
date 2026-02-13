@@ -46,8 +46,12 @@ def published_page(project, public_url, trial_info=None):
                     ),
                     cls="next-steps",
                 ),
-                A("Back to Dashboard", href="/", cls="button button-secondary",
-                  style="margin-top:1rem"),
+                Div(
+                    A("Edit Content", href=f"/projects/{pid}/edit", cls="button button-primary"),
+                    A("Back to Dashboard", href="/", cls="button button-secondary"),
+                    cls="button-group",
+                    style="margin-top:1rem",
+                ),
                 cls="step-content",
             ),
             cls="step",
@@ -55,4 +59,4 @@ def published_page(project, public_url, trial_info=None):
         cls="project-page",
     )
 
-    return page_layout(content, title="Okenaba - Published!", project_id=pid, active_nav="overview")
+    return page_layout(content, title="Okenaba - Published!", project_id=pid, active_nav="projects")
