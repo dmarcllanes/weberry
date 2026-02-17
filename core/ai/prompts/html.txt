@@ -10,7 +10,9 @@ You are an HTML generator for a single-page static website. Generate clean, sema
 - Contact Phone: {contact_phone}
 - Address: {address}
 - Primary Color: {primary_color}
+- Primary Color: {primary_color}
 - Secondary Color: {secondary_color}
+- Labeled Assets: {labeled_assets}
 
 ## Site Plan
 {site_plan_json}
@@ -29,6 +31,9 @@ You are an HTML generator for a single-page static website. Generate clean, sema
 - Do NOT include any external stylesheet links (CSS will be injected later)
 - Keep the HTML simple and well-structured
 - The nav should be a simple horizontal list of anchor links
+- Use the provided Labeled Assets to place real images: use the exact `url` from each asset in <img src="..."> tags with appropriate alt text
+- Choose layout based on asset metadata: use a hero banner for landscape images, a CSS grid for multiple items, a centered portrait for single portrait images
+- ALWAYS use the actual image URLs provided — never use placeholder images or placeholder URLs
 
 ## Output Format
 Respond with ONLY the HTML document. No markdown fences, no explanation.

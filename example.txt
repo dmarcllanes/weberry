@@ -1,0 +1,51 @@
+Here are three distinct examples of business information you can use to mimic a complete user workflow, ranging from a professional service to a creative portfolio.
+
+Example 1: High-End Service Business (Modern & Professional)
+This is perfect for testing the "Service" website type with a clean, trustworthy feel.
+
+Business Name: Zenith Architecture Group
+Tagline: Designing the Future of Sustainable Living
+Website Type: Service Business
+Primary Goal: Lead Generation / Portfolio Showcase
+Description: A premier architecture firm specializing in eco-friendly residential designs and urban revitalization projects. We blend modern aesthetics with sustainable engineering.
+Services: Sustainable Design, Urban Planning, Interior Architecture, Renovation Consulting
+Contact: hello@zenitharch.com | 
+(555) 123-4567
+Theme: Navy Blue (#1e3a8a), Slate Gray (#64748b), and White.
+Example 2: Creative Portfolio (Vibrant & Bold)
+Use this to test layout flexibility and how the AI handles "Creative" or "Portfolio" types.
+
+Business Name: Studio Neon Pulse
+Tagline: Digital Magic for Bold Brands
+Website Type: Portfolio / Creative Agency
+Primary Goal: Brand Awareness / Creative Showcase
+Description: A boutique digital agency that crafts high-impact visual identities and immersive web experiences for early-stage startups.
+Services: Motion Graphics, UI/UX Design, Brand Identity, Webflow Development
+Contact: collab@neonpulse.io | 
+(555) 987-6543
+Theme: Cyber Purple (#7c3aed), Electric Pink (#db2777), and Dark Mode (#0f172a).
+Example 3: Local "Main Street" Shop (Warm & Approachable)
+Great for testing a "Storefront" type or a more traditional service business.
+
+Business Name: The Roasted Bean & Co.
+Tagline: Your Daily Dose of Community
+Website Type: Local Storefront / Cafe
+Primary Goal: Informational / In-Person Visits
+Description: A cozy neighborhood coffee roastery and bakery dedicated to ethically sourced beans and handmade pastries. We’re the living room of our community.
+Services: Small-Batch Roasting, Catering, Workspace Rental, Pastry Subscriptions
+Contact: coffee@roastedbean.co | 123 Maple Ave, Oakwood
+Theme: Earthy Brown (#78350f), Sage Green (#16a34a), and Cream (#fef3c7).
+How to use these in your workflow:
+Onboarding: Enter the name and tagline from one of these examples.
+Goals: Select the goal that matches (e.g., "Lead Gen" for Architecture).
+Details: Copy/paste the description and services.
+Preview: See how the "Preview Your Site" page renders the specific services and theme.
+Dashboard: Click Details on the project card to see this info pop up in the new modal we just built!
+Good
+Bad
+Review Changes
+
+
+
+
+

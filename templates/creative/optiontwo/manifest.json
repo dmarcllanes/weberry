@@ -1,0 +1,38 @@
+{
+  "id": "creative/optiontwo",
+  "name": "Mary Hardy Portfolio",
+  "description": "Personal branding and portfolio template for digital experts and creatives.",
+  "intent": "portfolio",
+  "optional_sections": ["intro", "skills", "experience", "services", "portfolio", "testimonials", "blog"],
+  "slots": {
+    "header_image": "portrait",
+    "intro_image": "portrait",
+    "client1_image": "square",
+    "client2_image": "square",
+    "client3_image": "square",
+    "client4_image": "square",
+    "client5_image": "square",
+    "portfolio1_image": "landscape",
+    "portfolio2_image": "landscape",
+    "portfolio3_image": "landscape",
+    "portfolio4_image": "landscape",
+    "portfolio5_image": "landscape",
+    "portfolio6_image": "landscape",
+    "blog1_image": "landscape",
+    "blog2_image": "landscape",
+    "blog3_image": "landscape",
+    "banner_image": "landscape"
+  },
+  "keywords": ["creative", "portfolio", "personal", "digital", "expert"],
+  "copy_keys": [
+    "hero_tagline", "hero_headline", "hero_subheadline", "hero_description",
+    "cta_button_text",
+    "about_headline", "about_description",
+    "cta_headline", "cta_description",
+    "contact_phone", "contact_email"
+  ],
+  "list_keys": {
+    "services_list": ["title", "description"],
+    "testimonials_list": ["text", "author", "role"]
+  }
+}

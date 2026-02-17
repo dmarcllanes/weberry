@@ -13,6 +13,17 @@ class InvalidStateTransition(CoreError):
         )
 
 
+class TrialExpiredError(CoreError):
+    """Raised when a user on the DRAFTER plan has exceeded the trial duration."""
+
+    def __init__(self, plan_type: str, days_active: int):
+        self.plan_type = plan_type
+        self.days_active = days_active
+        super().__init__(
+            f"Trial expired for {plan_type} plan after {days_active} days."
+        )
+
+
 class AILimitExceeded(CoreError):
     """Raised when a user has exhausted their AI usage quota."""
 

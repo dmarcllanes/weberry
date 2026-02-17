@@ -1,0 +1,17 @@
+{
+  "id": "creative/optionone",
+  "name": "Bold Personal Portfolio",
+  "description": "Minimalist dark portfolio with bold typography and hero image",
+  "intent": "presence",
+  "optional_sections": [],
+  "slots": {
+    "hero_image": "portrait",
+    "hero_bg": "landscape"
+  },
+  "keywords": ["creative", "portfolio", "designer", "personal"],
+  "copy_keys": [
+    "hero_headline", "hero_subheadline", "cta_button_text",
+    "about_description"
+  ],
+  "list_keys": {}
+}

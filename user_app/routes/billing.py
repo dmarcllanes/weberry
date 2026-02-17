@@ -24,3 +24,9 @@ async def trial_status(req, project_id: str):
         "days_remaining": days_remaining(trial_ends_at),
         "is_paused": row.get("is_paused", False),
     }
+
+
+async def show_billing(req):
+    from user_app.frontend.pages.billing import billing_page
+    user = req.scope["user"]
+    return billing_page(user)

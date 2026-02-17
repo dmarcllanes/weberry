@@ -10,6 +10,9 @@ Modify as you add/change files.
 
 import sys
 from datetime import datetime, timezone, timedelta
+from dotenv import load_dotenv
+
+load_dotenv()
 
 LIVE_MODE = "--live" in sys.argv
 passed = 0
@@ -35,16 +38,17 @@ print("\n--- config/settings.py ---")
 
 def test_settings_loads():
     from config.settings import (
-        NVIDIA_API_KEY, NVIDIA_MODEL, AI_LIMITS,
+        HF_API_KEY, HF_MODELS, AI_LIMITS,
         RATE_LIMIT_MAX_CALLS, RATE_LIMIT_WINDOW_SECONDS,
         AI_COOLDOWN_SECONDS,
     )
     assert isinstance(AI_LIMITS, dict)
-    assert "FREE" in AI_LIMITS and "PAID" in AI_LIMITS
-    assert AI_LIMITS["FREE"]["planner_calls"] == 1
-    assert AI_LIMITS["PAID"]["planner_calls"] == 5
+    assert "DRAFTER" in AI_LIMITS and "VALIDATOR" in AI_LIMITS
+    assert AI_LIMITS["DRAFTER"]["planner_calls"] == 1
+    assert AI_LIMITS["VALIDATOR"]["planner_calls"] == 10
     assert isinstance(RATE_LIMIT_MAX_CALLS, int)
     assert isinstance(AI_COOLDOWN_SECONDS, int)
+    assert "copy" in HF_MODELS and "code" in HF_MODELS
 
 test("settings load and have correct values", test_settings_loads)
 
@@ -75,8 +79,8 @@ def test_error_messages():
     from core.state_machine.states import ProjectState
     e1 = InvalidStateTransition(ProjectState.DRAFT, ProjectState.PUBLISHED)
     assert "draft" in str(e1) and "published" in str(e1)
-    e2 = AILimitExceeded("planner", "FREE")
-    assert "planner" in str(e2) and "FREE" in str(e2)
+    e2 = AILimitExceeded("planner", "DRAFTER")
+    assert "planner" in str(e2) and "DRAFTER" in str(e2)
     e3 = AICooldownActive(15.0)
     assert "15" in str(e3)
 
@@ -109,11 +113,11 @@ print("\n--- core/models/user.py ---")
 def test_user_creation():
     from core.models.user import User, PlanType
     u = User(id="u1", email="a@b.com")
-    assert u.plan == PlanType.FREE  # default is FREE
-    u2 = User(id="u2", email="b@b.com", plan=PlanType.PAID)
-    assert u2.plan == PlanType.PAID
+    assert u.plan == PlanType.DRAFTER  # default is DRAFTER
+    u2 = User(id="u2", email="b@b.com", plan=PlanType.VALIDATOR)
+    assert u2.plan == PlanType.VALIDATOR
 
-test("user defaults to FREE plan", test_user_creation)
+test("user defaults to DRAFTER plan", test_user_creation)
 
 
 # ============================================================
@@ -130,7 +134,20 @@ def test_brand_memory():
     assert bm.services == []  # default empty list
     assert bm.primary_color == "#2563eb"
 
+def test_brand_memory_intent():
+    from core.models.brand_memory import BrandMemory, ProjectIntent
+    bm = BrandMemory(
+        business_name="Test", website_type="portfolio", primary_goal="showcase",
+        project_intent=ProjectIntent.PRESENCE
+    )
+    assert bm.project_intent == ProjectIntent.PRESENCE
+    bm2 = BrandMemory(
+        business_name="Test", website_type="portfolio", primary_goal="showcase"
+    )
+    assert bm2.project_intent == ProjectIntent.VALIDATION  # default
+
 test("brand memory has sensible defaults", test_brand_memory)
+test("brand memory handles project intent", test_brand_memory_intent)
 
 
 # ============================================================
@@ -303,10 +320,10 @@ def test_free_plan_limit():
     from core.models.user import PlanType
     from core.errors import AILimitExceeded
     u = AIUsage()
-    check_ai_limit(u, PlanType.FREE, "planner")  # 0 < 1
+    check_ai_limit(u, PlanType.DRAFTER, "planner")  # 0 < 1
     increment_usage(u, "planner")
     try:
-        check_ai_limit(u, PlanType.FREE, "planner")  # 1 >= 1
+        check_ai_limit(u, PlanType.DRAFTER, "planner")  # 1 >= 1
         assert False
     except AILimitExceeded:
         pass
@@ -316,17 +333,17 @@ def test_paid_plan_limit():
     from core.models.ai_usage import AIUsage
     from core.models.user import PlanType
     from core.errors import AILimitExceeded
-    u = AIUsage(planner_calls=4)
-    check_ai_limit(u, PlanType.PAID, "planner")  # 4 < 5
+    u = AIUsage(planner_calls=9)
+    check_ai_limit(u, PlanType.VALIDATOR, "planner")  # 9 < 10
     increment_usage(u, "planner")
     try:
-        check_ai_limit(u, PlanType.PAID, "planner")  # 5 >= 5
+        check_ai_limit(u, PlanType.VALIDATOR, "planner")  # 10 >= 10
         assert False
     except AILimitExceeded:
         pass
 
-test("free plan: 1 planner call allowed", test_free_plan_limit)
-test("paid plan: 5 planner calls allowed", test_paid_plan_limit)
+test("drafter plan: 1 planner call allowed", test_free_plan_limit)
+test("validator plan: 10 planner calls allowed", test_paid_plan_limit)
 
 
 # ============================================================
@@ -536,7 +553,7 @@ if LIVE_MODE:
 
         reset()
 
-        user = User(id="test-user", email="t@t.com", plan=PlanType.FREE)
+        user = User(id="test-user", email="t@t.com", plan=PlanType.DRAFTER)
         project = Project(id="test-project", user_id=user.id)
         project.brand_memory = BrandMemory(
             business_name="Sunrise Bakery",
@@ -583,7 +600,7 @@ if LIVE_MODE:
         from core.ai.gateway import generate_plan
         from core.errors import AILimitExceeded
 
-        user = User(id="limit-user", email="t@t.com", plan=PlanType.FREE)
+        user = User(id="limit-user", email="t@t.com", plan=PlanType.DRAFTER)
         project = Project(id="limit-project", user_id=user.id, state=ProjectState.MEMORY_READY)
         project.brand_memory = BrandMemory(
             business_name="Test", website_type="test", primary_goal="test",

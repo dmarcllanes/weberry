@@ -1,0 +1,43 @@
+{
+  "id": "travel/optionone",
+  "name": "Royal Hotels",
+  "description": "Elegant travel and hotel booking template with property showcase, step-by-step guide, and inspiration section",
+  "intent": "service",
+  "optional_sections": ["hotels", "steps", "inspiration", "property", "trip", "contact"],
+  "slots": {
+    "hotel1_image": "square",
+    "hotel2_image": "square",
+    "hotel3_image": "square",
+    "steps1_image": "square",
+    "steps2_image": "square",
+    "steps3_image": "square",
+    "inspiration1_image": "portrait",
+    "inspiration2_image": "portrait",
+    "inspiration3_image": "portrait",
+    "inspiration4_image": "portrait",
+    "inspiration5_image": "portrait",
+    "inspiration6_image": "portrait",
+    "property1_image": "landscape",
+    "property2_image": "landscape",
+    "property3_image": "landscape",
+    "property4_image": "landscape",
+    "trip1_image": "landscape",
+    "trip2_image": "landscape",
+    "trip3_image": "landscape",
+    "trip4_image": "landscape"
+  },
+  "keywords": ["travel", "hotel", "booking", "trip", "vacation"],
+  "copy_keys": [
+    "hero_headline", "hero_subheadline", "cta_button_text",
+    "features_headline",
+    "about_headline",
+    "services_headline", "services_description",
+    "testimonials_headline", "testimonials_description",
+    "cta_headline", "cta_description"
+  ],
+  "list_keys": {
+    "features_list": ["title", "price"],
+    "about_list": ["title", "description"],
+    "testimonials_list": ["title", "location", "reviews"]
+  }
+}

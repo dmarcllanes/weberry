@@ -3,6 +3,7 @@ Okenaba — FastHTML app entry point.
 Start with: python user_app/main.py
 """
 
+import os
 import sys
 from pathlib import Path
 
@@ -12,34 +13,102 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from dotenv import load_dotenv
 load_dotenv()
 
-from fasthtml.common import fast_app, serve, Beforeware
+from fasthtml.common import fast_app, serve, Beforeware, RedirectResponse
+from starlette.responses import JSONResponse
 
 from user_app.auth.guards import auth_beforeware
+from user_app.auth.login import get_or_create_user
+from user_app.frontend.pages.login import login_page
+from user_app.frontend.pages.landing import landing_page
 from user_app.routes import projects, generation, editing, publishing, billing
+from user_app.routes import help as help_routes
 
 # --- Beforeware ---
 
 bw = Beforeware(
     auth_beforeware,
-    skip=[r'/favicon\.ico', r'/static/.*', r'/sites/.*', r'/landing'],
+    skip=[
+        r'^/$',
+        r'/favicon\.ico',
+        r'/static/.*',
+        r'/sites/.*',
+        r'/landing',
+        r'/login',
+        r'/api/auth/.*',
+        r'/logout',
+        r'/sw.js',
+    ],
 )
 
 # --- App ---
 
 PROJECT_ROOT = str(Path(__file__).resolve().parent.parent)
-app, rt = fast_app(before=bw, static_path=PROJECT_ROOT)
+
+SECRET_KEY = os.environ.get("SESSION_SECRET", "okenaba-dev-secret-change-me")
+
+app, rt = fast_app(
+    before=bw,
+    static_path=PROJECT_ROOT,
+    secret_key=SECRET_KEY,
+    pico=False,
+)
+
+# --- Routes: Auth ---
+
+@rt("/login")
+def get(req):
+    return login_page()
+
+
+@rt("/api/auth/session")
+async def post(req, sess):
+    try:
+        body = await req.json()
+    except Exception:
+        body = dict(await req.form())
+    user_id = body.get("user_id")
+    email = body.get("email")
+    full_name = body.get("full_name")
+    avatar_url = body.get("avatar_url")
+    if not user_id or not email:
+        return JSONResponse({"error": "missing user_id or email"}, status_code=400)
+
+    get_or_create_user(user_id, email, full_name, avatar_url)
+    sess["user_id"] = user_id
+    if avatar_url:
+        sess["avatar_url"] = avatar_url
+    return JSONResponse({"status": "success"})
+
+
+@rt("/logout")
+async def post(req, sess):
+    sess.clear()
+    return RedirectResponse("/?logged_out=1", status_code=303)
+
 
 # --- Routes: Landing page (public, no auth) ---
 # TODO: Import and wire up your landing page here.
-#   from user_app.frontend.pages.landing import landing_page
-#
-#   @rt("/landing")
-#   def get(req):
-#       return landing_page()
 
-# --- Routes: Dashboard ---
+# --- Routes: Projects ---
 
 @rt("/")
+def get(req, sess):
+    if sess.get("user_id"):
+        return RedirectResponse("/projects", status_code=303)
+    return landing_page()
+
+
+@rt("/dashboard")
+def get(req):
+    return RedirectResponse("/projects", status_code=303)
+
+
+@rt("/project")
+def get(req):
+    return RedirectResponse("/projects", status_code=303)
+
+
+@rt("/projects")
 def get(req):
     return projects.dashboard(req)
 
@@ -73,11 +142,26 @@ async def post(req, project_id: str):
     return await projects.save_memory(req, project_id)
 
 
+@rt("/projects/{project_id}/braindump")
+async def post(req, project_id: str):
+    return await projects.braindump(req, project_id)
+
+
+@rt("/projects/{project_id}/assets")
+async def post(req, project_id: str):
+    return await projects.upload_asset(req, project_id)
+
+
+@rt("/projects/{project_id}/assets")
+async def delete(req, project_id: str):
+    return await projects.delete_asset(req, project_id)
+
+
 # --- Routes: Profile & Site detail ---
 
-@rt("/projects/{project_id}/profile")
+@rt("/projects/{project_id}/details")
 async def get(req, project_id: str):
-    return await projects.show_profile(req, project_id)
+    return await projects.get_brand_details(req, project_id)
 
 
 @rt("/projects/{project_id}/site")
@@ -126,6 +210,11 @@ async def post(req, project_id: str):
     return await editing.edit_content(req, project_id)
 
 
+@rt("/projects/{project_id}/edit-image")
+async def post(req, project_id: str):
+    return await editing.edit_image(req, project_id)
+
+
 # --- Routes: Publishing ---
 
 @rt("/projects/{project_id}/publish")
@@ -144,6 +233,16 @@ async def get(req, project_id: str):
 async def get(req, project_id: str):
     return await billing.trial_status(req, project_id)
 
+
+@rt("/billing")
+async def get(req):
+    return await billing.show_billing(req)
+
+# --- Routes: Help ---
+
+@rt("/help")
+async def get(req):
+    return await help_routes.show_help(req)
 
 # --- Start ---
 

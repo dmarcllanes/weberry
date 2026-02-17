@@ -1,0 +1,38 @@
+{
+  "id": "travel/optiontwo",
+  "name": "Tourguide",
+  "description": "Comprehensive travel agency template with tour types, destination grid, and blog section.",
+  "intent": "service",
+  "optional_sections": ["about", "tours", "destinations", "reviews", "blog"],
+  "slots": {
+    "header_image": "landscape",
+    "about_image": "landscape",
+    "tour1_image": "square",
+    "tour2_image": "square",
+    "tour3_image": "square",
+    "tour4_image": "square",
+    "destination1_image": "landscape",
+    "destination2_image": "landscape",
+    "destination3_image": "landscape",
+    "review_image": "square",
+    "blog1_image": "landscape",
+    "blog2_image": "landscape",
+    "blog3_image": "landscape",
+    "banner1_image": "landscape",
+    "banner2_image": "landscape",
+    "banner3_image": "landscape",
+    "banner4_image": "landscape",
+    "banner5_image": "landscape"
+  },
+  "keywords": ["travel", "agency", "tour", "destination", "holidays"],
+  "copy_keys": [
+    "hero_headline", "hero_description",
+    "about_headline", "about_description",
+    "tours_headline",
+    "destinations_headline",
+    "testimonials_headline"
+  ],
+  "list_keys": {
+    "testimonials_list": ["text", "author", "role"]
+  }
+}

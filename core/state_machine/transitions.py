@@ -4,7 +4,7 @@ from core.state_machine.states import ProjectState
 VALID_TRANSITIONS: dict[ProjectState, list[ProjectState]] = {
     ProjectState.DRAFT: [ProjectState.INPUT_READY],
     ProjectState.INPUT_READY: [ProjectState.MEMORY_READY],
-    ProjectState.MEMORY_READY: [ProjectState.PLAN_READY],
+    ProjectState.MEMORY_READY: [ProjectState.PLAN_READY, ProjectState.SITE_GENERATED],
     ProjectState.PLAN_READY: [ProjectState.PLAN_APPROVED],
     ProjectState.PLAN_APPROVED: [ProjectState.SITE_GENERATED],
     ProjectState.SITE_GENERATED: [ProjectState.PREVIEW],

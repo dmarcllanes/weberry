@@ -2,7 +2,7 @@ from pathlib import Path
 
 from openai import OpenAI
 
-from config.settings import NVIDIA_API_KEY, NVIDIA_MODEL, NVIDIA_BASE_URL
+from config.settings import HF_API_KEY, HF_MODELS, HF_BASE_URL
 from core.models.brand_memory import BrandMemory
 from core.ai.schemas import CSSOutput
 from core.errors import AIGenerationError, AIValidationError
@@ -51,14 +51,15 @@ def _validate_css(css: str) -> None:
 
 
 def run_css_generator(html: str, memory: BrandMemory) -> CSSOutput:
-    """Call LLM via OpenRouter to generate CSS for the given HTML and brand memory."""
+    """Call LLM via HF Inference (Qwen2.5) to generate CSS."""
     prompt = _build_prompt(html, memory)
 
-    client = OpenAI(base_url=NVIDIA_BASE_URL, api_key=NVIDIA_API_KEY, max_retries=5)
+    client = OpenAI(base_url=HF_BASE_URL, api_key=HF_API_KEY, max_retries=5)
     try:
         response = client.chat.completions.create(
-            model=NVIDIA_MODEL,
+            model=HF_MODELS["code"],
             messages=[{"role": "user", "content": prompt}],
+            max_tokens=4000,
         )
     except Exception as e:
         raise AIGenerationError("css_generator", str(e)) from e

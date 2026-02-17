@@ -1,0 +1,23 @@
+{
+  "id": "ecommerce/optiontwo",
+  "name": "Hut Music Shop",
+  "description": "Modern music equipment ecommerce template with features section and testimonial slider.",
+  "intent": "product",
+  "optional_sections": ["features", "music", "testimonials", "discount"],
+  "slots": {
+    "header_image": "square",
+    "music_image": "square",
+    "discount_image": "square"
+  },
+  "keywords": ["ecommerce", "music", "shop", "headphones", "modern"],
+  "copy_keys": [
+    "hero_subheadline", "hero_headline", "cta_button_text",
+    "features_headline",
+    "music_headline", "music_description",
+    "testimonials_headline",
+    "discount_headline", "discount_description"
+  ],
+  "list_keys": {
+    "testimonials_list": ["text", "author", "role"]
+  }
+}

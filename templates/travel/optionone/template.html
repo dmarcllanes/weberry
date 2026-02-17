@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="{{ meta_description }}" />
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet" />
+    <title>{{ page_title }}</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap">
+</head>
+
+<body>
+    <header>
+        <nav>
+            <div class="nav__header">
+                <div class="nav__logo">
+                    <a href="#">{{ business_name | default('R.H.') }}</a>
+                </div>
+                <div class="nav__menu__btn" id="menu-btn">
+                    <i class="ri-menu-3-line"></i>
+                </div>
+            </div>
+            <ul class="nav__links" id="nav-links">
+                <li><a href="#home">HOME</a></li>
+                <li><a href="#hotel">HOTELS</a></li>
+                <li><a href="#property">PROPERTIES</a></li>
+                <li><a href="#blog">BLOGS</a></li>
+                <li><a href="#contact">CONTACT</a></li>
+            </ul>
+        </nav>
+
+        <div class="section__container header__container" id="home">
+            <h1>{{ hero_headline }}</h1>
+            <div class="header__content">
+                <p class="section__description">
+                    {{ hero_subheadline }}
+                </p>
+                <div class="header__btns">
+                    <button class="btn">Explore Hotels</button>
+                    <button class="btn">Login</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    {% if section_hotels %}
+    <section class="hotel" id="hotel">
+        <div class="section__container hotel__container">
+            <h2 class="section__header">{{ features_headline }}</h2>
+            <div class="hotel__grid">
+                {% for feature in features_list %}
+                <div class="hotel__card">
+                    <div class="hotel__image">
+                        <div class="hotel__rating">
+                            <span><i class="ri-star-fill"></i></span>
+                            <span><i class="ri-star-fill"></i></span>
+                            <span><i class="ri-star-fill"></i></span>
+                            <span><i class="ri-star-fill"></i></span>
+                        </div>
+                        <img src="{{ hotel1_image_url if loop.index == 1 else (hotel2_image_url if loop.index == 2 else hotel3_image_url) }}"
+                            alt="hotel" />
+                    </div>
+                    <h4>{{ feature.title }}</h4>
+                    <p>{{ feature.price | default('$300') }}<span>/night</span></p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    {% if section_steps %}
+    <section class="section__container steps__container">
+        <h2 class="section__header">{{ about_headline }}</h2>
+        <div class="steps__grid">
+            <div class="steps__card">
+                <img src="{{ steps1_image_url }}" alt="steps" />
+                <h4>{{ about_list[0].title if about_list and about_list|length > 0 else 'Step 1' }}</h4>
+                <p class="section__description">
+                    {{ about_list[0].description if about_list and about_list|length > 0 else 'Description' }}
+                </p>
+            </div>
+            <div class="steps__card">
+                <img src="{{ steps2_image_url }}" alt="steps" />
+                <h4>{{ about_list[1].title if about_list and about_list|length > 1 else 'Step 2' }}</h4>
+                <p class="section__description">
+                    {{ about_list[1].description if about_list and about_list|length > 1 else 'Description' }}
+                </p>
+            </div>
+            <div class="steps__card">
+                <img src="{{ steps3_image_url }}" alt="steps" />
+                <h4>{{ about_list[2].title if about_list and about_list|length > 2 else 'Step 3' }}</h4>
+                <p class="section__description">
+                    {{ about_list[2].description if about_list and about_list|length > 2 else 'Description' }}
+                </p>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    {% if section_inspiration %}
+    <section class="inspiration">
+        <h2 class="section__header">{{ services_headline }}</h2>
+        <p class="section__description">
+            {{ services_description }}
+        </p>
+        <div class="inspiration__wrapper">
+            <div class="inspiration__card">
+                <img src="{{ inspiration1_image_url }}" alt="inspiration" />
+                <h4>Paris</h4>
+                <p>France</p>
+            </div>
+            <div class="inspiration__card">
+                <img src="{{ inspiration2_image_url }}" alt="inspiration" />
+                <h4>Rome</h4>
+                <p>Italy</p>
+            </div>
+            <div class="inspiration__card">
+                <img src="{{ inspiration3_image_url }}" alt="inspiration" />
+                <h4>Santorini</h4>
+                <p>Greece</p>
+            </div>
+            <div class="inspiration__card">
+                <img src="{{ inspiration4_image_url }}" alt="inspiration" />
+                <h4>Beijing</h4>
+                <p>China</p>
+            </div>
+            <div class="inspiration__card">
+                <img src="{{ inspiration5_image_url }}" alt="inspiration" />
+                <h4>London</h4>
+                <p>England</p>
+            </div>
+            <div class="inspiration__card">
+                <img src="{{ inspiration6_image_url }}" alt="inspiration" />
+                <h4>Tokyo</h4>
+                <p>Japan</p>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    {% if section_property %}
+    <section class="property" id="property">
+        <div class="section__container property__container">
+            <h2 class="section__header">{{ testimonials_headline }}</h2>
+            <p class="section__description">
+                {{ testimonials_description }}
+            </p>
+            <div class="property__grid">
+                {% for property in testimonials_list %}
+                <div class="property__card">
+                    <img src="{{ property1_image_url if loop.index == 1 else (property2_image_url if loop.index == 2 else (property3_image_url if loop.index == 3 else property4_image_url)) }}"
+                        alt="property" />
+                    <div class="property__card__content">
+                        <h4>{{ property.title | default('Luxury Villa') }}</h4>
+                        <p>{{ property.location | default('Unknown') }}</p>
+                        <h5>
+                            <span>9.5</span>
+                            {{ property.reviews | default('100') }} Reviews
+                        </h5>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    {% if section_trip %}
+    <section class="section__container trip__container" id="trip">
+        <h2 class="section__header">Get inspiration for your next trip</h2>
+        <div class="trip__grid">
+            <div class="trip__card">
+                <img src="{{ trip1_image_url }}" alt="trip" />
+                <h4>Top 10 Luxury Stays with {{ business_name }}</h4>
+                <p>July 27, 2024</p>
+            </div>
+            <div class="trip__card">
+                <img src="{{ trip2_image_url }}" alt="trip" />
+                <h4>Inside Our Most Booked {{ business_name }} Hotels</h4>
+                <p>Sep 15, 2024</p>
+            </div>
+            <div class="trip__card">
+                <img src="{{ trip3_image_url }}" alt="trip" />
+                <h4>Most Booked {{ business_name }} Hotels Revealed</h4>
+                <p>Dec 09, 2024</p>
+            </div>
+            <div class="trip__card">
+                <img src="{{ trip4_image_url }}" alt="trip" />
+                <h4>How to Choose the Perfect Hotel for Your Vacation</h4>
+                <p>Feb 18, 2025</p>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    {% if section_contact %}
+    <section class="discount" id="contact">
+        <div class="section__container">
+            <div class="discount__container">
+                <div class="discount__content">
+                    <h2 class="section__header">{{ cta_headline }}</h2>
+                    <p class="section__description">
+                        {{ cta_description }}
+                    </p>
+                </div>
+                <div class="discount__btns">
+                    <button class="btn">{{ cta_button_text }}</button>
+                    <button class="btn">Sign In</button>
+                </div>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    <footer>
+        <div class="section__container footer__container">
+            <div class="footer__col">
+                <a href="#" class="footer__logo">{{ business_name }}</a>
+            </div>
+            <div class="footer__col">
+                <ul class="footer__links">
+                    <li><a href="#">Help</a></li>
+                    <li><a href="#">Privacy Settings</a></li>
+                    <li><a href="#">Log In</a></li>
+                </ul>
+            </div>
+            <div class="footer__col">
+                <ul class="footer__links">
+                    <li><a href="#">Cookie Policy</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms & Services</a></li>
+                    <li><a href="#">Company Details</a></li>
+                </ul>
+            </div>
+            <div class="footer__col">
+                <ul class="footer__links">
+                    <li><a href="#">Explore</a></li>
+                    <li><a href="#">Category</a></li>
+                    <li><a href="#">Partners</a></li>
+                    <li><a href="#">Trips</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer__bar">
+            Copyright &copy; 2025 {{ business_name }}. All rights reserved.
+        </div>
+    </footer>
+
+    
+    
+</body>
+
+</html>

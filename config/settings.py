@@ -1,18 +1,32 @@
 import os
 
-NVIDIA_API_KEY = os.environ.get("NVIDIA_API_KEY", "")
-NVIDIA_MODEL = os.environ.get("NVIDIA_MODEL", "nvidia/llama-3.1-nemotron-ultra-253b-v1")
-NVIDIA_BASE_URL = "https://integrate.api.nvidia.com/v1"
+HF_API_KEY = os.environ.get("HF_API_KEY", "")
+HF_INFERENCE_URL = "https://router.huggingface.co/models"
+HF_BASE_URL = "https://router.huggingface.co/v1"
+
+# Model Router
+HF_MODELS = {
+    # Logic Engine: Metadata analysis, routing, simple decisions
+    "logic": "meta-llama/Llama-3.3-70B-Instruct",
+    # Copywriter: Sales letters, bio, creative text (Planner)
+    "copy": "meta-llama/Llama-3.3-70B-Instruct",
+    # Architect: Valid HTML/CSS generation
+    "code": "meta-llama/Llama-3.3-70B-Instruct",
+}
 
 # AI usage limits per plan
 AI_LIMITS = {
-    "FREE": {
+    "DRAFTER": {
         "planner_calls": 1,
         "generation_calls": 1,
     },
-    "PAID": {
-        "planner_calls": 5,
-        "generation_calls": 5,
+    "VALIDATOR": {
+        "planner_calls": 10,
+        "generation_calls": 10,
+    },
+    "AGENCY": {
+        "planner_calls": float("inf"),
+        "generation_calls": float("inf"),
     },
 }
 
@@ -26,7 +40,9 @@ AI_COOLDOWN_SECONDS = int(os.environ.get("AI_COOLDOWN_SECONDS", "30"))
 # Supabase
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "")
 SUPABASE_SERVICE_KEY = os.environ.get("SUPABASE_SERVICE_KEY", "")
+SUPABASE_KEY = os.environ.get("SUPABASE_ANON_KEY", "")  # anon key for frontend JS client
 SUPABASE_STORAGE_BUCKET = os.environ.get("SUPABASE_STORAGE_BUCKET", "published-sites")
+SUPABASE_ASSETS_BUCKET = os.environ.get("SUPABASE_ASSETS_BUCKET", "public-assets")
 
 # Database
 DATABASE_URL = os.environ.get("DATABASE_URL", "")

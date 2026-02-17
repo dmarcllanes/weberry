@@ -3,7 +3,7 @@ from pathlib import Path
 
 from openai import OpenAI
 
-from config.settings import NVIDIA_API_KEY, NVIDIA_MODEL, NVIDIA_BASE_URL
+from config.settings import HF_API_KEY, HF_MODELS, HF_BASE_URL
 from core.models.brand_memory import BrandMemory
 from core.ai.schemas import SitePlan, SectionPlan, validate_site_plan
 from core.errors import AIGenerationError
@@ -32,6 +32,10 @@ def _build_prompt(memory: BrandMemory) -> str:
         description=memory.description,
         tagline=memory.tagline,
         services=", ".join(memory.services) if memory.services else "N/A",
+        project_intent=memory.project_intent.value if hasattr(memory.project_intent, "value") else str(memory.project_intent),
+        labeled_assets=str([{"label": a.label, "orientation": a.orientation} for a in memory.labeled_assets])
+        if memory.labeled_assets
+        else "None",
     )
 
 
@@ -64,14 +68,15 @@ def _parse_response(raw: str) -> SitePlan:
 
 
 def run_planner(memory: BrandMemory) -> SitePlan:
-    """Call LLM via OpenRouter to generate a site plan from brand memory."""
+    """Call LLM via HF Inference (DeepSeek-V3) to generate a site plan."""
     prompt = _build_prompt(memory)
 
-    client = OpenAI(base_url=NVIDIA_BASE_URL, api_key=NVIDIA_API_KEY, max_retries=5)
+    client = OpenAI(base_url=HF_BASE_URL, api_key=HF_API_KEY, max_retries=5)
     try:
         response = client.chat.completions.create(
-            model=NVIDIA_MODEL,
+            model=HF_MODELS["copy"],
             messages=[{"role": "user", "content": prompt}],
+            max_tokens=4000,
         )
     except Exception as e:
         raise AIGenerationError("planner", str(e)) from e

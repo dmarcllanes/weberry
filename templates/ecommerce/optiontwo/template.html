@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="{{ meta_description }}" />
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <title>{{ page_title }}</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap">
+</head>
+
+<body>
+    <nav>
+        <div class="logo">
+            <a href="#">{{ business_name | default('Hut') }}<span>.</span></a>
+        </div>
+        <div class="nav__search" id="nav-search">
+            <input type="text" placeholder="Search..." />
+            <span><i class="ri-search-2-line"></i></span>
+        </div>
+    </nav>
+
+    <header class="header">
+        <div class="section__container header__container">
+            <div class="header__image">
+                <img src="{{ header_image_url }}" alt="header" />
+            </div>
+            <div class="header__content">
+                <p class="section__subheader">{{ hero_subheadline | default('New Arrival') }}</p>
+                <h1>{{ hero_headline }}</h1>
+                <div class="header__btn">
+                    <button class="btn">{{ cta_button_text | default('Buy Now') }}</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    {% if section_features %}
+    <section class="section__container feature__container">
+        <p class="section__subheader">Features</p>
+        <h2 class="section__header">{{ features_headline | default('Product Features') }}</h2>
+        <div class="feature__grid">
+            <div class="feature__card">
+                <div><i class="ri-instance-line"></i></div>
+                <h4>Amazing Bass</h4>
+                <p>
+                    Experience deep, thumping lows that make every beat resonate with
+                    powerful intensity.
+                </p>
+            </div>
+            <div class="feature__card">
+                <div><i class="ri-headphone-line"></i></div>
+                <h4>Built-in MIc</h4>
+                <p>
+                    Enjoy crystal-clear calls and voice commands with high-quality
+                    integrated microphone.
+                </p>
+            </div>
+            <div class="feature__card">
+                <div><i class="ri-battery-2-charge-line"></i></div>
+                <h4>Quick Charge</h4>
+                <p>
+                    Get hours of playback with just a few minutes of charging, keeping the
+                    music going.
+                </p>
+            </div>
+            <div class="feature__card">
+                <div><i class="ri-bluetooth-line"></i></div>
+                <h4>Bluetooth 5.0</h4>
+                <p>
+                    Seamlessly connect with stable, high-speed wireless audio for an
+                    uninterrupted listening experience.
+                </p>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    {% if section_music %}
+    <section class="music">
+        <div class="section__container music__container">
+            <div class="music__image">
+                <span><i class="ri-music-2-fill"></i></span>
+                <img src="{{ music_image_url }}" alt="music" />
+            </div>
+            <div class="music__content">
+                <p class="section__subheader">Limited Offer</p>
+                <h2 class="section__header">{{ music_headline | default('Enhance Your Music Experience') }}</h2>
+                <p>
+                    {{ music_description | default('Immerse yourself in superior sound quality with our premium
+                    headphones, designed to deliver every note with clarity and precision. Whether you are a casual
+                    listener or an audiophile, our headphones offer the perfect blend of comfort and style.') }}
+                </p>
+                <div class="music__btn">
+                    <button class="btn">Buy Now</button>
+                </div>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    {% if section_testimonials %}
+    <section class="section__container client__container">
+        <p class="section__subheader">Testimonials</p>
+        <h2 class="section__header">{{ testimonials_headline | default('What Our Clients Say') }}</h2>
+        <!-- Slider main container -->
+        <div class="swiper">
+            <!-- Additional required wrapper -->
+            <div class="swiper-wrapper">
+                <!-- Slides -->
+                {% for review in testimonials_list %}
+                <div class="swiper-slide">
+                    <div class="client__card">
+                        <span><i class="ri-double-quotes-l"></i></span>
+                        <h4>{{ review.author }}</h4>
+                        <h5>{{ review.role | default('Customer') }}</h5>
+                        <p>
+                            {{ review.text }}
+                        </p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <!-- If we need pagination -->
+            <!-- <div class="swiper-pagination"></div> -->
+        </div>
+    </section>
+    {% endif %}
+
+    {% if section_discount %}
+    <section class="discount">
+        <div class="section__container discount__container">
+            <div class="discount__bg">
+                <img src="{{ discount_image_url }}" alt="discount-bg" />
+            </div>
+            <div class="discount__content">
+                <h2 class="section__header">{{ discount_headline | default('Save Big on Our Exclusive Headphone
+                    Collection') }}</h2>
+                <p>
+                    {{ discount_description | default('Experience premium sound for less with our limited-time discount
+                    on top-rated headphones.') }}
+                </p>
+                <div class="discount__btn">
+                    <button class="btn">Buy Now</button>
+                </div>
+            </div>
+            <div class="discount__image">
+                <img src="{{ discount_image_url }}" alt="discount" />
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    <footer>
+        <div class="section__container footer__container">
+            <ul class="footer__links">
+                <li class="footer__logo">
+                    <div class="logo">
+                        <a href="#">{{ business_name }}<span>.</span></a>
+                    </div>
+                </li>
+                <li><a href="#">About Us</a></li>
+                <li><a href="#">Features</a></li>
+                <li><a href="#">Contact Us</a></li>
+            </ul>
+        </div>
+        <div class="footer__bar">
+            Copyright © 2024 {{ business_name }}. All rights reserved.
+        </div>
+    </footer>
+
+    
+    
+    
+</body>
+
+</html>

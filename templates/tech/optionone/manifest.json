@@ -1,0 +1,27 @@
+{
+  "id": "tech/optionone",
+  "name": "Tech Product Showcase",
+  "description": "Bold tech product landing page with feature cards, banner sections, and product grid",
+  "intent": "validation",
+  "optional_sections": ["features", "services", "products", "contact"],
+  "slots": {
+    "hero_image": "landscape",
+    "banner1_image": "landscape",
+    "banner2_image": "landscape",
+    "product_image": "landscape"
+  },
+  "keywords": ["technology", "gaming", "product", "controller"],
+  "copy_keys": [
+    "hero_headline", "hero_subheadline", "cta_button_text",
+    "features_subheadline", "features_headline", "features_description",
+    "service1_title", "service2_title",
+    "products_subheadline", "products_headline", "products_description",
+    "cta_headline", "cta_description",
+    "contact_phone", "contact_email", "address"
+  ],
+  "list_keys": {
+    "features_list": ["title", "description"],
+    "specs_list": ["title", "description"],
+    "products_list": ["title"]
+  }
+}

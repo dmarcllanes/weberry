@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="{{ meta_description }}" />
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet" />
+    <title>{{ page_title }}</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100">
+</head>
+
+<body>
+    <nav>
+        <div class="nav__header">
+            <div class="nav__logo">
+                <a href="#" class="logo">{{ business_name }}</a>
+            </div>
+            <div class="nav__menu__btn" id="menu-btn">
+                <i class="ri-menu-3-line"></i>
+            </div>
+        </div>
+        <ul class="nav__links" id="nav-links">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#menu">Menu</a></li>
+            <li><a href="#categories">Categories</a></li>
+            <li><a href="#contact">Contact Us</a></li>
+        </ul>
+    </nav>
+
+    <header id="home">
+        <div class="header__image">
+            <img src="{{ hero_image_url }}" alt="header" />
+        </div>
+        <div class="header__content">
+            <h1>{{ hero_headline }}</h1>
+            <p class="section__description">{{ hero_subheadline }}</p>
+            <div class="header__btn">
+                <button class="btn">{{ cta_button_text }}</button>
+            </div>
+        </div>
+    </header>
+
+    {% if section_features %}
+    <section class="section__container popular__container" id="menu">
+        <h2 class="section__header">{{ features_headline }}</h2>
+        <div class="popular__grid">
+            <div class="popular__card">
+                <img src="{{ menu1_image_url }}" alt="popular" />
+                <div class="popular__card__content">
+                    <h4>{{ features_list[0].title if features_list and features_list|length > 0 else 'Featured Item' }}</h4>
+                    <p>{{ features_list[0].description if features_list and features_list|length > 0 else '' }}</p>
+                </div>
+            </div>
+            <div class="popular__card">
+                <img src="{{ menu2_image_url }}" alt="popular" />
+                <div class="popular__card__content">
+                    <h4>{{ features_list[1].title if features_list and features_list|length > 1 else 'Featured Item' }}</h4>
+                    <p>{{ features_list[1].description if features_list and features_list|length > 1 else '' }}</p>
+                </div>
+            </div>
+            <div class="popular__card">
+                <img src="{{ menu3_image_url }}" alt="popular" />
+                <div class="popular__card__content">
+                    <h4>{{ features_list[2].title if features_list and features_list|length > 2 else 'Featured Item' }}</h4>
+                    <p>{{ features_list[2].description if features_list and features_list|length > 2 else '' }}</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    {% if section_about %}
+    <section class="section__container discover__container" id="categories">
+        <h2 class="section__header">{{ about_headline }}</h2>
+        <p class="section__description">{{ about_description }}</p>
+        <div class="discover__grid">
+            {% for product in services_list | default([]) %}
+            <div class="discover__card">
+                <img src="{{ product_image_url if loop.index == 1 else (product2_image_url if loop.index == 2 else product3_image_url) }}" alt="discover" />
+                <div class="discover__card__content">
+                    <h4>{{ product.title }}</h4>
+                    <p class="section__description">{{ product.description }}</p>
+                    <div class="discover__card__btn">
+                        <button class="btn">{{ cta_button_text }}</button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    <section class="banner">
+        <div class="banner__image" style="background-image: url('{{ banner_image_url }}');"></div>
+        <div class="banner__content">
+            <h2 class="section__header">{{ cta_headline | default('Get the Best at a Great Price') }}</h2>
+            <p class="section__description">{{ cta_description | default('') }}</p>
+            <div class="banner__flex">
+                <div class="banner__card">
+                    <img src="{{ banner1_image_url }}" alt="banner" />
+                    <h4>{{ services_list[0].title if services_list and services_list|length > 0 else 'Quality Service' }}</h4>
+                </div>
+                <div class="banner__card">
+                    <img src="{{ banner2_image_url }}" alt="banner" />
+                    <h4>{{ services_list[1].title if services_list and services_list|length > 1 else 'Fast Service' }}</h4>
+                </div>
+                <div class="banner__card">
+                    <img src="{{ banner3_image_url }}" alt="banner" />
+                    <h4>{{ services_list[2].title if services_list and services_list|length > 2 else 'Great Value' }}</h4>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {% if section_contact %}
+    <section class="section__container subscribe__container" id="contact">
+        <div class="subscribe__content">
+            <h2 class="section__header">{{ contact_headline | default('Subscribe For Updates') }}</h2>
+            <p class="section__description">{{ contact_description | default('Stay tuned for the latest news and offers.') }}</p>
+            <form action="/">
+                <input type="text" placeholder="Your Email" />
+                <button class="btn">Subscribe</button>
+            </form>
+        </div>
+    </section>
+    {% endif %}
+
+    <footer>
+        <div class="section__container footer__container">
+            <div class="footer__col">
+                <a href="#" class="logo">{{ business_name }}</a>
+            </div>
+            <div class="footer__col">
+                <ul class="footer__links">
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#menu">Menu</a></li>
+                    <li><a href="#categories">Categories</a></li>
+                    <li><a href="#contact">Contact Us</a></li>
+                </ul>
+            </div>
+            <div class="footer__col">
+                <p>{{ contact_email }}</p>
+                <p>{{ contact_phone }}</p>
+                <p>{{ address }}</p>
+            </div>
+        </div>
+        <div class="footer__bar">
+            Copyright &copy; 2025 {{ business_name }}. All rights reserved.
+        </div>
+    </footer>
+
+    
+</body>
+
+</html>

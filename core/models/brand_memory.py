@@ -1,6 +1,20 @@
 from dataclasses import dataclass, field
 
+from enum import Enum
 
+
+class ProjectIntent(Enum):
+    VALIDATION = "validation"  # Conversion Focus
+    PRESENCE = "presence"      # Identity Focus
+
+
+@dataclass
+class LabeledAsset:
+    url: str
+    label: str  # e.g. "spoon", "profile", "hero"
+    width: int
+    height: int
+    orientation: str  # "portrait", "landscape", "square"
 @dataclass
 class BrandMemory:
     business_name: str
@@ -15,3 +29,5 @@ class BrandMemory:
     address: str = ""
     tagline: str = ""
     services: list[str] = field(default_factory=list)
+    project_intent: ProjectIntent = ProjectIntent.VALIDATION
+    labeled_assets: list[LabeledAsset] = field(default_factory=list)

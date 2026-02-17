@@ -9,26 +9,26 @@ def can_create_project(user: User, project_count: int) -> bool:
 
 
 def can_regenerate(user: User, project: Project) -> bool:
-    if user.plan == PlanType.FREE:
+    if user.plan == PlanType.DRAFTER:
         return False
     limits = get_plan_limits(user.plan)
     return project.ai_usage.generation_calls < limits["generation_calls"]
 
 
 def can_replan(user: User, project: Project) -> bool:
-    if user.plan == PlanType.FREE:
+    if user.plan == PlanType.DRAFTER:
         return False
     limits = get_plan_limits(user.plan)
     return project.ai_usage.planner_calls < limits["planner_calls"]
 
 
 def can_change_theme(user: User) -> bool:
-    return user.plan != PlanType.FREE
+    return user.plan != PlanType.DRAFTER
 
 
 def can_use_custom_domain(user: User) -> bool:
-    return user.plan != PlanType.FREE
+    return user.plan != PlanType.DRAFTER
 
 
 def can_export_files(user: User) -> bool:
-    return user.plan != PlanType.FREE
+    return user.plan != PlanType.DRAFTER

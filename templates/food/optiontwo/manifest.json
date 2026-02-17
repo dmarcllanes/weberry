@@ -1,0 +1,27 @@
+{
+  "id": "food/optiontwo",
+  "name": "Bakery & Pastry",
+  "description": "Warm pastry and coffee shop with menu cards, booking form, and about section",
+  "intent": "presence",
+  "optional_sections": ["features", "about", "contact"],
+  "slots": {
+    "hero_image": "landscape",
+    "menu1_image": "landscape",
+    "menu2_image": "landscape",
+    "menu3_image": "landscape",
+    "menu4_image": "landscape",
+    "about_image": "portrait",
+    "banner_image": "landscape"
+  },
+  "keywords": ["food", "bakery", "pastry", "coffee"],
+  "copy_keys": [
+    "hero_headline", "hero_subheadline", "cta_button_text",
+    "features_headline",
+    "about_headline", "about_description",
+    "contact_headline",
+    "contact_email", "contact_phone", "address"
+  ],
+  "list_keys": {
+    "features_list": ["title", "description"]
+  }
+}

@@ -5,7 +5,9 @@ from fasthtml.common import Div, H1, P, Button, Section, Span, Ul, Li, A
 from user_app.frontend.layout import page_layout
 
 
-def published_page(project, public_url, trial_info=None):
+
+
+def published_page(user, project, public_url, trial_info=None):
     """Success screen after publishing."""
     pid = project.id
     name = project.brand_memory.business_name if project.brand_memory else "Your site"
@@ -59,4 +61,4 @@ def published_page(project, public_url, trial_info=None):
         cls="project-page",
     )
 
-    return page_layout(content, title="Okenaba - Published!", project_id=pid, active_nav="projects")
+    return page_layout(content, user=user, title="Okenaba - Published!", project_id=pid, active_nav="projects")

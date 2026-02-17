@@ -1,0 +1,293 @@
+:root {
+    --bg-dark: #0f172a;
+    --card-bg: rgba(30, 41, 59, 0.4);
+    --border-color: rgba(255, 255, 255, 0.1);
+    --text-primary: #ffffff;
+    --text-secondary: #94a3b8;
+    --accent-color: #6366f1;
+    /* Indigo/Purple from image */
+    --accent-glow: rgba(99, 102, 241, 0.5);
+    --input-bg: rgba(15, 23, 42, 0.6);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background-color: var(--bg-dark);
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    background-position: center center;
+    min-height: 100vh;
+    /* Use dvh for mobile browsers if supported */
+    min-height: 100dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-primary);
+    overflow-x: hidden;
+    position: relative;
+    padding: 1rem;
+    /* Prevent edge touching on mobile */
+}
+
+/* Background blob effect - Top Left */
+body::before {
+    content: '';
+    position: fixed;
+    /* Fixed so scrolling doesn't break it */
+    top: -10%;
+    left: -10%;
+    width: 700px;
+    height: 700px;
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.15), transparent 70%);
+    border-radius: 50%;
+    z-index: -1;
+    animation: float-blob-1 10s ease-in-out infinite alternate;
+    pointer-events: none;
+}
+
+/* Background blob effect - Bottom Right */
+body::after {
+    content: '';
+    position: fixed;
+    /* Fixed so scrolling doesn't break it */
+    bottom: -10%;
+    right: -10%;
+    width: 700px;
+    height: 700px;
+    background: radial-gradient(circle, rgba(56, 189, 248, 0.1), transparent 70%);
+    border-radius: 50%;
+    z-index: -1;
+    animation: float-blob-2 12s ease-in-out infinite alternate;
+    pointer-events: none;
+}
+
+@keyframes float-blob-1 {
+    0% {
+        transform: translate(0, 0) scale(1);
+    }
+
+    100% {
+        transform: translate(50px, 30px) scale(1.1);
+    }
+}
+
+@keyframes float-blob-2 {
+    0% {
+        transform: translate(0, 0) scale(1);
+    }
+
+    100% {
+        transform: translate(-50px, -30px) scale(1.1);
+    }
+}
+
+.login-card {
+    background: var(--card-bg);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid var(--border-color);
+    border-radius: 24px;
+    padding: 3rem 2.5rem;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.icon-container {
+    width: 64px;
+    height: 64px;
+    background: linear-gradient(135deg, #818cf8, #6366f1);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 2rem;
+    box-shadow: 0 0 20px var(--accent-glow);
+}
+
+.icon-container svg {
+    width: 32px;
+    height: 32px;
+    color: white;
+}
+
+h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    letter-spacing: -0.025em;
+}
+
+.subtitle {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    margin-bottom: 2.5rem;
+}
+
+/* Google Button */
+.btn-google {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    background: rgba(255, 255, 255, 0.08);
+    /* Slightly lighter than card */
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 0.875rem;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+}
+
+.btn-google:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px);
+}
+
+.btn-google:active {
+    transform: translateY(0);
+}
+
+/* Divider */
+.divider {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin: 2rem 0;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.divider::before,
+.divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border-color);
+}
+
+.divider span {
+    padding: 0 1rem;
+}
+
+/* Links */
+.create-account {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.btn-back {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-primary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    /* Slight fill */
+    border: 1px solid var(--border-color);
+    width: 60%;
+    /* Make it look like a secondary button */
+    font-size: 0.9rem;
+}
+
+.btn-back:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.btn-back:active {
+    transform: translateY(0);
+}
+
+.footer-links {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    opacity: 0.7;
+}
+
+.footer-links a {
+    color: var(--text-secondary);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.footer-links a:hover {
+    color: var(--text-primary);
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 480px) {
+    .login-card {
+        padding: 2rem 1.5rem;
+        border-radius: 20px;
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+    }
+
+    .icon-container {
+        width: 56px;
+        height: 56px;
+        margin-bottom: 1.5rem;
+    }
+
+    .icon-container svg {
+        width: 28px;
+        height: 28px;
+    }
+
+    h1 {
+        font-size: 1.5rem;
+    }
+
+    .subtitle {
+        font-size: 0.9rem;
+        margin-bottom: 2rem;
+    }
+
+    .btn-google {
+        font-size: 0.9rem;
+        padding: 0.75rem;
+    }
+
+    .btn-back {
+        width: 100%;
+        /* Full width on mobile for easier tapping */
+        padding: 0.875rem;
+    }
+
+    /* Adjust blobs for mobile so they don't cover everything */
+    body::before,
+    body::after {
+        width: 400px;
+        height: 400px;
+        opacity: 0.6;
+    }
+}

@@ -7,6 +7,8 @@ You are a website structure planner. Your job is to create a simple, effective s
 - Description: {description}
 - Tagline: {tagline}
 - Services: {services}
+- Project Intent: {project_intent}
+- Labeled Assets: {labeled_assets}
 
 ## Rules
 - Plan ONLY a single-page website
@@ -16,6 +18,9 @@ You are a website structure planner. Your job is to create a simple, effective s
 - Always include a contact or CTA section
 - Sections should flow logically for the business type
 - Think about what a visitor needs to see to trust this business
+- If Project Intent is VALIDATION, structure as a Sales Letter (Hook -> Pain -> Solution -> CTA)
+- If Project Intent is PRESENCE, structure as a Portfolio (Hero -> Bio -> Services -> Contact)
+- Use Labeled Assets to suggest layout types (e.g. multiple 'spoon' assets -> grid/gallery)
 
 ## Output Format
 Respond with ONLY valid JSON, no markdown fences, no explanation:

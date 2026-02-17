@@ -1,0 +1,19 @@
+/* Dashboard Tabs */
+.tab-link {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--color-text-light);
+    text-decoration: none;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.tab-link:hover {
+    color: var(--color-text);
+}
+
+.tab-link.active {
+    color: var(--color-text);
+    border-bottom-color: var(--color-primary);
+}

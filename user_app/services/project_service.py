@@ -65,3 +65,20 @@ def update_text_content(project: Project, updates: dict[str, str]) -> None:
 
     project.site_version.html = html
     db.save_project(project)
+
+
+def rerender_site(project: Project) -> None:
+    """Re-render the template with current plan/memory (e.g. after image update)."""
+    # Local import to avoid circular dependency
+    from core.ai.template_renderer import render_template
+
+    if not project.site_plan or not project.site_plan.selected_template:
+        raise CoreError("No site plan or template selected")
+
+    site_version = render_template(
+        project.site_plan.selected_template,
+        project.site_plan,
+        project.brand_memory
+    )
+    project.site_version = site_version
+    db.save_project(project)

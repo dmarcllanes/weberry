@@ -1,0 +1,222 @@
+# Google Auth Implementation Guide (Supabase + FastHTML)
+
+This guide documents how Google Authentication is currently implemented in the LuluPet project, so you can copy and implement it in another application.
+
+## 1. Overview
+The implementation uses a **Backend-for-Frontend (BFF)** pattern with Supabase:
+1.  **Frontend**: Uses Supabase JS Client to handle Google Sign-In.
+2.  **Session Sync**: After successful login, the frontend sends the Supabase session (access token, user info) to the backend.
+3.  **Backend**: Verifies and stores the session in a server-side session (cookie) and persists the user in the database.
+
+## 2. Prerequisites
+- A Supabase project.
+- Google Cloud Console Project with OAuth 2.0 Client credentials.
+- Google Auth provider enabled in Supabase Authentication settings.
+
+## 3. Environment Variables
+Ensure your `.env` file has the following:
+
+```bash
+SUPABASE_URL=your_supabase_project_url
+SUPABASE_KEY=your_supabase_anon_key
+```
+
+## 4. Backend Implementation
+
+### A. Session Data Model & Routes (`app/backend/routes/auth.py`)
+This file defines the data structure for the session and the endpoint to sync with the frontend.
+
+```python
+from fasthtml.common import *
+from pydantic import BaseModel
+
+class SessionData(BaseModel):
+    access_token: str
+    refresh_token: str
+    user_id: str
+    email: str
+    full_name: str | None = None
+
+def register_auth_routes(app):
+    @app.post("/api/auth/session")
+    async def set_session(data: SessionData, session):
+        # Store Supabase tokens in server-side session
+        session['access_token'] = data.access_token
+        session['user_id'] = data.user_id
+        
+        # You should also create/update the user in your database here
+        # user_repo.get_or_create_user(data.user_id, data.email, data.full_name)
+        
+        return {"status": "success"}
+
+    @app.post("/logout")
+    async def logout(session):
+        session.clear()
+        return RedirectResponse("/", status_code=303)
+```
+
+### B. User Repository (`app/database/user_repo.py`)
+Handles creating or updating the user in your database when they log in.
+
+```python
+from app.database.supabase_client import get_supabase
+
+def get_or_create_user(user_id: str, email: str, full_name: str = None):
+    supabase = get_supabase()
+    
+    # Check if user exists
+    result = supabase.table("users").select("*").eq("id", user_id).execute()
+    
+    if result.data:
+        # Update existing user
+        update_data = {"email": email}
+        if full_name:
+            update_data["full_name"] = full_name
+        supabase.table("users").update(update_data).eq("id", user_id).execute()
+        return result.data[0]
+    else:
+        # Create new user
+        user_data = {
+            "id": user_id,
+            "email": email,
+            "full_name": full_name,
+        }
+        result = supabase.table("users").insert(user_data).execute()
+        return result.data[0] if result.data else None
+```
+
+### C. Main App Integration (`app/main.py`)
+Ensure you import and register the routes.
+
+```python
+# ... imports
+from app.backend.routes.auth import register_auth_routes
+
+app, rt = fast_app(...)
+
+# Register auth routes if using a separate router, 
+# OR just include the endpoints directly in main.py as seen in the code:
+
+@rt("/api/auth/session", methods=["POST"])
+async def set_session(data: SessionData, session):
+    # ... implementation detailed above ...
+    pass
+```
+
+## 5. Frontend Implementation
+
+### A. Login Page HTML (`app/frontend/pages/login.py`)
+This Python file generates the HTML. Key parts are:
+1.  Including Supabase JS SDK.
+2.  Injecting `SUPABASE_URL` and `SUPABASE_KEY` into `window` object.
+3.  The "Continue with Google" button.
+
+```python
+from fasthtml.common import *
+import os
+
+def login_page():
+    return Html(
+        Head(
+            # ... other head elements ...
+            Script(src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"),
+            Script(f"""
+                window.SUPABASE_URL = '{os.environ.get("SUPABASE_URL", "")}';
+                window.SUPABASE_KEY = '{os.environ.get("SUPABASE_KEY", "")}';
+            """),
+        ),
+        Body(
+            # ... UI components ...
+            Button(
+                "Continue with Google",
+                id='googleBtn',
+                cls='btn btn-google'
+            ),
+            Script(src='/js/login.js')
+        )
+    )
+```
+
+### B. Client-side Logic (`static/js/login.js`)
+Handles the Google Sign-In flow and syncing the session.
+
+```javascript
+// 1. Initialize Supabase
+let supabaseClient;
+try {
+    if (window.supabase) {
+        supabaseClient = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_KEY);
+    }
+} catch (e) {
+    console.error('Failed to initialize Supabase:', e);
+}
+
+// 2. Handle Google Button Click
+const googleBtn = document.getElementById('googleBtn');
+if (googleBtn) {
+    googleBtn.addEventListener('click', async () => {
+        if (!supabaseClient) return;
+        
+        const { data, error } = await supabaseClient.auth.signInWithOAuth({
+            provider: 'google',
+            options: {
+                redirectTo: window.location.origin + '/login' // Redirect back to login page to handle session sync
+            }
+        });
+        
+        if (error) console.error('Google login error:', error);
+    });
+}
+
+// 3. Sync Session on Page Load (after redirect from Google)
+window.addEventListener('load', async () => {
+    if (!supabaseClient) return;
+
+    // Check for session in local storage/URL hash
+    const { data: { session } } = await supabaseClient.auth.getSession();
+
+    if (session) {
+        await syncSession(session);
+    }
+    
+    // Listen for auth state changes
+    supabaseClient.auth.onAuthStateChange(async (event, session) => {
+        if (event === 'SIGNED_IN' && session) {
+            await syncSession(session);
+        }
+    });
+});
+
+async function syncSession(session) {
+    try {
+        const response = await fetch('/api/auth/session', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                access_token: session.access_token,
+                refresh_token: session.refresh_token,
+                user_id: session.user.id,
+                email: session.user.email,
+                full_name: session.user.user_metadata?.full_name || null
+            }),
+        });
+
+        if (response.ok) {
+            window.location.href = '/dashboard'; // Redirect to dashboard after sync
+        }
+    } catch (err) {
+        console.error('Session sync error:', err);
+    }
+}
+```
+
+## Summary of Flow
+1. User clicks "Continue with Google".
+2. Supabase SDK redirects user to Google -> Authenticates -> Redirects back to `/login`.
+3. `login.js` detects the Supabase session.
+4. `login.js` POSTs session data to `/api/auth/session`.
+5. Backend verifies, creates user DB record, and sets session cookie.
+6. Backend responds success.
+7. Frontend redirects to `/dashboard`.

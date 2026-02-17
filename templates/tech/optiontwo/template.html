@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="{{ meta_description }}" />
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <title>{{ page_title }}</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900&display=swap">
+</head>
+
+<body>
+    <nav>
+        <div class="nav__header">
+            <div class="logo">
+                <a href="#">{{ business_name | default('VETA') }}</a>
+            </div>
+            <div class="nav__menu__btn" id="menu-btn">
+                <i class="ri-menu-line"></i>
+            </div>
+        </div>
+        <ul class="nav__links" id="nav-links">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#discover">Discover</a></li>
+            <li><a href="#build">Build</a></li>
+            <li><a href="#client">Community</a></li>
+        </ul>
+        <div class="nav__btns">
+            <button class="btn">Login</button>
+            <button class="btn">Sign Up</button>
+        </div>
+    </nav>
+
+    <header id="home">
+        <div class="section__container header__container">
+            <div class="header__content">
+                <h1>{{ hero_headline }}</h1>
+                <p class="section__description">
+                    {{ hero_description }}
+                </p>
+                <div class="header__btns">
+                    <button class="btn">Get Started</button>
+                    <a href="#">
+                        <span><i class="ri-play-fill"></i></span>
+                        See Demo
+                    </a>
+                </div>
+            </div>
+            <div class="header__image">
+                <img src="{{ header_image_url }}" alt="header" />
+            </div>
+        </div>
+    </header>
+
+    {% if section_discover %}
+    <section class="section__container discover__container" id="discover">
+        <h2 class="section__header">{{ discover_headline | default('Discover our new customized virtual reality for
+            better experience') }}</h2>
+        <div class="gradient__box discover__grid">
+            <div class="discover__card">
+                <span><i class="ri-truck-line"></i></span>
+                <h4>VR for Commercial</h4>
+            </div>
+            <div class="discover__card">
+                <span><i class="ri-instance-line"></i></span>
+                <h4>VR for Games</h4>
+            </div>
+            <div class="discover__card">
+                <span><i class="ri-hotel-line"></i></span>
+                <h4>VR for Education</h4>
+            </div>
+            <div class="discover__card">
+                <span><i class="ri-film-line"></i></span>
+                <h4>VR for Entertainment</h4>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    {% if section_commitment %}
+    <section class="section__container commitment__container">
+        <div class="commitment__image">
+            <img src="{{ commitment_image_url }}" alt="commitment" />
+        </div>
+        <div class="commitment__content">
+            <h2 class="section__header">{{ commitment_headline | default('We are committed solely to the development of
+                VR') }}</h2>
+            <p class="section__description">
+                {{ commitment_description }}
+            </p>
+            <ul class="commitment__list">
+                <li>
+                    <div class="gradient__box">
+                        <span><i class="ri-share-forward-fill"></i></span>
+                        Easy to share and view on web, mobile, and VR
+                    </div>
+                </li>
+                <li>
+                    <div class="gradient__box">
+                        <span><i class="ri-eye-fill"></i></span>
+                        No special equipment or software required
+                    </div>
+                </li>
+                <li>
+                    <div class="gradient__box">
+                        <span><i class="ri-link"></i></span>
+                        Embed VR content into your own website
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </section>
+    {% endif %}
+
+    {% if section_build %}
+    <section class="section__container build__container" id="build">
+        <div class="build__image">
+            <img src="{{ build_image_url }}" alt="build" />
+        </div>
+        <div class="build__content">
+            <h2 class="section__header">{{ build_headline | default('Build your customized virtual reality') }}</h2>
+            <p class="section__description">
+                {{ build_description }}
+            </p>
+            <ul class="build__grid">
+                <li>
+                    <div class="gradient__box build__card">
+                        <span><i class="ri-user-line"></i></span>
+                        <h4>Personal virtual reality</h4>
+                    </div>
+                </li>
+                <li>
+                    <div class="gradient__box build__card">
+                        <span><i class="ri-building-line"></i></span>
+                        <h4>Real estate virtual reality</h4>
+                    </div>
+                </li>
+                <li>
+                    <div class="gradient__box build__card">
+                        <span><i class="ri-store-3-line"></i></span>
+                        <h4>Exhibition virtual reality</h4>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </section>
+    {% endif %}
+
+    {% if section_testimonials %}
+    <section class="section__container client__container" id="client">
+        <div class="gradient__box client__image">
+            <img src="{{ client_image_url }}" alt="client" />
+        </div>
+        <div class="client__content">
+            <h2 class="section__header">{{ testimonials_headline | default('What our clients say') }}</h2>
+            <p class="section__description">
+                {{ testimonials_description }}
+            </p>
+            <!-- Slider main container -->
+            <div class="swiper">
+                <!-- Additional required wrapper -->
+                <div class="swiper-wrapper">
+                    <!-- Slides -->
+                    {% for review in testimonials_list %}
+                    <div class="swiper-slide">
+                        <div class="client__card">
+                            <p>
+                                {{ review.text }}
+                            </p>
+                            <h4>{{ review.author }}</h4>
+                            <h5>{{ review.role | default('Client') }}</h5>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <!-- If we need pagination -->
+                <div class="swiper-pagination"></div>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    {% if section_getstarted %}
+    <section class="section__container">
+        <div class="getstarted__container">
+            <h2 class="section__header">{{ cta_headline }}</h2>
+            <p class="section__description">
+                {{ cta_description }}
+            </p>
+            <button class="btn">Get Started</button>
+        </div>
+    </section>
+    {% endif %}
+
+    <footer>
+        <div class="section__container footer__container">
+            <div class="logo footer__logo">
+                <a href="#">{{ business_name }}</a>
+            </div>
+            <ul class="footer__links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#discover">Discover</a></li>
+                <li><a href="#build">Build</a></li>
+                <li><a href="#client">Community</a></li>
+            </ul>
+            <ul class="footer__links">
+                <li><a href="#">Facebook</a></li>
+                <li><a href="#">Instagram</a></li>
+                <li><a href="#">Twitter</a></li>
+            </ul>
+        </div>
+        <div class="footer__bar">
+            Copyright © 2024 {{ business_name }}. All rights reserved.
+        </div>
+    </footer>
+
+    
+    
+    
+</body>
+
+</html>

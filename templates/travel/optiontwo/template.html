@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="{{ meta_description }}" />
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <title>{{ page_title }}</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&family=Roboto:ital,wght@0,100..900&display=swap">
+</head>
+
+<body>
+    <nav>
+        <div class="nav__header">
+            <div class="nav__logo">
+                <a href="#">
+                    {{ business_name }}
+                </a>
+            </div>
+            <div class="nav__menu__btn" id="menu-btn">
+                <i class="ri-menu-line"></i>
+            </div>
+        </div>
+        <ul class="nav__links" id="nav-links">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#tour">Tour</a></li>
+            <li><a href="#package">Package</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </nav>
+
+    <header class="header__container" id="home">
+        <div class="header__image">
+            <img src="{{ header_image_url }}" alt="header" />
+        </div>
+        <div class="header__content">
+            <h1>{{ hero_headline }}</h1>
+            <p class="section__description">
+                {{ hero_description }}
+            </p>
+            <!-- Search Form functionality omitted for template, mostly UI -->
+            <form action="/">
+                <div class="input__group">
+                    <label for="destination"><span><i class="ri-map-pin-2-fill"></i></span> Destination</label>
+                    <input type="text" placeholder="San Francisco, CA" />
+                </div>
+                <div class="input__group">
+                    <label for="check-in"><span><i class="ri-calendar-2-fill"></i></span> Check In</label>
+                    <input type="text" placeholder="Tue, 2 Feb 2024" />
+                </div>
+                <div class="input__group">
+                    <label for="check-out"><span><i class="ri-calendar-2-fill"></i></span> Check Out</label>
+                    <input type="text" placeholder="Fri, 5 Feb 2024" />
+                </div>
+                <div class="input__group">
+                    <label for="guests"><span><i class="ri-user-fill"></i></span> Guests</label>
+                    <input type="text" placeholder="2 Guests" />
+                </div>
+                <button class="btn"><i class="ri-arrow-right-line"></i></button>
+            </form>
+        </div>
+    </header>
+
+    {% if section_about %}
+    <section class="about" id="about">
+        <div class="section__container about__container">
+            <div class="about__image">
+                <img src="{{ about_image_url }}" alt="about" />
+            </div>
+            <div class="about__content">
+                <h2 class="section__header">{{ about_headline | default('We create the trips you love') }}</h2>
+                <p class="section__description">
+                    {{ about_description }}
+                </p>
+                <!-- Hardcoded signature for now as it's part of the template style -->
+                <!-- <div class="about__signature">
+                    Jemala Alqen
+                </div> -->
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    {% if section_tours %}
+    <section class="section__container tour__container" id="tour">
+        <p class="section__subheader">Categories</p>
+        <h2 class="section__header">{{ tours_headline | default('Choose Tour Type') }}</h2>
+        <div class="tour__grid">
+            <div class="tour__card">
+                <img src="{{ tour1_image_url }}" alt="tour" />
+                <h4>City Tour</h4>
+                <p>10 Tours</p>
+            </div>
+            <div class="tour__card">
+                <img src="{{ tour2_image_url }}" alt="tour" />
+                <h4>Beaches Tour</h4>
+                <p>21 Tours</p>
+            </div>
+            <div class="tour__card">
+                <img src="{{ tour3_image_url }}" alt="tour" />
+                <h4>Boat Tour</h4>
+                <p>15 Tours</p>
+            </div>
+            <div class="tour__card">
+                <img src="{{ tour4_image_url }}" alt="tour" />
+                <h4>Adventure Tour</h4>
+                <p>25 Tours</p>
+            </div>
+        </div>
+        <div class="tour__btn">
+            <button class="btn">View All Categories <i class="ri-arrow-right-line"></i></button>
+        </div>
+    </section>
+    {% endif %}
+
+    {% if section_destinations %}
+    <section class="destination" id="package">
+        <div class="section__container destination__container">
+            <p class="section__subheader">Packages</p>
+            <h2 class="section__header">{{ destinations_headline | default('The Beauty of The World') }}</h2>
+            <div class="destination__grid">
+                <div class="destination__card">
+                    <img src="{{ destination1_image_url }}" alt="destination" />
+                    <div class="destination__card__content">
+                        <h4>London</h4>
+                        <h5>United Kingdom</h5>
+                        <div class="destination__card__footer">
+                            <h6>$500 <span>/ Person</span></h6>
+                            <p>4.5 <span><i class="ri-star-fill"></i></span></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="destination__card">
+                    <img src="{{ destination2_image_url }}" alt="destination" />
+                    <div class="destination__card__content">
+                        <h4>Prague</h4>
+                        <h5>Czech Republic</h5>
+                        <div class="destination__card__footer">
+                            <h6>$800 <span>/ Person</span></h6>
+                            <p>4.8 <span><i class="ri-star-fill"></i></span></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="destination__card">
+                    <img src="{{ destination3_image_url }}" alt="destination" />
+                    <div class="destination__card__content">
+                        <h4>Baku</h4>
+                        <h5>Azerbaijan</h5>
+                        <div class="destination__card__footer">
+                            <h6>$600 <span>/ Person</span></h6>
+                            <p>4.2 <span><i class="ri-star-fill"></i></span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="destination__btn">
+                <button class="btn">View All Packages <i class="ri-arrow-right-line"></i></button>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    {% if section_reviews %}
+    <section class="section__container review__container">
+        <div class="review__image">
+            <img src="{{ review_image_url }}" alt="review" />
+        </div>
+        <div class="review__content">
+            <p class="section__subheader">Reviews</p>
+            <h2 class="section__header">{{ testimonials_headline | default('What Our Clients Say') }}</h2>
+            <!-- Slider main container -->
+            <div class="swiper">
+                <!-- Additional required wrapper -->
+                <div class="swiper-wrapper">
+                    <!-- Slides -->
+                    {% for review in testimonials_list %}
+                    <div class="swiper-slide">
+                        <div class="review__card">
+                            <span><i class="ri-double-quotes-l"></i></span>
+                            <p class="section__description">
+                                {{ review.text }}
+                            </p>
+                            <h4>{{ review.author }}</h4>
+                            <h5>{{ review.role | default('Traveler') }}</h5>
+                            <div>
+                                <span><i class="ri-star-fill"></i></span>
+                                <span><i class="ri-star-fill"></i></span>
+                                <span><i class="ri-star-fill"></i></span>
+                                <span><i class="ri-star-fill"></i></span>
+                                <span><i class="ri-star-half-fill"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    {% if section_blog %}
+    <section class="blog">
+        <div class="section__container blog__container">
+            <p class="section__subheader">Blog</p>
+            <h2 class="section__header">Stories of The Journey</h2>
+            <div class="blog__grid">
+                <div class="blog__card">
+                    <img src="{{ blog1_image_url }}" alt="blog" />
+                    <div class="blog__content">
+                        <h4>Travel is The Best Way to Heal The Body & Mind</h4>
+                        <div class="blog__btn">
+                            <button class="btn">Read More <i class="ri-arrow-right-line"></i></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="blog__card">
+                    <img src="{{ blog2_image_url }}" alt="blog" />
+                    <div class="blog__content">
+                        <h4>Travel is The Best Way to Heal The Body & Mind</h4>
+                        <div class="blog__btn">
+                            <button class="btn">Read More <i class="ri-arrow-right-line"></i></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="blog__card">
+                    <img src="{{ blog3_image_url }}" alt="blog" />
+                    <div class="blog__content">
+                        <h4>Travel is The Best Way to Heal The Body & Mind</h4>
+                        <div class="blog__btn">
+                            <button class="btn">Read More <i class="ri-arrow-right-line"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    <section class="banner">
+        <div class="banner__wrapper">
+            <img src="{{ banner1_image_url }}" alt="banner" />
+            <img src="{{ banner2_image_url }}" alt="banner" />
+            <img src="{{ banner3_image_url }}" alt="banner" />
+            <img src="{{ banner4_image_url }}" alt="banner" />
+            <img src="{{ banner5_image_url }}" alt="banner" />
+            <!-- Duplicate for loop -->
+            <img src="{{ banner1_image_url }}" alt="banner" />
+            <img src="{{ banner2_image_url }}" alt="banner" />
+            <img src="{{ banner3_image_url }}" alt="banner" />
+        </div>
+    </section>
+
+    <footer id="contact">
+        <div class="section__container footer__container">
+            <div class="footer__logo">
+                <a href="#">
+                    {{ business_name }}
+                </a>
+            </div>
+            <ul class="footer__links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#about">About Us</a></li>
+                <li><a href="#package">Packages</a></li>
+            </ul>
+            <ul class="footer__socials">
+                <li><a href="#"><i class="ri-facebook-fill"></i></a></li>
+                <li><a href="#"><i class="ri-twitter-fill"></i></a></li>
+                <li><a href="#"><i class="ri-linkedin-fill"></i></a></li>
+                <li><a href="#"><i class="ri-youtube-fill"></i></a></li>
+            </ul>
+        </div>
+        <div class="footer__bar">
+            Copyright © 2024 {{ business_name }}. All rights reserved.
+        </div>
+    </footer>
+
+    
+    
+    
+</body>
+
+</html>

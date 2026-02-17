@@ -1,118 +1,102 @@
-"""Onboarding wizard (DRAFT / INPUT_READY states)."""
+"""Onboarding — Brain Dump form (3-step wizard)."""
 
 from fasthtml.common import (
-    Div, H1, P, Form, Button, Input, Textarea, Label, Span,
-    Section, Aside, Select, Option, A,
+    Div, H1, H2, P, Form, Button, Input, Textarea, Label, Span,
+    Section, Select, Option, A, Img, Small,
 )
 
-from user_app.frontend.layout import page_layout, make_step_indicator
+from user_app.frontend.layout import page_layout
 
 
-def onboarding_page(project):
-    """Multi-step wizard that collects BrandMemory fields."""
-    mem = project.brand_memory
-    pid = project.id
-
-    # Pre-fill values from existing brand_memory if any
-    bname = mem.business_name if mem else ""
-    tagline = mem.tagline if mem else ""
-    wtype = mem.website_type if mem else ""
-    goal = mem.primary_goal if mem else ""
-    desc = mem.description if mem else ""
-    services = ", ".join(mem.services) if mem and mem.services else ""
-    email = mem.contact_email if mem else ""
-    phone = mem.contact_phone if mem else ""
-    address = mem.address if mem else ""
-
-    website_types = [
-        ("", "Select a type..."),
-        ("portfolio", "Portfolio"),
-        ("business", "Business"),
-        ("personal", "Personal"),
-        ("freelancer", "Freelancer"),
-        ("restaurant", "Restaurant"),
-        ("nonprofit", "Nonprofit"),
-    ]
-    goals = [
-        ("", "Select a goal..."),
-        ("attract_clients", "Attract new clients"),
-        ("showcase_work", "Showcase my work"),
-        ("provide_info", "Provide information"),
-        ("build_credibility", "Build credibility"),
-        ("sell_services", "Sell services"),
-    ]
-
-    # Step 1: Welcome
-    step1 = Section(
+def render_asset_card(asset, project_id):
+    """Render a single uploaded asset card (used by onboarding and upload endpoint)."""
+    return Div(
+        Img(src=asset.url, alt=asset.label, cls="asset-card-img"),
         Div(
-            H1("Welcome to Okenaba", cls="step-title"),
-            P(
-                "Let's create your online presence. We'll walk you through it "
-                "step by step \u2014 no technical skills needed.",
-                cls="step-description",
-            ),
-            Div(
-                Div(cls="welcome-icon-bar"),
-                Div(cls="welcome-icon-bar"),
-                Div(cls="welcome-icon-bar"),
-                cls="welcome-icon",
-            ),
-            Button("Let's Get Started", cls="button button-primary",
-                   type="button", onclick="nextStep()"),
-            cls="step-content",
+            Span(asset.label.capitalize(), cls="asset-card-label"),
+            Span(f"{asset.width}x{asset.height} {asset.orientation}", cls="asset-card-dims"),
+            cls="asset-card-info",
         ),
-        id="step1", cls="step step-active",
+        Button("Remove", type="button", cls="btn btn-sm btn-ghost btn-delete",
+               hx_delete=f"/projects/{project_id}/assets?url={asset.url}",
+               hx_target="closest .asset-card", hx_swap="outerHTML"),
+        cls="asset-card",
     )
 
-    # Step 2: Basic Info
-    step2 = Section(
+
+def _step_indicator():
+    """3-step indicator: Basics, Brand, Details."""
+    labels = ["Basics", "Brand", "Details"]
+    items = []
+    for i, lbl in enumerate(labels):
+        step_num = i + 1
+        cls = "si-circle si-active" if step_num == 1 else "si-circle"
+        items.append(
+            Div(
+                Div(str(step_num), cls=cls,
+                    onclick=f"goToStep({step_num})" if step_num > 1 else None),
+                Span(lbl, cls="si-label si-label-active" if step_num == 1 else "si-label"),
+                cls="si-step",
+            )
+        )
+        if step_num < len(labels):
+            items.append(Div(cls="si-connector"))
+    return Div(*items, cls="step-indicator", id="stepIndicator")
+
+
+def onboarding_page(user, project):
+    """3-step Brain Dump wizard — collects input then auto-generates."""
+    pid = project.id
+    mem = project.brand_memory
+    bname = mem.business_name if mem else ""
+    desc = mem.description if mem else ""
+    goal = mem.primary_goal if mem else ""
+
+    goals = [
+        ("", "What's the #1 thing this site should do?"),
+        ("collect_emails", "Collect Emails / Leads"),
+        ("sell_preorder", "Sell a Pre-order"),
+        ("schedule_call", "Schedule Calls / Demos"),
+        ("build_authority", "Build Authority"),
+        ("direct_traffic", "Direct Traffic to Another Link"),
+    ]
+
+    # --- Step 1: The Basics ---
+    industry_val = mem.services[0] if mem and mem.services else ""
+
+    step1 = Div(
         Div(
-            H1("Tell Us About You", cls="step-title"),
-            P("Start with the basics. You can always refine this later.", cls="step-description"),
+            H1("The Basics", cls="step-title"),
+            P("Tell us about your business in 30 seconds.", cls="step-description"),
             Div(
                 Div(
-                    Label("Business or personal name", _for="business_name", cls="label"),
+                    Label("Business name", _for="business_name", cls="label"),
                     Input(type="text", name="business_name", id="business_name",
                           value=bname, placeholder="e.g., Sarah's Photography",
-                          cls="input", oninput="updatePreview(); clearFieldError(this)"),
+                          cls="input", oninput="clearFieldError(this)"),
                     Span(cls="field-error", id="business_name_error", role="alert"),
                     cls="form-group",
                 ),
                 Div(
-                    Label("Tagline", Span("(optional)", cls="optional"), _for="tagline", cls="label"),
-                    Input(type="text", name="tagline", id="tagline",
-                          value=tagline, placeholder="e.g., Creating beautiful moments",
-                          cls="input", oninput="updatePreview()"),
+                    Label("Industry", _for="industry", cls="label"),
+                    Input(type="text", name="industry", id="industry",
+                          value=industry_val,
+                          placeholder="e.g., Coffee Shop, SaaS, Photography",
+                          cls="input", oninput="clearFieldError(this)"),
+                    Span(cls="field-error", id="industry_error", role="alert"),
                     cls="form-group",
                 ),
                 Div(
-                    Label("Website type", _for="website_type", cls="label"),
-                    Select(
-                        *[Option(lbl, value=val, selected=(val == wtype)) for val, lbl in website_types],
-                        name="website_type", id="website_type", cls="input",
-                        onchange="clearFieldError(this)",
+                    Label("Describe what you do", Span("(optional)", cls="optional"),
+                          _for="description", cls="label"),
+                    Textarea(
+                        desc,
+                        name="description", id="description",
+                        placeholder="Include your services, audience, what makes you different...",
+                        cls="input input-textarea", rows="3",
                     ),
-                    Span(cls="field-error", id="website_type_error", role="alert"),
                     cls="form-group",
                 ),
-                Div(
-                    Button("Back", type="button", cls="button button-secondary", onclick="prevStep()"),
-                    Button("Next", type="button", cls="button button-primary", onclick="nextStep()"),
-                    cls="button-group",
-                ),
-                cls="form",
-            ),
-            cls="step-content",
-        ),
-        id="step2", cls="step",
-    )
-
-    # Step 3: Story
-    step3 = Section(
-        Div(
-            H1("Add Your Story", cls="step-title"),
-            P("Tell visitors what you're about. Keep it simple and genuine.", cls="step-description"),
-            Div(
                 Div(
                     Label("Primary goal", _for="primary_goal", cls="label"),
                     Select(
@@ -124,27 +108,123 @@ def onboarding_page(project):
                     cls="form-group",
                 ),
                 Div(
-                    Label("Description", Span("(optional)", cls="optional"), _for="description", cls="label"),
-                    Textarea(
-                        desc,
-                        name="description", id="description",
-                        placeholder="Tell people about yourself or your business...",
-                        cls="input input-textarea", rows="4", oninput="updatePreview()",
-                    ),
-                    cls="form-group",
+                    Button("Next", type="button", cls="button button-primary",
+                           onclick="nextStep(event)"),
+                    cls="button-group",
                 ),
+                cls="form",
+            ),
+            cls="step-content",
+        ),
+        id="step1", cls="step step-active",
+    )
+
+    # --- Step 2: Brand Identity ---
+    step2 = Div(
+        Div(
+            H1("Brand Identity", cls="step-title"),
+            P("Set the personality and look of your site.", cls="step-description"),
+            Div(
                 Div(
-                    Label("Services", Span("(comma separated, optional)", cls="optional"), _for="services", cls="label"),
-                    Input(type="text", name="services", id="services",
-                          value=services,
-                          placeholder="e.g., Photography, Editing, Prints",
+                    Label("Tagline", Span("(optional)", cls="optional"),
+                          _for="tagline", cls="label"),
+                    Input(type="text", name="tagline", id="tagline",
+                          value=mem.tagline if mem and mem.tagline else "",
+                          placeholder="e.g., Your neighborhood coffee experts",
                           cls="input"),
                     cls="form-group",
                 ),
                 Div(
-                    Button("Back", type="button", cls="button button-secondary", onclick="prevStep()"),
-                    Button("Next", type="button", cls="button button-primary", onclick="nextStep()"),
+                    Label("Brand color", _for="primary_color", cls="label"),
+                    Div(
+                        *[Span(
+                            cls="color-swatch",
+                            style=f"background-color:{c}",
+                            onclick=f"document.getElementById('primary_color').value='{c}'",
+                          ) for c in [
+                            "#4F46E5", "#2563EB", "#059669", "#D97706",
+                            "#DC2626", "#7C3AED", "#0891B2", "#1F2937",
+                        ]],
+                        cls="color-swatch-row",
+                    ),
+                    Input(type="color", name="primary_color", id="primary_color",
+                          value=mem.primary_color if mem and mem.primary_color else "#4F46E5",
+                          cls="color-input"),
+                    cls="form-group",
+                ),
+                Div(
+                    Label("Tone / Vibe", _for="theme", cls="label"),
+                    Select(
+                        Option("Professional", value="professional",
+                               selected=(mem and mem.theme == "professional")),
+                        Option("Friendly & Casual", value="friendly",
+                               selected=(mem and mem.theme == "friendly")),
+                        Option("Bold & Energetic", value="bold",
+                               selected=(mem and mem.theme == "bold")),
+                        Option("Elegant & Minimal", value="elegant",
+                               selected=(mem and mem.theme == "elegant")),
+                        name="theme", id="theme", cls="input",
+                    ),
+                    cls="form-group",
+                ),
+                Div(
+                    Button("Back", type="button", cls="button button-secondary",
+                           onclick="prevStep()"),
+                    Button("Next", type="button", cls="button button-primary",
+                           onclick="nextStep(event)"),
                     cls="button-group",
+                ),
+                cls="form",
+            ),
+            cls="step-content",
+        ),
+        id="step2", cls="step",
+    )
+
+    # --- Step 3: Contact & Details ---
+    step3 = Div(
+        Div(
+            H1("Contact & Details", cls="step-title"),
+            P(
+                "Add your contact info so visitors can reach you. "
+                "All fields are optional — skip if you prefer.",
+                cls="step-description",
+            ),
+            Div(
+                Div(
+                    Label("Contact email", Span("(optional)", cls="optional"),
+                          _for="contact_email", cls="label"),
+                    Input(type="email", name="contact_email", id="contact_email",
+                          value=mem.contact_email if mem and mem.contact_email else "",
+                          placeholder="hello@yourbusiness.com",
+                          cls="input"),
+                    cls="form-group",
+                ),
+                Div(
+                    Label("Contact phone", Span("(optional)", cls="optional"),
+                          _for="contact_phone", cls="label"),
+                    Input(type="tel", name="contact_phone", id="contact_phone",
+                          value=mem.contact_phone if mem and mem.contact_phone else "",
+                          placeholder="+1 (555) 123-4567",
+                          cls="input"),
+                    cls="form-group",
+                ),
+                Div(
+                    Label("Address / Location", Span("(optional)", cls="optional"),
+                          _for="address", cls="label"),
+                    Input(type="text", name="address", id="address",
+                          value=mem.address if mem and mem.address else "",
+                          placeholder="123 Main St, City, State",
+                          cls="input"),
+                    cls="form-group",
+                ),
+                Div(
+                    Button("Back", type="button", cls="button button-secondary",
+                           onclick="prevStep()"),
+                    Button("Build My Site", type="submit", cls="button button-primary",
+                           onclick="return validateAndSubmit()"),
+                    cls="button-group",
+                    style="margin-top:2rem"
                 ),
                 cls="form",
             ),
@@ -153,94 +233,59 @@ def onboarding_page(project):
         id="step3", cls="step",
     )
 
-    # Step 4: Contact + submit
-    step4 = Section(
-        Div(
-            H1("How Can People Reach You?", cls="step-title"),
-            P("Add your contact info so visitors can get in touch.", cls="step-description"),
-            Div(
-                Div(
-                    Label("Email address", Span("(optional)", cls="optional"), _for="contact_email", cls="label"),
-                    Input(type="email", name="contact_email", id="contact_email",
-                          value=email, placeholder="your@email.com", cls="input",
-                          oninput="updatePreview()"),
-                    cls="form-group",
-                ),
-                Div(
-                    Label("Phone", Span("(optional)", cls="optional"), _for="contact_phone", cls="label"),
-                    Input(type="text", name="contact_phone", id="contact_phone",
-                          value=phone, placeholder="(555) 123-4567", cls="input"),
-                    cls="form-group",
-                ),
-                Div(
-                    Label("Address", Span("(optional)", cls="optional"), _for="address", cls="label"),
-                    Input(type="text", name="address", id="address",
-                          value=address, placeholder="City, State", cls="input"),
-                    cls="form-group",
-                ),
-                Div(
-                    Button("Back", type="button", cls="button button-secondary", onclick="prevStep()"),
-                    Button("Save & Continue", type="submit", cls="button button-primary",
-                           onclick="return validateBeforeSubmit()"),
-                    cls="button-group",
-                ),
-                cls="form",
-            ),
-            cls="step-content",
-        ),
-        id="step4", cls="step",
-    )
-
-    # Preview panel (desktop sidebar)
-    preview = Aside(
-        Div(
-            Div(Span("Preview", cls="preview-title"), cls="preview-header"),
-            Div(
-                Div(P("Your site preview will appear here"), cls="preview-placeholder"),
-                cls="preview-content", id="previewContent",
-            ),
-            cls="preview-container",
-        ),
-        cls="preview-panel",
-    )
-
     form = Form(
-        step1, step2, step3, step4,
-        # Hidden defaults at form root level
-        Input(type="hidden", name="theme", value="professional"),
-        Input(type="hidden", name="primary_color", value="#2563eb"),
-        Input(type="hidden", name="secondary_color", value="#1e40af"),
-        method="post", action=f"/projects/{pid}/memory", cls="wizard",
+        Div(id="onboarding-active", data_delete_url=f"/projects/{pid}/delete",
+            style="display:none"),
+        _step_indicator(),
+        Div(step1, step2, step3, cls="wizard"),
+        method="post", action=f"/projects/{pid}/braindump",
     )
 
-    # Marker so app.js can detect onboarding and prompt before leaving
-    onboarding_marker = Div(id="onboarding-active", style="display:none")
+    content = Div(form, cls="onboarding-layout", style="max-width:640px;margin:0 auto")
 
-    indicator = make_step_indicator(1, 4)
-    return page_layout(onboarding_marker, form, preview, step_indicator=indicator, title="Okenaba - Setup", project_id=pid, active_nav="projects")
+    return page_layout(content, user=user, title="Okenaba - Brain Dump", project_id=pid, active_nav="projects")
 
 
-def waiting_for_plan_page(project):
-    """After memory is saved — prompt to generate plan."""
+def waiting_for_plan_page(user, project):
+    """After memory is saved — prompt to generate site (template flow)."""
     pid = project.id
     name = project.brand_memory.business_name if project.brand_memory else "your site"
 
     content = Section(
         Div(
-            Div("\U0001f4cb", cls="step-icon"),
-            H1("Ready to Plan Your Site", cls="step-title"),
+            Div(
+                Div(cls="action-icon-inner"),
+                cls="action-icon action-icon--plan",
+            ),
+            H1("Ready to Generate Your Site", cls="step-title"),
             P(
-                f"Great! We have everything we need about {name}. "
-                "Click below to generate a personalized site plan.",
+                f"We have everything we need about {name}. "
+                "Our AI will pick the best template, write your copy, "
+                "and build your site in seconds.",
                 cls="step-description",
             ),
             Div(
+                Div(
+                    Span("AI picks the perfect template", cls="action-feature-text"),
+                    cls="action-feature",
+                ),
+                Div(
+                    Span("Custom copy tailored to your business", cls="action-feature-text"),
+                    cls="action-feature",
+                ),
+                Div(
+                    Span("Instant rendering, no waiting", cls="action-feature-text"),
+                    cls="action-feature",
+                ),
+                cls="action-features",
+            ),
+            Div(
+                A("Back to Projects", href="/", cls="button button-secondary"),
                 Form(
-                    Button("Generate My Plan", cls="button button-primary", type="submit",
-                           onclick="return showLoading('Generating your plan...')"),
+                    Button("Generate My Site", cls="button button-primary", type="submit",
+                           onclick="return showLoading('Generating your site...')"),
                     method="post", action=f"/projects/{pid}/plan",
                 ),
-                A("Exit", href="/", cls="button button-secondary"),
                 cls="button-group",
             ),
             cls="step-content action-page",
@@ -248,4 +293,4 @@ def waiting_for_plan_page(project):
         cls="step",
     )
 
-    return page_layout(content, title="Okenaba - Generate Plan", project_id=pid, active_nav="projects")
+    return page_layout(content, user=user, title="Okenaba - Generate Site", project_id=pid, active_nav="projects")

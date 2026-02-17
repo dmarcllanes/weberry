@@ -17,5 +17,7 @@ class Project:
     ai_usage: AIUsage = field(default_factory=AIUsage)
     site_plan: SitePlan | None = None
     site_version: SiteVersion | None = None
+    template_id: str | None = None
     created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
     published_at: datetime | None = None

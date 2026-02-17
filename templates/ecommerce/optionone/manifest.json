@@ -1,0 +1,37 @@
+{
+  "id": "ecommerce/optionone",
+  "name": "Luxury Watch Store",
+  "description": "Elegant dark-themed ecommerce store for luxury items with product showcase, story section, and testimonial slider",
+  "intent": "shop",
+  "optional_sections": ["products", "story", "store", "testimonials", "subscribe"],
+  "slots": {
+    "header_image": "landscape",
+    "feature1_image": "square",
+    "feature2_image": "square",
+    "feature3_image": "square",
+    "story_image": "landscape",
+    "arrival1_image": "portrait",
+    "arrival2_image": "portrait",
+    "arrival3_image": "portrait",
+    "arrival4_image": "portrait",
+    "client_image": "portrait",
+    "testimonial1_image": "square",
+    "testimonial2_image": "square",
+    "testimonial3_image": "square"
+  },
+  "keywords": ["ecommerce", "watch", "luxury", "shop", "store"],
+  "copy_keys": [
+    "hero_headline", "hero_subheadline",
+    "cta_price", "cta_button_text",
+    "features_headline",
+    "about_headline", "about_tagline", "about_description",
+    "services_headline",
+    "contact_headline", "contact_description",
+    "contact_email", "contact_phone", "address"
+  ],
+  "list_keys": {
+    "features_list": ["title", "price"],
+    "services_list": ["title", "price"],
+    "testimonials_list": ["text", "author", "role"]
+  }
+}

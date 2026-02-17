@@ -7,7 +7,10 @@ from fasthtml.common import (
 from user_app.frontend.layout import page_layout
 
 
-def site_detail_page(project, public_url=None, trial_info=None):
+from user_app.frontend.pages.profile import brand_info_component
+
+
+def site_detail_page(user, project, public_url=None, trial_info=None):
     """Show the website details, preview, plan, and publishing info."""
     pid = project.id
     mem = project.brand_memory
@@ -25,6 +28,10 @@ def site_detail_page(project, public_url=None, trial_info=None):
     )
 
     sections = [status]
+    
+    # Brand Info Section
+    brand_section = brand_info_component(project)
+    sections.append(brand_section)
 
     # Live URL section (only if published)
     if public_url:
@@ -117,4 +124,4 @@ def site_detail_page(project, public_url=None, trial_info=None):
 
     content = Div(*sections, cls="project-page")
 
-    return page_layout(content, title=f"Okenaba - {name} Site", project_id=pid, active_nav="projects")
+    return page_layout(content, user=user, title=f"Okenaba - {name} Site", project_id=pid, active_nav="projects")

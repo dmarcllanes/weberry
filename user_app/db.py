@@ -12,10 +12,10 @@ from supabase import create_client, Client
 from config.settings import SUPABASE_URL, SUPABASE_SERVICE_KEY
 from core.models.user import User, PlanType
 from core.models.project import Project
-from core.models.brand_memory import BrandMemory
+from core.models.brand_memory import BrandMemory, LabeledAsset, ProjectIntent
 from core.models.ai_usage import AIUsage
 from core.models.site_version import SiteVersion
-from core.ai.schemas import SitePlan, SectionPlan
+from core.ai.schemas import SitePlan, SectionPlan, CopyBlock
 from core.state_machine.states import ProjectState
 
 
@@ -40,12 +40,26 @@ def get_storage():
 def _serialize_brand_memory(bm: BrandMemory | None) -> dict | None:
     if bm is None:
         return None
-    return asdict(bm)
+    d = asdict(bm)
+    # Convert Enum to value for JSON serialization
+    if "project_intent" in d and hasattr(d["project_intent"], "value"):
+        d["project_intent"] = d["project_intent"].value
+    # Convert labeled_assets if they exist (asdict handles nested dataclasses but let's be safe)
+    return d
 
 
 def _deserialize_brand_memory(data: dict | None) -> BrandMemory | None:
     if data is None:
         return None
+    # Convert labeled_assets dicts back to LabeledAsset instances
+    if "labeled_assets" in data and data["labeled_assets"]:
+        data["labeled_assets"] = [
+            LabeledAsset(**a) if isinstance(a, dict) else a
+            for a in data["labeled_assets"]
+        ]
+    # Convert project_intent string back to ProjectIntent enum
+    if "project_intent" in data and isinstance(data.get("project_intent"), str):
+        data["project_intent"] = ProjectIntent(data["project_intent"])
     return BrandMemory(**data)
 
 
@@ -74,21 +88,40 @@ def _deserialize_ai_usage(data: dict | None) -> AIUsage:
 def _serialize_site_plan(plan: SitePlan | None) -> dict | None:
     if plan is None:
         return None
-    return {
+    d = {
         "page_title": plan.page_title,
         "meta_description": plan.meta_description,
         "sections": [asdict(s) for s in plan.sections],
     }
+    if plan.copy_blocks:
+        d["copy_blocks"] = [asdict(cb) for cb in plan.copy_blocks]
+    if plan.active_sections:
+        d["active_sections"] = plan.active_sections
+    if plan.selected_template:
+        d["selected_template"] = plan.selected_template
+    if plan.image_keywords:
+        d["image_keywords"] = plan.image_keywords
+    if plan.image_overrides:
+        d["image_overrides"] = plan.image_overrides
+    return d
 
 
 def _deserialize_site_plan(data: dict | None) -> SitePlan | None:
     if data is None:
         return None
     sections = [SectionPlan(**s) for s in data.get("sections", [])]
+    copy_blocks = [
+        CopyBlock(**cb) for cb in data.get("copy_blocks", [])
+    ]
     return SitePlan(
         sections=sections,
         page_title=data["page_title"],
         meta_description=data["meta_description"],
+        copy_blocks=copy_blocks,
+        active_sections=data.get("active_sections", []),
+        selected_template=data.get("selected_template", ""),
+        image_keywords=data.get("image_keywords", {}),
+        image_overrides=data.get("image_overrides", {}),
     )
 
 
@@ -119,11 +152,43 @@ def get_user(user_id: str) -> User | None:
     if not result.data:
         return None
     row = result.data[0]
+    plan_str = row["plan"]
+    if plan_str == "FREE":
+        plan = PlanType.DRAFTER
+    elif plan_str == "PAID":
+        plan = PlanType.VALIDATOR
+    else:
+        plan = PlanType(plan_str)
+
     return User(
         id=row["id"],
         email=row["email"],
-        plan=PlanType(row["plan"]),
+        plan=plan,
+        full_name=row.get("full_name"),
+        avatar_url=row.get("avatar_url"),
     )
+
+
+def upsert_user(user_id: str, email: str, full_name: str | None = None, avatar_url: str | None = None) -> User:
+    """Create or update a user by Supabase auth ID."""
+    result = get_client().table("users").select("*").eq("id", user_id).execute()
+    if result.data:
+        update_data = {"email": email}
+        if full_name:
+            update_data["full_name"] = full_name
+        # avatar_url is stored in session, not DB
+        get_client().table("users").update(update_data).eq("id", user_id).execute()
+    else:
+        user_data = {
+            "id": user_id,
+            "email": email,
+            "plan": PlanType.DRAFTER.value,
+        }
+        if full_name:
+            user_data["full_name"] = full_name
+        # avatar_url is stored in session, not DB
+        get_client().table("users").insert(user_data).execute()
+    return get_user(user_id)
 
 
 def get_user_by_email(email: str) -> User | None:
@@ -131,10 +196,20 @@ def get_user_by_email(email: str) -> User | None:
     if not result.data:
         return None
     row = result.data[0]
+    plan_str = row["plan"]
+    if plan_str == "FREE":
+        plan = PlanType.DRAFTER
+    elif plan_str == "PAID":
+        plan = PlanType.VALIDATOR
+    else:
+        plan = PlanType(plan_str)
+
     return User(
         id=row["id"],
         email=row["email"],
-        plan=PlanType(row["plan"]),
+        plan=plan,
+        full_name=row.get("full_name"),
+        avatar_url=row.get("avatar_url"),
     )
 
 
@@ -149,7 +224,9 @@ def _row_to_project(row: dict) -> Project:
         ai_usage=_deserialize_ai_usage(row.get("ai_usage")),
         site_plan=_deserialize_site_plan(row.get("site_plan")),
         site_version=_deserialize_site_version(row.get("site_version")),
+        template_id=row.get("template_id"),
         created_at=_parse_timestamp(row.get("created_at")),
+        updated_at=_parse_timestamp(row.get("updated_at")) or _parse_timestamp(row["created_at"]),
         published_at=_parse_timestamp(row.get("published_at")),
     )
 
@@ -190,6 +267,7 @@ def save_project(project: Project) -> None:
         "ai_usage": _serialize_ai_usage(project.ai_usage),
         "site_plan": _serialize_site_plan(project.site_plan),
         "site_version": _serialize_site_version(project.site_version),
+        "template_id": project.template_id,
         "published_at": project.published_at.isoformat() if project.published_at else None,
     }
     get_client().table("projects").update(data).eq("id", project.id).execute()
@@ -213,8 +291,10 @@ def get_project_row(project_id: str) -> dict | None:
 
 
 def delete_project(project_id: str) -> None:
-    """Delete a project by ID."""
-    get_client().table("projects").delete().eq("id", project_id).execute()
+    """Delete a project and its published sites by ID."""
+    client = get_client()
+    client.table("published_sites").delete().eq("project_id", project_id).execute()
+    client.table("projects").delete().eq("id", project_id).execute()
 
 
 def set_project_paused(project_id: str, paused: bool) -> None:

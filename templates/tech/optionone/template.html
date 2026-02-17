@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="{{ meta_description }}" />
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet" />
+    <title>{{ page_title }}</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000">
+</head>
+
+<body>
+    <header id="home">
+        <nav>
+            <div class="nav__header">
+                <div class="nav__logo">
+                    <a href="#" class="logo">{{ business_name }}</a>
+                </div>
+                <div class="nav__menu__btn" id="menu-btn">
+                    <i class="ri-menu-line"></i>
+                </div>
+            </div>
+            <ul class="nav__links" id="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#products">Products</a></li>
+                <li>
+                    <button class="btn">{{ cta_button_text }}</button>
+                </li>
+            </ul>
+        </nav>
+        <div class="header__content">
+            <h1>{{ hero_headline }}</h1>
+            <p>{{ hero_subheadline }}</p>
+            <div class="header__btns">
+                <button class="btn">
+                    {{ cta_button_text }} <span><i class="ri-arrow-right-up-line"></i></span>
+                </button>
+            </div>
+        </div>
+        <div class="header__image">
+            <img src="{{ hero_image_url }}" alt="header" />
+        </div>
+    </header>
+
+    {% if section_features %}
+    <section class="section__container feature__container" id="features">
+        <div class="feature__content">
+            <h3 class="section__subheader">{{ features_subheadline | default('OUR FEATURES') }}</h3>
+            <h2 class="section__header">{{ features_headline }}</h2>
+            <p>{{ features_description | default('') }}</p>
+            <div class="feature__btn">
+                <button class="btn">
+                    {{ cta_button_text }} <span><i class="ri-arrow-right-up-line"></i></span>
+                </button>
+            </div>
+        </div>
+        <div class="feature__grid">
+            {% for feature in features_list %}
+            <div class="feature__card">
+                <span><i class="ri-shapes-line"></i></span>
+                <h4>{{ feature.title }}</h4>
+                <p>{{ feature.description }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    {% if section_services %}
+    <section class="section__container banner__container">
+        <div class="banner__card">
+            <img src="{{ banner1_image_url }}" alt="banner" />
+            <h4>{{ service1_title | default('Featured Service') }}</h4>
+            <button class="btn">
+                {{ cta_button_text }} <span><i class="ri-arrow-right-up-line"></i></span>
+            </button>
+        </div>
+        <div class="banner__card">
+            <img src="{{ banner2_image_url }}" alt="banner" />
+            <h4>{{ service2_title | default('Featured Event') }}</h4>
+            <button class="btn">
+                {{ cta_button_text }} <span><i class="ri-arrow-right-up-line"></i></span>
+            </button>
+        </div>
+    </section>
+
+    <section class="specs">
+        <div class="section__container specs__container">
+            {% for spec in specs_list | default([]) %}
+            <div class="specs__row">
+                <div class="specs__card">
+                    <div>
+                        <span><i class="ri-wireless-charging-line"></i></span>
+                        <h4>{{ spec.title }}</h4>
+                    </div>
+                    <p>{{ spec.description }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    {% if section_products %}
+    <section class="section__container product__container" id="products">
+        <h3 class="section__subheader">{{ products_subheadline | default('OUR PRODUCTS') }}</h3>
+        <h2 class="section__header">{{ products_headline | default('Explore our products') }}</h2>
+        <div class="product__grid">
+            <ul class="product__list">
+                {% for product in products_list | default([]) %}
+                <li>
+                    <p>{{ product.title }}</p>
+                </li>
+                {% endfor %}
+            </ul>
+            <div class="product__content">
+                <img src="{{ product_image_url }}" alt="product" />
+                <p>{{ products_description | default('') }}</p>
+                <div class="product__btn">
+                    <button class="btn">
+                        {{ cta_button_text }} <span><i class="ri-arrow-right-up-line"></i></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    <footer class="footer">
+        <div class="section__container footer__container">
+            <div class="footer__col">
+                <div class="footer__logo">
+                    <a href="#" class="logo">{{ business_name }}</a>
+                </div>
+                <ul class="footer__links">
+                    <li>
+                        <a href="#">
+                            <span><i class="ri-phone-line"></i></span> {{ contact_phone }}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <span><i class="ri-map-pin-line"></i></span> {{ address }}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <span><i class="ri-mail-line"></i></span> {{ contact_email }}
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="footer__col">
+                <h4>Menu</h4>
+                <ul class="footer__links">
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#products">Products</a></li>
+                </ul>
+            </div>
+            <div class="footer__col">
+                <h2>{{ cta_headline | default('Join our newsletter') }}</h2>
+                <p>{{ cta_description | default('Stay tuned for updates') }}</p>
+                <form action="/">
+                    <input type="text" placeholder="Your email here" />
+                    <button class="btn">Subscribe</button>
+                </form>
+            </div>
+        </div>
+        <div class="footer__bar">
+            Copyright &copy; 2024 {{ business_name }}. All rights reserved.
+        </div>
+    </footer>
+
+    
+</body>
+
+</html>

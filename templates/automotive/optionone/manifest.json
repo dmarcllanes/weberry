@@ -1,0 +1,30 @@
+{
+  "id": "automotive/optionone",
+  "name": "Premium Car Rental",
+  "description": "Luxury car rental service with fleet showcase, features list, and mobile app download call-to-action",
+  "intent": "service",
+  "optional_sections": ["about", "fleet", "features", "help"],
+  "slots": {
+    "header_image": "landscape",
+    "about_image": "landscape",
+    "fleet1_image": "landscape",
+    "fleet2_image": "landscape",
+    "fleet3_image": "landscape",
+    "fleet4_image": "landscape",
+    "fleet5_image": "landscape",
+    "fleet6_image": "landscape",
+    "fleet7_image": "landscape"
+  },
+  "keywords": ["car", "rental", "luxury", "automotive", "vehicle"],
+  "copy_keys": [
+    "hero_headline", "hero_subheadline",
+    "about_tagline", "about_headline", "about_description",
+    "services_tagline", "services_headline", "services_description",
+    "features_tagline", "features_headline", "features_description",
+    "cta_headline", "cta_description", "cta_button_text",
+    "contact_email", "contact_phone", "address"
+  ],
+  "list_keys": {
+    "features_list": ["title", "description"]
+  }
+}

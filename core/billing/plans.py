@@ -1,15 +1,20 @@
 from core.models.user import PlanType
 
 PLAN_LIMITS = {
-    PlanType.FREE: {
+    PlanType.DRAFTER: {
         "max_projects": 1,
         "planner_calls": 1,
         "generation_calls": 1,
     },
-    PlanType.PAID: {
-        "max_projects": 10,
-        "planner_calls": 5,
-        "generation_calls": 5,
+    PlanType.VALIDATOR: {
+        "max_projects": 3,
+        "planner_calls": 10,
+        "generation_calls": 10,
+    },
+    PlanType.AGENCY: {
+        "max_projects": float("inf"),
+        "planner_calls": float("inf"),
+        "generation_calls": float("inf"),
     },
 }
 

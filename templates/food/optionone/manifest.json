@@ -1,0 +1,33 @@
+{
+  "id": "food/optionone",
+  "name": "Ice Cream Parlor",
+  "description": "Vibrant ice cream shop with popular flavors grid, featured products, and subscribe section",
+  "intent": "presence",
+  "optional_sections": ["features", "about", "contact"],
+  "slots": {
+    "hero_image": "portrait",
+    "menu1_image": "portrait",
+    "menu2_image": "portrait",
+    "menu3_image": "portrait",
+    "product1_image": "landscape",
+    "product2_image": "landscape",
+    "product3_image": "landscape",
+    "banner_image": "landscape",
+    "banner1_image": "square",
+    "banner2_image": "square",
+    "banner3_image": "square"
+  },
+  "keywords": ["food", "ice cream", "dessert", "sweet"],
+  "copy_keys": [
+    "hero_headline", "hero_subheadline", "cta_button_text",
+    "features_headline",
+    "about_headline", "about_description",
+    "cta_headline", "cta_description",
+    "contact_headline", "contact_description",
+    "contact_email", "contact_phone", "address"
+  ],
+  "list_keys": {
+    "features_list": ["title", "description"],
+    "services_list": ["title", "description"]
+  }
+}

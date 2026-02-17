@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="60" height="60" fill="#FFB900">
+    <!-- Starburst/Rosette shape -->
+    <polygon points="50,5 61,35 95,35 68,55 79,85 50,65 21,85 32,55 5,35 39,35" />
+    <circle cx="50" cy="50" r="15" fill="#005696" opacity="1"/> <!-- Blue center -->
+</svg>

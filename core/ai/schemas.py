@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from core.errors import AIValidationError
 
 
@@ -11,10 +11,22 @@ class SectionPlan:
 
 
 @dataclass
+class CopyBlock:
+    placeholder_key: str  # e.g. "hero_headline"
+    content: str          # AI-written text
+
+
+@dataclass
 class SitePlan:
     sections: list[SectionPlan]
     page_title: str
     meta_description: str
+    # Template flow fields
+    copy_blocks: list[CopyBlock] = field(default_factory=list)
+    active_sections: list[str] = field(default_factory=list)
+    selected_template: str = ""
+    image_keywords: dict[str, str] = field(default_factory=dict)
+    image_overrides: dict[str, str] = field(default_factory=dict)
 
 
 @dataclass

@@ -81,7 +81,7 @@ TAG_LABELS = {
 }
 
 
-def edit_page(project):
+def edit_page(user, project):
     """Render the edit-content page for a project."""
     pid = project.id
     html = project.site_version.html if project.site_version else ""
@@ -152,4 +152,4 @@ def edit_page(project):
         cls="project-page",
     )
 
-    return page_layout(content, title="Okenaba - Edit Content", project_id=pid, active_nav="projects")
+    return page_layout(content, user=user, title="Okenaba - Edit Content", project_id=pid, active_nav="projects")

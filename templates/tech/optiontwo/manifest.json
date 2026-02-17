@@ -1,0 +1,25 @@
+{
+  "id": "tech/optiontwo",
+  "name": "VETA VR",
+  "description": "High-tech VR and technology template with dark theme and neon accents.",
+  "intent": "product",
+  "optional_sections": ["discover", "commitment", "build", "testimonials", "getstarted"],
+  "slots": {
+    "header_image": "landscape",
+    "commitment_image": "landscape",
+    "build_image": "landscape",
+    "client_image": "square"
+  },
+  "keywords": ["tech", "vr", "dark", "neon", "future"],
+  "copy_keys": [
+    "hero_headline", "hero_description",
+    "discover_headline",
+    "commitment_headline", "commitment_description",
+    "build_headline", "build_description",
+    "testimonials_headline", "testimonials_description",
+    "cta_headline", "cta_description"
+  ],
+  "list_keys": {
+    "testimonials_list": ["text", "author", "role"]
+  }
+}

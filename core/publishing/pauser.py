@@ -3,7 +3,7 @@ from core.models.user import PlanType
 
 
 def should_pause_site(plan: PlanType, trial_ends_at) -> bool:
-    if plan == PlanType.PAID:
+    if plan in (PlanType.VALIDATOR, PlanType.AGENCY):
         return False
     return is_trial_expired(trial_ends_at)
 

@@ -4,7 +4,7 @@ from pathlib import Path
 
 from openai import OpenAI
 
-from config.settings import NVIDIA_API_KEY, NVIDIA_MODEL, NVIDIA_BASE_URL
+from config.settings import HF_API_KEY, HF_MODELS, HF_BASE_URL
 from core.models.brand_memory import BrandMemory
 from core.ai.schemas import SitePlan, HTMLOutput
 from core.errors import AIGenerationError, AIValidationError
@@ -49,6 +49,9 @@ def _build_prompt(plan: SitePlan, memory: BrandMemory) -> str:
         address=memory.address or "N/A",
         primary_color=memory.primary_color,
         secondary_color=memory.secondary_color,
+        labeled_assets=str([{"label": a.label, "url": a.url, "width": a.width, "height": a.height, "orientation": a.orientation} for a in memory.labeled_assets])
+        if memory.labeled_assets
+        else "None",
         site_plan_json=json.dumps(plan_dict, indent=2),
     )
 
@@ -83,14 +86,15 @@ def _validate_html(html: str) -> None:
 
 
 def run_html_generator(plan: SitePlan, memory: BrandMemory) -> HTMLOutput:
-    """Call LLM via OpenRouter to generate HTML from a site plan and brand memory."""
+    """Call LLM via HF Inference (Qwen2.5) to generate HTML."""
     prompt = _build_prompt(plan, memory)
 
-    client = OpenAI(base_url=NVIDIA_BASE_URL, api_key=NVIDIA_API_KEY, max_retries=5)
+    client = OpenAI(base_url=HF_BASE_URL, api_key=HF_API_KEY, max_retries=5)
     try:
         response = client.chat.completions.create(
-            model=NVIDIA_MODEL,
+            model=HF_MODELS["code"],
             messages=[{"role": "user", "content": prompt}],
+            max_tokens=8000,
         )
     except Exception as e:
         raise AIGenerationError("html_generator", str(e)) from e

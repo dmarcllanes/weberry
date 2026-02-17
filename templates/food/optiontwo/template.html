@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="{{ meta_description }}" />
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css" rel="stylesheet" />
+    <title>{{ page_title }}</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,100..900">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,100..900">
+</head>
+
+<body>
+    <header>
+        <nav>
+            <div class="nav__header">
+                <div class="nav__logo">
+                    <a href="#" class="logo">{{ business_name }}</a>
+                </div>
+                <div class="nav__menu__btn" id="menu-btn">
+                    <i class="ri-menu-3-line"></i>
+                </div>
+            </div>
+            <ul class="nav__links" id="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#menu">Menu</a></li>
+                <li><a href="#about">About Us</a></li>
+            </ul>
+        </nav>
+
+        <div class="section__container header__container" id="home">
+            <h1>{{ hero_headline }}</h1>
+            <p>{{ hero_subheadline }}</p>
+            <div class="header__btns">
+                <button class="btn">{{ cta_button_text }}</button>
+            </div>
+        </div>
+    </header>
+
+    {% if section_features %}
+    <section class="menu" id="menu">
+        <div class="section__container menu__container">
+            <h2 class="section__header">{{ features_headline }}</h2>
+            <div class="menu__grid">
+                {% for item in features_list | default([]) %}
+                <div class="menu__card">
+                    <img src="{{ menu1_image_url if loop.index == 1 else (menu2_image_url if loop.index == 2 else (menu3_image_url if loop.index == 3 else menu4_image_url)) }}" alt="menu" />
+                    <div class="menu__card__content">
+                        <h4>{{ item.title }}</h4>
+                        <p>{{ item.description }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    {% if section_contact %}
+    <section class="book">
+        <div class="section__container book__container">
+            <form action="/">
+                <h4>{{ contact_headline | default('Get in Touch') }}</h4>
+                <div class="input__row">
+                    <div class="input__group">
+                        <label for="firstName">FIRST NAME</label>
+                        <input type="text" />
+                    </div>
+                    <div class="input__group">
+                        <label for="lastName">LAST NAME</label>
+                        <input type="text" />
+                    </div>
+                </div>
+                <div class="input__row">
+                    <div class="input__group">
+                        <label for="email">EMAIL</label>
+                        <input type="email" />
+                    </div>
+                    <div class="input__group">
+                        <label for="message">MESSAGE</label>
+                        <input type="text" />
+                    </div>
+                </div>
+                <div class="input__row">
+                    <button class="btn" type="submit">{{ cta_button_text }}</button>
+                </div>
+            </form>
+        </div>
+    </section>
+    {% endif %}
+
+    {% if section_about %}
+    <section class="section__container about__container" id="about">
+        <div class="about__image">
+            <img src="{{ about_image_url }}" alt="about" />
+        </div>
+        <div class="about__content">
+            <h2 class="section__header">{{ about_headline }}</h2>
+            <div>
+                <p>{{ about_description }}</p>
+                <div class="about__btn">
+                    <button class="btn">{{ cta_button_text }}</button>
+                </div>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    <footer>
+        <div class="section__container footer__container">
+            <div class="footer__col">
+                <a href="#" class="logo">{{ business_name }}</a>
+            </div>
+            <div class="footer__col">
+                <h4>Contact</h4>
+                <ul class="footer__links">
+                    <li><a href="#">{{ contact_email }}</a></li>
+                    <li><a href="#">{{ contact_phone }}</a></li>
+                    <li><a href="#">{{ address }}</a></li>
+                </ul>
+            </div>
+            <div class="footer__col">
+                <h4>Links</h4>
+                <ul class="footer__links">
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#menu">Menu</a></li>
+                    <li><a href="#about">About Us</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer__bar">
+            Copyright &copy; 2025 {{ business_name }}. All rights reserved.
+        </div>
+    </footer>
+
+    
+</body>
+
+</html>

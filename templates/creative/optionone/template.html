@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="{{ meta_description }}" />
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet" />
+    <title>{{ page_title }}</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100">
+</head>
+
+<body>
+    <nav>
+        <div class="nav__header">
+            <div class="nav__logo">
+                <a href="#">{{ business_name }}<span>.</span></a>
+            </div>
+            <div class="nav__menu__btn" id="menu-btn">
+                <i class="ri-menu-3-line"></i>
+            </div>
+        </div>
+        <ul class="nav__links" id="nav-links">
+            <li><a href="#">About</a></li>
+            <li><a href="#">Portfolio</a></li>
+            <li><a href="#">Contact</a></li>
+            <li><a href="#">{{ cta_button_text }}</a></li>
+        </ul>
+        <img src="{{ hero_bg_url }}" alt="background" class="nav__bg-1" />
+    </nav>
+
+    <header>
+        <div class="section__container header__container">
+            <div class="header__image">
+                <img src="{{ hero_image_url }}" alt="header" />
+            </div>
+            <div class="header__content">
+                <h2>{{ hero_headline }}</h2>
+                <h1>{{ hero_subheadline }}</h1>
+                <p>{{ about_description }}</p>
+                <div class="header__btns">
+                    <button class="btn">{{ cta_button_text }}</button>
+                </div>
+            </div>
+        </div>
+        <img src="{{ hero_bg_url }}" alt="background" class="header__bg-1" />
+    </header>
+
+    
+</body>
+
+</html>

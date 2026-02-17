@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="{{ meta_description }}" />
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.css" />
+    <title>{{ page_title }}</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&family=Roboto:ital,wght@0,100..900&display=swap">
+</head>
+
+<body>
+    <div class="background">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+
+    <nav>
+        <div class="nav__header">
+            <div class="nav__logo">
+                <a href="#">
+                    {{ business_name }}
+                </a>
+            </div>
+            <div class="nav__menu__btn" id="menu-btn">
+                <i class="ri-menu-4-line"></i>
+            </div>
+        </div>
+        <ul class="nav__links" id="nav-links">
+            <li><a href="#home">HOME</a></li>
+            <li><a href="#gallery">GALLERY</a></li>
+            <li><a href="#about">ABOUT US</a></li>
+            <li><a href="#contact">CONTACT US</a></li>
+        </ul>
+    </nav>
+
+    <header id="home">
+        <div class="section__container header__container">
+            <h1 class="section__header">{{ hero_headline }}</h1>
+        </div>
+    </header>
+
+    {% if section_gallery %}
+    <section class="section__container gallery__container" id="gallery">
+        <p class="section__subheader">{{ gallery_tagline | default('GALLERY') }}</p>
+        <h2 class="section__header">{{ gallery_headline | default('OUR GALLERY') }}</h2>
+        <!-- Slider main container -->
+        <div class="swiper">
+            <!-- Additional required wrapper -->
+            <div class="swiper-wrapper">
+                <!-- Slides -->
+                <div class="swiper-slide">
+                    <img src="{{ gallery1_image_url }}" alt="gallery" />
+                </div>
+                <div class="swiper-slide">
+                    <img src="{{ gallery2_image_url }}" alt="gallery" />
+                </div>
+                <div class="swiper-slide">
+                    <img src="{{ gallery3_image_url }}" alt="gallery" />
+                </div>
+                <div class="swiper-slide">
+                    <img src="{{ gallery4_image_url }}" alt="gallery" />
+                </div>
+                <div class="swiper-slide">
+                    <img src="{{ gallery5_image_url }}" alt="gallery" />
+                </div>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    {% if section_about %}
+    <section class="section__container service__container" id="about">
+        <p class="section__subheader">{{ about_tagline | default('KNOW US BETTER') }}</p>
+        <h2 class="section__header">
+            {{ about_headline }}
+        </h2>
+        <div class="service__content">
+            {% for service in services_list %}
+            <div class="service__row">
+                <div class="service__img">
+                    <img src="{{ service1_image_url if loop.index == 1 else (service2_image_url if loop.index == 2 else (service3_image_url if loop.index == 3 else service4_image_url)) }}"
+                        alt="service" />
+                </div>
+                <div class="service__details">
+                    <h4>{{ service.title }}</h4>
+                    <p>
+                        {{ service.description }}
+                    </p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="service__btn">
+            <button class="btn">VIEW ALL SERVICES</button>
+        </div>
+    </section>
+    {% endif %}
+
+    {% if section_instagram %}
+    <section class="section__container instagram__container">
+        <p class="section__subheader">FOLLOW US ON</p>
+        <h2 class="section__header">INSTAGRAM</h2>
+        <div class="instagram__wrapper">
+            <div class="instagram__images">
+                <img src="{{ instagram1_image_url }}" alt="instagram" />
+                <img src="{{ instagram2_image_url }}" alt="instagram" />
+                <img src="{{ instagram3_image_url }}" alt="instagram" />
+                <img src="{{ instagram4_image_url }}" alt="instagram" />
+                <img src="{{ instagram5_image_url }}" alt="instagram" />
+                <!-- Duplicates for seamless loop if needed, but keeping simple for now -->
+                <img src="{{ instagram1_image_url }}" alt="instagram" />
+                <img src="{{ instagram2_image_url }}" alt="instagram" />
+                <img src="{{ instagram3_image_url }}" alt="instagram" />
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    {% if section_banner %}
+    <section class="banner">
+        <div class="section__container banner__container">
+            <p class="section__subheader">{{ cta_tagline | default('AUTOMOTIVE HUB') }}</p>
+            <h2 class="section__header">{{ cta_headline }}</h2>
+        </div>
+    </section>
+    {% endif %}
+
+    <footer>
+        <div class="section__container footer__container" id="contact">
+            <div class="footer__col">
+                <a href="#" class="footer__logo">
+                    {{ business_name }}
+                </a>
+                <p class="section__description">
+                    {{ meta_description }}
+                </p>
+                <ul class="footer__socials">
+                    <li>
+                        <a href="#"><i class="ri-facebook-circle-fill"></i></a>
+                    </li>
+                    <li>
+                        <a href="#"><i class="ri-instagram-line"></i></a>
+                    </li>
+                    <li>
+                        <a href="#"><i class="ri-youtube-fill"></i></a>
+                    </li>
+                </ul>
+            </div>
+            <div class="footer__col">
+                <h4>QUICK LINKS</h4>
+                <ul class="footer__links">
+                    <li><a href="#home">HOME</a></li>
+                    <li><a href="#about">ABOUT US</a></li>
+                    <li><a href="#gallery">GALLERY</a></li>
+                    <li><a href="#contact">CONTACT US</a></li>
+                </ul>
+            </div>
+            <div class="footer__col">
+                <h4>SERVICES</h4>
+                <ul class="footer__links">
+                    <li><a href="#">CAR DETAILING</a></li>
+                    <li><a href="#">PAINT CORRECTION</a></li>
+                    <li><a href="#">PAINT PROTECTION FILM</a></li>
+                    <li><a href="#">CERAMIC COATING</a></li>
+                </ul>
+            </div>
+            <div class="footer__col">
+                <h4>SIGNUP FOR NEWSLETTER</h4>
+                <form action="/">
+                    <input type="text" placeholder="ENTER EMAIL" />
+                    <button class="btn">
+                        <i class="ri-send-plane-2-fill"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+        <div class="footer__bar">
+            Copyright &copy; 2025 {{ business_name }}. All rights reserved.
+        </div>
+    </footer>
+
+    
+    
+    
+</body>
+
+</html>

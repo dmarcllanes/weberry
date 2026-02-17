@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 60" width="80" height="48" fill="#C5A059">
+    <circle cx="35" cy="30" r="20" stroke="#C5A059" stroke-width="8" fill="none" opacity="0.9"/>
+    <circle cx="65" cy="30" r="20" stroke="#C5A059" stroke-width="8" fill="none" opacity="0.9"/>
+    <rect x="25" y="28" width="10" height="4" fill="#020617"/> <!-- Gap matches bg -->
+    <rect x="55" y="28" width="10" height="4" fill="#020617"/> <!-- Gap matches bg -->
+</svg>

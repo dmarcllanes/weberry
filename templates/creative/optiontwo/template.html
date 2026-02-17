@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="{{ meta_description }}" />
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <title>{{ page_title }}</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap">
+</head>
+
+<body>
+    <nav>
+        <div class="nav__header">
+            <div class="nav__logo">
+                <a href="#">{{ business_name | default('MARY.') }}<span>.</span></a>
+            </div>
+            <div class="nav__menu__btn" id="menu-btn">
+                <i class="ri-menu-line"></i>
+            </div>
+        </div>
+        <ul class="nav__links" id="nav-links">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#intro">Intro</a></li>
+            <li><a href="#service">Services</a></li>
+            <li><a href="#client">Clients</a></li>
+            <li><a href="#blog">Blog</a></li>
+        </ul>
+        <div class="nav__btns">
+            <button class="btn">{{ cta_button_text | default('Hire Me') }}</button>
+        </div>
+    </nav>
+
+    <header id="home">
+        <div class="section__container header__container">
+            <div class="header__content">
+                <h2>{{ hero_tagline | default('Hi, I am') }}</h2>
+                <h1>{{ hero_headline }}</h1>
+                <h3>{{ hero_subheadline }}</h3>
+                <p>
+                    {{ hero_description }}
+                </p>
+                <div class="header__btns">
+                    <button class="btn">Download CV</button>
+                    <button class="btn">Contact Me</button>
+                </div>
+            </div>
+            <div class="header__image">
+                <img src="{{ header_image_url }}" alt="header" />
+            </div>
+        </div>
+    </header>
+
+    {% if section_intro %}
+    <section class="section__container intro__container" id="intro">
+        <div class="intro__image">
+            <img src="{{ intro_image_url }}" alt="intro" />
+        </div>
+        <div class="intro__content">
+            <p class="section__subheader">My Intro</p>
+            <h2 class="section__header">{{ about_headline | default('About Me') }}</h2>
+            <p class="intro__description">
+                {{ about_description }}
+            </p>
+            <div class="intro__grid">
+                <h5>
+                    <span><i class="ri-user-line"></i></span> Name
+                </h5>
+                <span>:</span>
+                <p>{{ business_name }}</p>
+                <h5>
+                    <span><i class="ri-phone-line"></i></span> Phone
+                </h5>
+                <span>:</span>
+                <p>{{ contact_phone }}</p>
+                <h5>
+                    <span><i class="ri-mail-line"></i></span> Email
+                </h5>
+                <span>:</span>
+                <p>{{ contact_email }}</p>
+            </div>
+            <h4>My Interests</h4>
+            <div class="intro__flex">
+                <div>
+                    <span><i class="ri-headphone-line"></i></span> Music
+                </div>
+                <div>
+                    <span><i class="ri-briefcase-3-line"></i></span> Travel
+                </div>
+                <div>
+                    <span><i class="ri-film-line"></i></span> Movie
+                </div>
+                <div>
+                    <span><i class="ri-camera-line"></i></span> Photo
+                </div>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    {% if section_skills %}
+    <section class="choose">
+        <div class="section__container choose__container">
+            <p class="section__subheader">Why Choose Me</p>
+            <h2 class="section__header">My Experties Area</h2>
+            <div class="choose__grid">
+                <div class="choose__card">
+                    <div>
+                        <h4>Search Engine Optimization</h4>
+                        <h4>80%</h4>
+                    </div>
+                    <div class="choose__progress" style="--progress: 80%"></div>
+                </div>
+                <div class="choose__card">
+                    <div>
+                        <h4>Social Media Marketing</h4>
+                        <h4>95%</h4>
+                    </div>
+                    <div class="choose__progress" style="--progress: 95%"></div>
+                </div>
+                <div class="choose__card">
+                    <div>
+                        <h4>Content Strategy</h4>
+                        <h4>85%</h4>
+                    </div>
+                    <div class="choose__progress" style="--progress: 85%"></div>
+                </div>
+                <div class="choose__card">
+                    <div>
+                        <h4>Pay-Per-Click Advertising</h4>
+                        <h4>80%</h4>
+                    </div>
+                    <div class="choose__progress" style="--progress: 80%"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    {% if section_experience %}
+    <section class="section__container journey__container">
+        <p class="section__subheader">My Qualifications</p>
+        <h2 class="section__header">Awesome Journey</h2>
+        <div class="journey__grid">
+            <div>
+                <div class="journey__grid__header">
+                    <span><i class="ri-graduation-cap-line"></i></span> Education
+                </div>
+                <div class="journey__card">
+                    <span><i class="ri-circle-fill"></i></span>
+                    <div>
+                        <h4>Master's in Digital Marketing</h4>
+                        <h5>Crafting impactful online strategies</h5>
+                        <p>
+                            <span><i class="ri-calendar-fill"></i></span> 2018-2020
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="journey__grid__header">
+                    <span><i class="ri-briefcase-line"></i></span> Experience
+                </div>
+                <div class="journey__card">
+                    <span><i class="ri-circle-fill"></i></span>
+                    <div>
+                        <h4>Digital Marketing Manager</h4>
+                        <h5>XYZ Agency</h5>
+                        <p>
+                            <span><i class="ri-calendar-fill"></i></span> 2023-2024
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    {% if section_services %}
+    <section class="section__container service__container" id="service">
+        <p class="section__subheader">My Services</p>
+        <h2 class="section__header">What I Offer</h2>
+        <div class="service__grid">
+            {% for service in services_list %}
+            <div class="service__card">
+                <span><i class="ri-window-fill"></i></span>
+                <h4>{{ service.title }}</h4>
+                <p>
+                    {{ service.description }}
+                </p>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    {% if section_portfolio %}
+    <section class="portfolio" id="portfolio">
+        <div class="section__container portfolio__container">
+            <p class="section__subheader">My Portfolio</p>
+            <h2 class="section__header">Recent Works</h2>
+            <div class="portfolio__grid">
+                <div class="portfolio__card">
+                    <img src="{{ portfolio1_image_url }}" alt="project" />
+                </div>
+                <div class="portfolio__card">
+                    <img src="{{ portfolio2_image_url }}" alt="project" />
+                </div>
+                <div class="portfolio__card">
+                    <img src="{{ portfolio3_image_url }}" alt="project" />
+                </div>
+                <div class="portfolio__card">
+                    <img src="{{ portfolio4_image_url }}" alt="project" />
+                </div>
+                <div class="portfolio__card">
+                    <img src="{{ portfolio5_image_url }}" alt="project" />
+                </div>
+                <div class="portfolio__card">
+                    <img src="{{ portfolio6_image_url }}" alt="project" />
+                </div>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    {% if section_banner %}
+    <section class="banner__container">
+        <div class="banner__content">
+            <h2 class="section__header">{{ cta_headline }}</h2>
+            <p>
+                {{ cta_description }}
+            </p>
+            <div class="banner__btn">
+                <button class="btn">Contact Me</button>
+            </div>
+        </div>
+        <div class="banner__image">
+            <img src="{{ banner_image_url }}" alt="banner" />
+        </div>
+    </section>
+    {% endif %}
+
+    {% if section_testimonials %}
+    <section class="section__container client__container" id="client">
+        <p class="section__subheader">Testimonials</p>
+        <h2 class="section__header">My Client Saying</h2>
+        <!-- Slider main container -->
+        <div class="swiper">
+            <!-- Additional required wrapper -->
+            <div class="swiper-wrapper">
+                <!-- Slides -->
+                {% for review in testimonials_list %}
+                <div class="swiper-slide">
+                    <div class="client__card">
+                        <div class="client__header">
+                            <div class="client__details">
+                                <img src="{{ client1_image_url if loop.index == 1 else (client2_image_url if loop.index == 2 else (client3_image_url if loop.index == 3 else client4_image_url)) }}"
+                                    alt="client" />
+                                <div>
+                                    <h4>{{ review.author }}</h4>
+                                    <h5>{{ review.role | default('Client') }}</h5>
+                                </div>
+                            </div>
+                            <div class="client__ratings">
+                                <span><i class="ri-star-fill"></i></span>
+                                <span><i class="ri-star-fill"></i></span>
+                                <span><i class="ri-star-fill"></i></span>
+                                <span><i class="ri-star-fill"></i></span>
+                                <span><i class="ri-star-fill"></i></span>
+                            </div>
+                        </div>
+                        <p>
+                            {{ review.text }}
+                        </p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <!-- If we need pagination -->
+            <div class="swiper-pagination"></div>
+        </div>
+    </section>
+    {% endif %}
+
+    {% if section_blog %}
+    <section class="blog" id="blog">
+        <div class="section__container blog__container">
+            <p class="section__subheader">Blog</p>
+            <h2 class="section__header">Latest Updates</h2>
+            <div class="blog__grid">
+                <div class="blog__card">
+                    <img src="{{ blog1_image_url }}" alt="blog" />
+                    <div>
+                        <p>20 Jul 2024</p>
+                        <h4>The Power of SEO: How to Rank Higher and Drive Traffic</h4>
+                    </div>
+                </div>
+                <div class="blog__card">
+                    <img src="{{ blog2_image_url }}" alt="blog" />
+                    <div>
+                        <p>15 Oct 2024</p>
+                        <h4>Social Media Marketing Trends to Watch in 2024</h4>
+                    </div>
+                </div>
+                <div class="blog__card">
+                    <img src="{{ blog3_image_url }}" alt="blog" />
+                    <div>
+                        <p>08 Feb 2024</p>
+                        <h4>
+                            10 Proven Digital Marketing Strategies to Grow Your Business
+                        </h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    <footer>
+        <div class="section__container footer__container">
+            <h4>{{ business_name }}</h4>
+            <ul class="footer__socials">
+                <a href="#"><i class="ri-twitter-fill"></i></a>
+                <a href="#"><i class="ri-linkedin-fill"></i></a>
+                <a href="#"><i class="ri-behance-fill"></i></a>
+                <a href="#"><i class="ri-dribbble-line"></i></a>
+                <a href="#"><i class="ri-pinterest-line"></i></a>
+            </ul>
+        </div>
+        <div class="footer__bar">
+            Copyright © 2024 {{ business_name }}. All rights reserved.
+        </div>
+    </footer>
+
+    
+    
+    
+</body>
+
+</html>

@@ -1,0 +1,35 @@
+{
+  "id": "automotive/optiontwo",
+  "name": "Eightyeight Detailing",
+  "description": "Premium dark-themed automotive template featuring a gallery slider, detailed service sections, and a sleek modern design.",
+  "intent": "service",
+  "optional_sections": ["gallery", "about", "instagram", "banner", "contact"],
+  "slots": {
+    "header_image": "landscape",
+    "gallery1_image": "landscape",
+    "gallery2_image": "landscape",
+    "gallery3_image": "landscape",
+    "gallery4_image": "landscape",
+    "gallery5_image": "landscape",
+    "service1_image": "landscape",
+    "service2_image": "landscape",
+    "service3_image": "landscape",
+    "service4_image": "landscape",
+    "instagram1_image": "square",
+    "instagram2_image": "square",
+    "instagram3_image": "square",
+    "instagram4_image": "square",
+    "instagram5_image": "square",
+    "banner_image": "landscape"
+  },
+  "keywords": ["automotive", "detailing", "car", "dark", "premium"],
+  "copy_keys": [
+    "hero_headline",
+    "gallery_tagline", "gallery_headline",
+    "about_tagline", "about_headline",
+    "cta_tagline", "cta_headline"
+  ],
+  "list_keys": {
+    "services_list": ["title", "description"]
+  }
+}
