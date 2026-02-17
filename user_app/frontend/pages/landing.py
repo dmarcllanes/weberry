@@ -71,6 +71,7 @@ def landing_page():
                         Li(A('How It Works', href='#how-it-works', onclick='toggleMobileMenu()')),
                         Li(A('Pricing', href='#pricing', onclick='toggleMobileMenu()')),
                         Li(A('Contact', href='#contact', onclick='toggleMobileMenu()')),
+                        Li(A('Sign In', href='/login', cls='mobile-nav-cta')),
                         cls='mobile-nav-links'
                     ),
                     cls='mobile-menu',

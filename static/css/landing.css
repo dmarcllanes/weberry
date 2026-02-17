@@ -1139,6 +1139,15 @@ ul {
 }
 
 @media (max-width: 768px) {
+    .navbar {
+        padding: 0.8rem 1.25rem;
+    }
+
+    /* Hide desktop sign in button on mobile */
+    .nav-actions .btn-secondary {
+        display: none;
+    }
+
     .footer-content {
         grid-template-columns: 1fr;
         gap: 3rem;
@@ -1161,4 +1170,13 @@ ul {
         grid-template-columns: 1fr;
         gap: 2rem;
     }
+}
+
+/* Style for the Sign In link in mobile menu */
+.mobile-nav-cta {
+    color: var(--primary) !important;
+    font-weight: 700 !important;
+    background: rgba(59, 130, 246, 0.1);
+    border-radius: 8px;
+    margin-top: 0.5rem;
 }
