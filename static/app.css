@@ -2754,3 +2754,40 @@ details[open]>.img-editor-summary::before {
         font-size: 16px; /* Prevent zoom */
     }
 }
+
+    /* Mobile Image Editor Styles */
+    .img-editor-grid {
+        display: flex;
+        flex-direction: column; /* Stack cards vertically on mobile */
+        gap: var(--spacing-sm);
+    }
+    
+    .img-editor-card {
+        flex-direction: column; /* Stack image and controls */
+        align-items: stretch;
+    }
+    
+    .img-editor-thumb {
+        width: 100%;
+        height: 150px;
+        object-fit: cover;
+    }
+    
+    .img-editor-card-body {
+        padding: var(--spacing-sm);
+        gap: var(--spacing-sm);
+    }
+    
+    .browser-bar {
+        padding: var(--spacing-xs) var(--spacing-sm);
+        gap: var(--spacing-sm);
+    }
+    
+    .browser-url-text {
+        font-size: 0.7rem; 
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: block;
+        max-width: 200px;
+    }

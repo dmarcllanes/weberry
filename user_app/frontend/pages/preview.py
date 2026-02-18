@@ -197,8 +197,7 @@ def preview_page(user, project):
             image_editor,
             cls="step-content",
         ),
-        cls="step",
-        style="max-width:960px;margin:0 auto;padding:2rem",
+        cls="step preview-page-step",
     )
 
     return page_layout(content, user=user, title="Okenaba - Preview", project_id=pid, active_nav="projects")

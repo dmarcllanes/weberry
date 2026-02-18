@@ -224,7 +224,6 @@ def onboarding_page(user, project):
                     Button("Build My Site", type="submit", cls="button button-primary",
                            onclick="return validateAndSubmit()"),
                     cls="button-group",
-                    style="margin-top:2rem"
                 ),
                 cls="form",
             ),
@@ -241,7 +240,7 @@ def onboarding_page(user, project):
         method="post", action=f"/projects/{pid}/braindump",
     )
 
-    content = Div(form, cls="onboarding-layout", style="max-width:640px;margin:0 auto")
+    content = Div(form, cls="onboarding-layout")
 
     return page_layout(content, user=user, title="Okenaba - Brain Dump", project_id=pid, active_nav="projects")
 
