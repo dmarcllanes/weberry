@@ -215,6 +215,11 @@ async def post(req, project_id: str):
     return await editing.edit_image(req, project_id)
 
 
+@rt("/projects/{project_id}/bulk-upload")
+async def post(req, project_id: str):
+    return await editing.bulk_upload_images(req, project_id)
+
+
 # --- Routes: Publishing ---
 
 @rt("/projects/{project_id}/publish")

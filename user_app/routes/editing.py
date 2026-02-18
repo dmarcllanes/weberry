@@ -85,6 +85,66 @@ async def edit_content(req, project_id: str):
     return RedirectResponse(f"/projects/{project_id}/edit", status_code=303)
 
 
+async def bulk_upload_images(req, project_id: str):
+    """Upload multiple images and assign them to template image slots in order."""
+    user = req.scope["user"]
+    project = db.get_project(project_id)
+    if project is None or project.user_id != user.id:
+        return error_page("Project not found", 404)
+
+    plan = project.site_plan
+    if not plan:
+        return error_page("No site plan found")
+
+    from core.ai.template_loader import load_template_manifest
+    try:
+        manifest = load_template_manifest(plan.selected_template)
+    except FileNotFoundError:
+        return error_page("Template not found")
+
+    slots = list(manifest.get("slots", {}).keys())
+    if not slots:
+        return error_page("No image slots in this template")
+
+    form = await req.form()
+    files = form.getlist("files")
+    if not files:
+        return error_page("No files uploaded")
+
+    storage = db.get_storage()
+    uploaded_count = 0
+
+    for slot_name, upload in zip(slots, files):
+        if not hasattr(upload, "read"):
+            continue
+        contents = await upload.read()
+        if not contents or len(contents) > 5 * 1024 * 1024:
+            continue
+        try:
+            img = Image.open(io.BytesIO(contents))
+            img.verify()
+        except Exception:
+            continue
+
+        ext = upload.filename.rsplit(".", 1)[-1] if "." in upload.filename else "png"
+        storage_path = f"{project_id}/assets/{uuid.uuid4().hex}.{ext}"
+        content_type = upload.content_type or "image/png"
+        storage.from_(SUPABASE_ASSETS_BUCKET).upload(storage_path, contents, {"content-type": content_type})
+        public_url = storage.from_(SUPABASE_ASSETS_BUCKET).get_public_url(storage_path)
+        plan.image_overrides[slot_name] = public_url
+        uploaded_count += 1
+
+    if uploaded_count == 0:
+        return error_page("No valid images were uploaded")
+
+    try:
+        rerender_site(project)
+    except CoreError as e:
+        return error_page(str(e))
+
+    return RedirectResponse(f"/projects/{project_id}", status_code=303)
+
+
 async def edit_image(req, project_id: str):
     """
     Handle image slot updates (keyword change or file upload).

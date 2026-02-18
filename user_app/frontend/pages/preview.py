@@ -1,7 +1,7 @@
 """Preview page (SITE_GENERATED / PREVIEW states)."""
 
 import re
-import random
+import hashlib
 from pathlib import Path
 
 from fasthtml.common import (
@@ -25,8 +25,9 @@ def _get_thumb_url(slot_name: str, site_plan) -> str:
     override = site_plan.image_overrides.get(slot_name)
     if override:
         return override
-    keyword = site_plan.image_keywords.get(slot_name, slot_name).strip().replace(" ", "-")
-    return f"https://picsum.photos/seed/{keyword}/300/200"
+    keyword = site_plan.image_keywords.get(slot_name, slot_name).strip().replace(" ", ",")
+    lock = int(hashlib.md5(slot_name.encode()).hexdigest()[:8], 16) % 10000
+    return f"https://loremflickr.com/300/200/{keyword}?lock={lock}"
 
 
 def _get_template_slots(template_id: str) -> list[str]:
@@ -149,15 +150,51 @@ def preview_page(user, project):
         enctype="multipart/form-data",
     ) if upload_options else Div()
 
+    # Slot count for the hint
+    slot_count = len(used_slots)
+
+    # Bulk upload form — top of image section
+    bulk_upload_form = Form(
+        P(
+            f"Upload up to {slot_count} photo{'s' if slot_count != 1 else ''} at once. "
+            "They'll be assigned to each image spot on your site in order.",
+            cls="img-editor-hint",
+        ),
+        Div(
+            Label(
+                "Choose Photos",
+                Input(
+                    type="file", name="files", accept="image/*",
+                    multiple=True,
+                    style="display:none",
+                    onchange="this.form.submit()",
+                ),
+                cls="btn btn-primary",
+                style="cursor:pointer; display:inline-block;",
+            ),
+            cls="img-editor-upload-row",
+            style="margin-bottom:0",
+        ),
+        method="post",
+        action=f"/projects/{pid}/bulk-upload",
+        enctype="multipart/form-data",
+    ) if used_slots else Div()
+
     # Image editor section — open by default
     image_editor = Details(
         Summary("Edit Images", cls="img-editor-summary"),
         Div(
-            P("Change images by entering a keyword, or upload your own below.",
+            Div(
+                H3("Upload All Your Photos", cls="img-editor-upload-title"),
+                bulk_upload_form,
+                cls="img-editor-upload-section",
+                style="margin-bottom:1.5rem",
+            ),
+            P("Or swap individual images below using a keyword or per-slot upload.",
               cls="img-editor-hint"),
             Div(*slot_cards, cls="img-editor-grid"),
             Div(
-                H3("Upload Your Own Image", cls="img-editor-upload-title"),
+                H3("Upload a Single Image", cls="img-editor-upload-title"),
                 upload_form,
                 cls="img-editor-upload-section",
             ),
