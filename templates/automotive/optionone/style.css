@@ -29,7 +29,7 @@
 }
 
 .section__header {
-    font-size: 3rem;
+    font-size: 2rem;
     font-weight: 700;
     color: var(--text-dark);
     text-align: center;
@@ -80,6 +80,7 @@ ul {
 html,
 body {
     scroll-behavior: smooth;
+    overflow-x: hidden;
 }
 
 body {
@@ -176,11 +177,11 @@ header {
 
 .header__content h1 {
     margin-bottom: 2rem;
-    font-size: 4rem;
+    font-size: 2.25rem;
     font-weight: 700;
     color: var(--text-dark);
     text-align: center;
-    line-height: 4rem;
+    line-height: 2.75rem;
 }
 
 .about__container {
@@ -487,13 +488,18 @@ header {
         padding-block: 2rem;
     }
 
-    .header__content :is(h1, .section__description) {
+    .header__content h1 {
+        font-size: 4rem;
+        line-height: 4rem;
         text-align: left;
     }
 
-    .header__content h1 {
-        font-size: 5.5rem;
-        line-height: 5.5rem;
+    .header__content .section__description {
+        text-align: left;
+    }
+
+    .section__header {
+        font-size: 3rem;
     }
 
     .about__container {

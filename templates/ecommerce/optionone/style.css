@@ -63,6 +63,7 @@ ul {
 html,
 body {
     scroll-behavior: smooth;
+    overflow-x: hidden;
 }
 
 body {
@@ -157,9 +158,9 @@ nav {
 
 .header__content h1 {
     margin-bottom: 1rem;
-    font-size: 3.5rem;
+    font-size: 2rem;
     font-weight: 600;
-    line-height: 4rem;
+    line-height: 2.5rem;
     color: var(--text-dark);
 }
 
@@ -551,6 +552,11 @@ nav {
 
     .header__content {
         text-align: left;
+    }
+
+    .header__content h1 {
+        font-size: 3.5rem;
+        line-height: 4rem;
     }
 
     .header__btns {

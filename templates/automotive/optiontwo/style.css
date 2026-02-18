@@ -35,7 +35,7 @@
 .section__header {
     max-width: 800px;
     margin-inline: auto;
-    font-size: 3rem;
+    font-size: 2rem;
     color: var(--white);
     font-family: var(--header-font);
     letter-spacing: 2px;
@@ -75,6 +75,7 @@ ul {
 html,
 body {
     scroll-behavior: smooth;
+    overflow-x: hidden;
 }
 
 body {
@@ -473,6 +474,10 @@ header::before {
         margin: 0;
         text-align: left;
         font-size: 5rem;
+    }
+
+    .section__header {
+        font-size: 3rem;
     }
 
     .service__container :is(.section__header, .section__subheader) {

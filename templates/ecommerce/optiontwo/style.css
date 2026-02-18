@@ -68,6 +68,7 @@ a {
 html,
 body {
     scroll-behavior: smooth;
+    overflow-x: hidden;
 }
 
 body {
@@ -120,9 +121,9 @@ nav {
 
 .header__content h1 {
     margin-bottom: 2rem;
-    font-size: 4rem;
+    font-size: 2.25rem;
     font-weight: 700;
-    line-height: 5rem;
+    line-height: 2.75rem;
     color: var(--text-dark);
 }
 
@@ -443,6 +444,11 @@ nav {
 
     .header__content :is(.section__subheader, h1, .header__btn) {
         text-align: left;
+    }
+
+    .header__content h1 {
+        font-size: 4rem;
+        line-height: 5rem;
     }
 
     .feature__grid {

@@ -5,8 +5,13 @@ NAV_TOGGLE_JS = """<script>
   var nav=document.getElementById("nav-links");
   if(!btn||!nav)return;
   btn.addEventListener("click",function(){
-    var open=nav.classList.toggle("open");
-    nav.style.display=open?"flex":"none";
+    if(nav.classList.contains("open")){
+      nav.classList.remove("open");
+      setTimeout(function(){if(!nav.classList.contains("open"))nav.style.display="none";},350);
+    }else{
+      nav.style.display="flex";
+      requestAnimationFrame(function(){requestAnimationFrame(function(){nav.classList.add("open");});});
+    }
   });
   function check(){
     if(getComputedStyle(btn).display==="none"){

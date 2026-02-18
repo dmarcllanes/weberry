@@ -63,6 +63,7 @@ ul {
 html,
 body {
     scroll-behavior: smooth;
+    overflow-x: hidden;
 }
 
 body {
@@ -137,7 +138,7 @@ nav {
 
 .header__container h1 {
     margin-bottom: 2rem;
-    font-size: 4rem;
+    font-size: 2.25rem;
     font-weight: 600;
     font-family: var(--header-font);
     color: var(--white);
@@ -393,6 +394,7 @@ footer {
 
     .header__container h1 {
         max-width: 600px;
+        font-size: 4rem;
         text-align: left;
     }
 

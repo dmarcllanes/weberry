@@ -30,7 +30,7 @@
     margin-bottom: 1rem;
     font-family: var(--header-font);
     font-weight: 600;
-    font-size: 3rem;
+    font-size: 2rem;
     text-align: center;
     color: var(--white);
 }
@@ -177,10 +177,10 @@ nav {
 
 .header__content h1 {
     margin-bottom: 1rem;
-    font-size: 4.75rem;
+    font-size: 2.5rem;
     font-weight: 600;
     font-family: var(--header-font);
-    line-height: 5rem;
+    line-height: 3rem;
     color: var(--white);
     text-align: center;
 }
@@ -614,8 +614,18 @@ nav {
         align-items: center;
     }
 
-    .header__content :is(h1, .section__description) {
+    .header__content h1 {
+        font-size: 4.75rem;
+        line-height: 5rem;
         text-align: left;
+    }
+
+    .header__content .section__description {
+        text-align: left;
+    }
+
+    .section__header {
+        font-size: 3rem;
     }
 
     .header__btns {

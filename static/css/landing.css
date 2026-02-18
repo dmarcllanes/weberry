@@ -1149,7 +1149,7 @@ ul {
     }
 
     .hero {
-        padding-top: 140px;
+        padding-top: 180px;
         padding-bottom: 60px;
     }
 
@@ -1250,7 +1250,8 @@ ul {
 
 @media (max-width: 480px) {
     .hero {
-        padding-top: 120px;
+        padding-top: 180px;
+        padding-bottom: 60px;
     }
 
     .hero-title {

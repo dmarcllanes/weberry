@@ -82,6 +82,7 @@ ul {
 html,
 body {
     scroll-behavior: smooth;
+    overflow-x: hidden;
 }
 
 body {
@@ -169,7 +170,7 @@ nav {
 
 .header__content h1 {
     margin-bottom: 1rem;
-    font-size: 4rem;
+    font-size: 2.25rem;
     font-weight: 800;
     color: var(--text-dark);
     text-align: center;
@@ -682,7 +683,12 @@ nav {
         grid-area: 1/2/2/3;
     }
 
-    .header__content :is(h1, .section__description) {
+    .header__content h1 {
+        font-size: 4rem;
+        text-align: left;
+    }
+
+    .header__content .section__description {
         text-align: left;
     }
 
