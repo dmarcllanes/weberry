@@ -40,6 +40,7 @@ def get_templates_summary() -> str:
         for list_name, fields in list_keys_data.items():
             list_parts.append(f"{list_name} (fields: {', '.join(fields)})")
         list_keys_str = "; ".join(list_parts) if list_parts else "none"
+        slots_str = ", ".join(t.get("slots", {}).keys()) or "none"
         lines.append(
             f"- ID: {t['id']}\n"
             f"  Name: {t['name']}\n"
@@ -47,6 +48,7 @@ def get_templates_summary() -> str:
             f"  Description: {t['description']}\n"
             f"  Optional sections: {optional}\n"
             f"  Required copy keys: {copy_keys}\n"
-            f"  List keys: {list_keys_str}"
+            f"  List keys: {list_keys_str}\n"
+            f"  Image slots: {slots_str}"
         )
     return "\n".join(lines)

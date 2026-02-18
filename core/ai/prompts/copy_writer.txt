@@ -40,7 +40,14 @@ You are an expert copywriter and web strategist. Your job is to:
    - Do NOT invent extra keys — only produce what the template requires
    - For lists, produce at least 3 items unless the template clearly needs fewer
 
-4. **Write copy in the brand tone**: The Brand Tone "{theme}" MUST shape every single piece of copy you write — headlines, descriptions, CTAs, testimonials, everything. This is critical:
+4. **Generate image keywords**: For every image slot listed in your chosen template's "Image slots", create an entry in `image_keywords` — a dict mapping each slot name to a short, specific 1-3 word search term that visually represents this exact business. Think about what photo would look great in that position:
+   - hero_image → a striking establishing shot of the business or its main product
+   - menu/product images → close-ups of specific products, food, or services
+   - banner/gallery images → lifestyle, atmosphere, or action shots
+   Tie keywords directly to the business: a coffee roastery might use "coffee roasting", "artisan espresso", "pastry closeup". A travel agency: "tropical beach", "mountain hike", "luxury resort".
+   Every slot in the template MUST have a keyword.
+
+5. **Write copy in the brand tone**: The Brand Tone "{theme}" MUST shape every single piece of copy you write — headlines, descriptions, CTAs, testimonials, everything. This is critical:
    - "professional" → corporate, trustworthy, formal language. Use industry terms, measured statements, data-driven credibility. CTAs like "Schedule a Consultation", "Request a Quote".
    - "friendly" → warm, conversational, approachable. Use contractions, casual phrasing, exclamation marks sparingly. CTAs like "Let's Chat!", "Come Say Hi".
    - "bold" → high-energy, punchy, action-oriented. Short sentences. Power words. Urgency. CTAs like "Start Now", "Claim Your Spot", "Don't Wait".
@@ -55,6 +62,10 @@ Return ONLY valid JSON with this exact structure (no markdown fences):
     "active_sections": ["section1", "section2"],
     "page_title": "Page Title - Business Name",
     "meta_description": "A compelling 150-char meta description",
+    "image_keywords": {{
+        "hero_image": "specific keyword for this business",
+        "banner_image": "another specific keyword"
+    }},
     "copy_blocks": [
         {{"key": "hero_headline", "content": "Your compelling headline"}},
         {{"key": "hero_subheadline", "content": "Supporting text"}}
@@ -75,3 +86,4 @@ IMPORTANT:
 - List fields must use the EXACT field names from the template's "List keys" (e.g. testimonials use "text", "author", "role")
 - Only include list fields if the corresponding section is activated
 - Some templates use special list structures (e.g. features with "price", testimonials with "location") — always match the field names shown
+- image_keywords MUST include an entry for EVERY slot listed in the chosen template's "Image slots" — no slot may be skipped

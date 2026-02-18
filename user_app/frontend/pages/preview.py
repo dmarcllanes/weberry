@@ -179,7 +179,6 @@ def preview_page(user, project):
                     src=f"/projects/{pid}/preview-render",
                     cls="site-preview-frame",
                     title="Site preview",
-                    style="width:100%;height:600px;border:none;border-radius:0 0 8px 8px",
                 ),
                 cls="browser-chrome",
             ),
