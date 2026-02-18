@@ -12,6 +12,7 @@ Services: Sustainable Design, Urban Planning, Interior Architecture, Renovation 
 Contact: hello@zenitharch.com | 
 (555) 123-4567
 Theme: Navy Blue (#1e3a8a), Slate Gray (#64748b), and White.
+
 Example 2: Creative Portfolio (Vibrant & Bold)
 Use this to test layout flexibility and how the AI handles "Creative" or "Portfolio" types.
 
@@ -24,6 +25,7 @@ Services: Motion Graphics, UI/UX Design, Brand Identity, Webflow Development
 Contact: collab@neonpulse.io | 
 (555) 987-6543
 Theme: Cyber Purple (#7c3aed), Electric Pink (#db2777), and Dark Mode (#0f172a).
+
 Example 3: Local "Main Street" Shop (Warm & Approachable)
 Great for testing a "Storefront" type or a more traditional service business.
 
@@ -35,17 +37,10 @@ Description: A cozy neighborhood coffee roastery and bakery dedicated to ethical
 Services: Small-Batch Roasting, Catering, Workspace Rental, Pastry Subscriptions
 Contact: coffee@roastedbean.co | 123 Maple Ave, Oakwood
 Theme: Earthy Brown (#78350f), Sage Green (#16a34a), and Cream (#fef3c7).
+
 How to use these in your workflow:
 Onboarding: Enter the name and tagline from one of these examples.
 Goals: Select the goal that matches (e.g., "Lead Gen" for Architecture).
 Details: Copy/paste the description and services.
 Preview: See how the "Preview Your Site" page renders the specific services and theme.
 Dashboard: Click Details on the project card to see this info pop up in the new modal we just built!
-Good
-Bad
-Review Changes
-
-
-
-
-

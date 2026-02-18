@@ -30,14 +30,16 @@ def _get_thumb_url(slot_name: str, site_plan) -> str:
 
 
 def _get_template_slots(template_id: str) -> list[str]:
+    """Get all image slot names actually used in the template HTML."""
     template_path = TEMPLATES_DIR / template_id / "template.html"
     if not template_path.exists():
         return []
     html = template_path.read_text()
-    matches = re.findall(r"\{\{\s*(\w+)_url\s*\}\}", html)
+    # Match all xxx_url variable references inside Jinja2 {{ }} blocks,
+    # including conditionals like {{ a_url if ... else b_url }}
     seen = set()
     slots = []
-    for m in matches:
+    for m in re.findall(r"(\w+)_url", html):
         if m not in seen:
             seen.add(m)
             slots.append(m)

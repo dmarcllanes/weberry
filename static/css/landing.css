@@ -1148,6 +1148,90 @@ ul {
         display: none;
     }
 
+    .hero {
+        padding-top: 140px;
+        padding-bottom: 60px;
+    }
+
+    .hero-title {
+        font-size: 2.5rem;
+    }
+
+    .hero-subtitle {
+        font-size: 1.05rem;
+    }
+
+    .hero-buttons {
+        flex-direction: column;
+        margin-bottom: 2rem;
+    }
+
+    .hero-buttons .btn-primary,
+    .hero-buttons .btn-secondary {
+        width: 100%;
+    }
+
+    .how-it-works {
+        padding: 60px 0;
+    }
+
+    .how-it-works h2 {
+        font-size: 2rem;
+        margin-bottom: 3rem;
+    }
+
+    .features {
+        padding: 60px 0;
+    }
+
+    .features h2 {
+        font-size: 1.75rem;
+    }
+
+    .pricing {
+        padding: 60px 0;
+    }
+
+    .pricing h2 {
+        font-size: 1.75rem;
+    }
+
+    .pricing-grid {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+
+    .pricing-card.featured {
+        transform: scale(1);
+    }
+
+    .testimonials {
+        padding: 60px 0;
+    }
+
+    .testimonials h2 {
+        font-size: 1.75rem;
+    }
+
+    .testimonials-grid {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+
+    .cta {
+        padding: 60px 0;
+    }
+
+    .cta h2 {
+        font-size: 2rem;
+    }
+
+    .cta-content {
+        padding: 3rem 1.5rem;
+    }
+
+    .footer {
+        padding: 40px 0 24px;
+    }
+
     .footer-content {
         grid-template-columns: 1fr;
         gap: 3rem;
@@ -1158,17 +1242,32 @@ ul {
         gap: 2rem;
     }
 
-    .hero-title {
-        font-size: 2.5rem;
-    }
-
-    .pricing-card.featured {
-        transform: scale(1);
-    }
-
     .stats .container {
         grid-template-columns: 1fr;
         gap: 2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero {
+        padding-top: 120px;
+    }
+
+    .hero-title {
+        font-size: 2rem;
+    }
+
+    .step {
+        min-height: auto;
+        padding: 2rem 1.5rem;
+    }
+
+    .stat-item h4 {
+        font-size: 2rem;
+    }
+
+    .cta h2 {
+        font-size: 1.75rem;
     }
 }
 

@@ -1915,6 +1915,28 @@ select.input {
     .browser-dots {
         display: none;
     }
+
+    .browser-url-bar {
+        overflow: hidden;
+    }
+
+    .status-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .url-box {
+        width: 100%;
+    }
+
+    .trial-banner {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .browser-chrome {
+        border-radius: var(--radius-lg);
+    }
 }
 
 /* Small Mobile */
@@ -1948,6 +1970,30 @@ select.input {
 
     .logo-text {
         display: none;
+    }
+
+    .loading-card {
+        min-width: 0;
+        width: calc(100% - 2rem);
+    }
+
+    .site-preview-frame {
+        height: 300px;
+    }
+
+    .step-indicator {
+        gap: 0;
+        justify-content: space-between;
+    }
+
+    .si-connector {
+        width: 16px;
+    }
+
+    .si-circle {
+        width: 28px;
+        height: 28px;
+        font-size: 0.7rem;
     }
 }
 
