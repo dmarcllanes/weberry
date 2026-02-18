@@ -39,12 +39,13 @@ def _validate_css(css: str) -> None:
         issues.append("CSS must not contain @import rules")
 
     if "url(" in css_lower:
-        # Allow data: URIs but block external URLs
+        # Allow data URIs, local paths, and HTTPS (uploads, picsum)
         import re
         urls = re.findall(r'url\(["\']?(.*?)["\']?\)', css_lower)
         for url in urls:
-            if not url.startswith("data:"):
-                issues.append(f"CSS must not reference external URLs: {url}")
+            if url.startswith(("data:", "/", "https://")):
+                continue
+            issues.append(f"CSS must not reference external URLs: {url}")
 
     if issues:
         raise AIValidationError(issues)

@@ -31,8 +31,10 @@ def validate_for_publish(html: str, css: str) -> None:
 
     urls = re.findall(r'url\(["\']?(.*?)["\']?\)', css_lower)
     for url in urls:
-        if not url.startswith("data:"):
-            issues.append(f"CSS must not reference external URLs: {url}")
+        # Allow data URIs, local paths, and HTTPS (Supabase uploads, picsum)
+        if url.startswith(("data:", "/", "https://")):
+            continue
+        issues.append(f"CSS must not reference external URLs: {url}")
 
     if issues:
         raise AIValidationError(issues)

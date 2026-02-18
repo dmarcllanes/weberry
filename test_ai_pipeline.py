@@ -514,11 +514,11 @@ def test_css_rejects_import():
     except AIValidationError:
         pass
 
-def test_css_rejects_external_url():
+def test_css_rejects_unsafe_url():
     from core.ai.css_generator import _validate_css
     from core.errors import AIValidationError
     try:
-        _validate_css('body { background: url("https://example.com/img.png"); }')
+        _validate_css('body { background: url("http://example.com/img.png"); }')
         assert False
     except AIValidationError:
         pass
@@ -527,10 +527,20 @@ def test_css_allows_data_uri():
     from core.ai.css_generator import _validate_css
     _validate_css('body { background: url("data:image/png;base64,abc"); }')
 
+def test_css_allows_local_paths():
+    from core.ai.css_generator import _validate_css
+    _validate_css('body { background: url("/static/img/placeholder.svg"); }')
+
+def test_css_allows_https():
+    from core.ai.css_generator import _validate_css
+    _validate_css('body { background: url("https://picsum.photos/seed/coffee/1600/900"); }')
+
 test("valid CSS passes", test_css_valid)
 test("CSS rejects @import", test_css_rejects_import)
-test("CSS rejects external URLs", test_css_rejects_external_url)
+test("CSS rejects unsafe URLs", test_css_rejects_unsafe_url)
 test("CSS allows data URIs", test_css_allows_data_uri)
+test("CSS allows local paths", test_css_allows_local_paths)
+test("CSS allows HTTPS URLs", test_css_allows_https)
 
 
 # ============================================================
