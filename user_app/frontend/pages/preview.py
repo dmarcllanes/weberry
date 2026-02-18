@@ -25,8 +25,8 @@ def _get_thumb_url(slot_name: str, site_plan) -> str:
     override = site_plan.image_overrides.get(slot_name)
     if override:
         return override
-    # Use local placeholder to avoid validation errors
-    return "/static/img/placeholder.svg"
+    keyword = site_plan.image_keywords.get(slot_name, slot_name).strip().replace(" ", "-")
+    return f"https://picsum.photos/seed/{keyword}/300/200"
 
 
 def _get_template_slots(template_id: str) -> list[str]:

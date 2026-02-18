@@ -77,9 +77,9 @@ def render_template(template_id: str, site_plan: SitePlan, memory: BrandMemory) 
             if match not in slots:
                 slots[match] = "landscape"
 
-    # Generate placeholder image URLs for each slot or use overrides
+    # Generate image URLs for each slot or use overrides
     for slot_name, slot_type in slots.items():
-        # Check for manual override first
+        # 1. Uploaded image override takes highest priority
         override_url = site_plan.image_overrides.get(slot_name)
         if override_url:
             context[f"{slot_name}_url"] = override_url
@@ -95,8 +95,16 @@ def render_template(template_id: str, site_plan: SitePlan, memory: BrandMemory) 
         else:
             w, h = 1200, 800
 
-        # Use local placeholder to pass validation
-        url = "/static/img/placeholder.svg"
+        # 2. Use user-entered keyword, or deterministically pick from manifest defaults
+        keyword = site_plan.image_keywords.get(slot_name)
+        if not keyword:
+            if default_keywords:
+                # Use slot name hash so each slot gets a stable default keyword
+                keyword = default_keywords[hash(slot_name) % len(default_keywords)]
+            else:
+                keyword = slot_name
+        keyword_safe = keyword.strip().replace(" ", "-")
+        url = f"https://picsum.photos/seed/{keyword_safe}/{w}/{h}"
 
         context[f"{slot_name}_url"] = url
 

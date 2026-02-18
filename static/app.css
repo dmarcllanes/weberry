@@ -2677,3 +2677,80 @@ details[open]>.img-editor-summary::before {
         grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
     }
 }
+/* ===========================
+   MOBILE WIZARD OPTIMIZATIONS
+   =========================== */
+
+@media (max-width: 640px) {
+    /* Reduce main container padding */
+    .main {
+        padding: var(--spacing-sm);
+        gap: var(--spacing-sm);
+    }
+    
+    /* Compact Step Indicator */
+    .step-indicator {
+        padding: 0;
+        margin-bottom: var(--spacing-md);
+        gap: 0;
+    }
+    
+    .si-circle {
+        width: 32px;
+        height: 32px;
+        font-size: 0.75rem;
+    }
+    
+    .si-connector {
+        width: 32px; /* Shorten lines */
+        margin-top: -8px; /* Re-center vertically with smaller circles approx */
+    }
+    
+    .si-label {
+        font-size: 0.7rem;
+        margin-top: 4px;
+        display: none; /* Often cleaner to hide labels on very small screens */
+    }
+    
+    .si-label.si-label-active {
+        display: block; /* Show only active label */
+    }
+
+    /* Compact Step Card */
+    .step-content {
+        padding: var(--spacing-md); /* 1.5rem instead of 3rem */
+        border-radius: var(--radius-lg);
+    }
+
+    .step-title {
+        font-size: 1.5rem;
+        margin-bottom: var(--spacing-sm);
+    }
+
+    .step-description {
+        font-size: 0.95rem;
+        margin-bottom: var(--spacing-md);
+    }
+    
+    .button-group {
+        margin-top: var(--spacing-md);
+        gap: var(--spacing-sm);
+    }
+    
+    /* Adjust Color Swatches grid */
+    .color-swatch-row {
+        gap: 0.5rem;
+        justify-content: flex-start;
+        flex-wrap: wrap; 
+    }
+    
+    .color-swatch {
+        width: 36px;
+        height: 36px;
+    }
+    
+    /* Make inputs full width / comfortable */
+    .input {
+        font-size: 16px; /* Prevent zoom */
+    }
+}
