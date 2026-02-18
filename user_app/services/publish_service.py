@@ -37,6 +37,10 @@ def publish_project(project: Project, user: User) -> str:
     css = project.site_version.css
     version = project.site_version.version
 
+    # Strip legacy <script> tags from stored HTML (nav JS is re-injected by render_final_page)
+    import re
+    html = re.sub(r'<script[\s\S]*?</script>', '', html, flags=re.IGNORECASE)
+
     # 1. Validate
     validate_for_publish(html, css)
 

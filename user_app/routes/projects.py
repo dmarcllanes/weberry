@@ -124,8 +124,14 @@ async def preview_render(req, project_id: str):
 
     html = project.site_version.html
     css = project.site_version.css or ""
+    # Strip any legacy <script> tags from stored HTML
+    import re
+    html = re.sub(r'<script[\s\S]*?</script>', '', html, flags=re.IGNORECASE)
     if css:
         html = html.replace("</head>", f"<style>{css}</style></head>", 1)
+    # Inject mobile nav toggle JS (kept out of stored HTML for validation)
+    from core.publishing.renderer import inject_nav_js
+    html = inject_nav_js(html)
     return Response(html, media_type="text/html")
 
 

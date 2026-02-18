@@ -108,31 +108,8 @@ def render_template(template_id: str, site_plan: SitePlan, memory: BrandMemory) 
     html_template = env.get_template("template.html")
     html = html_template.render(**context)
 
-    # Inject nav fix: JS hamburger toggle + mobile hide
-    # All templates use #menu-btn / #nav-links / .nav__links.open convention
-    # JS detects mobile vs desktop by checking if hamburger button is visible,
-    # so it works regardless of each template's breakpoint (768px or 1024px)
-    nav_fix = """<script>
-(function(){
-  var btn=document.getElementById("menu-btn");
-  var nav=document.getElementById("nav-links");
-  if(!btn||!nav)return;
-  btn.addEventListener("click",function(){
-    var open=nav.classList.toggle("open");
-    nav.style.display=open?"flex":"none";
-  });
-  function check(){
-    if(getComputedStyle(btn).display==="none"){
-      nav.style.display="";nav.classList.remove("open");
-    }else if(!nav.classList.contains("open")){
-      nav.style.display="none";
-    }
-  }
-  window.addEventListener("resize",check);
-  check();
-})();
-</script>"""
-    html = html.replace("</body>", nav_fix + "</body>", 1)
+    # NOTE: Nav hamburger JS is injected at serving time (preview_render / render_final_page)
+    # to keep stored HTML free of <script> tags and pass publish validation.
 
     # Render CSS
     css = ""
