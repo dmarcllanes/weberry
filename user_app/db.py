@@ -213,6 +213,18 @@ def get_user_by_email(email: str) -> User | None:
     )
 
 
+
+def update_user_subscription(user_id: str, plan: str, customer_id: str, subscription_id: str, status: str, variant_id: str) -> None:
+    """Update user subscription details."""
+    get_client().table("users").update({
+        "plan": plan,
+        "lemon_squeezy_customer_id": customer_id,
+        "lemon_squeezy_subscription_id": subscription_id,
+        "subscription_status": status,
+        "variant_id": variant_id,
+    }).eq("id", user_id).execute()
+
+
 # --- Project CRUD ---
 
 def _row_to_project(row: dict) -> Project:

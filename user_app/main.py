@@ -243,6 +243,16 @@ async def get(req, page_id: str):
 async def get(req):
     return await billing.show_billing(req)
 
+
+@rt("/billing/checkout")
+async def post(req):
+    return await billing.create_checkout(req)
+
+
+@rt("/api/webhooks/lemon-squeezy")
+async def post(req):
+    return await billing.lemon_squeezy_webhook(req)
+
 # --- Routes: Help ---
 
 @rt("/help")

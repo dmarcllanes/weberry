@@ -295,7 +295,7 @@ def landing_page():
                             Li('✓ Export to HTML/CSS'),
                             cls='features-list'
                         ),
-                        Button('Get Started', cls='btn-secondary'),
+                        A('Get Started', cls='btn-secondary', href='/login'),
                         cls='pricing-card'
                     ),
                     
@@ -362,7 +362,7 @@ def landing_page():
                             Li('✓ API Access'),
                             cls='features-list'
                         ),
-                        Button('Contact Sales', cls='btn-secondary'),
+                        A('Contact Sales', cls='btn-secondary', href='/login'),
                         cls='pricing-card'
                     ),
                     cls='pricing-grid'

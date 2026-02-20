@@ -48,7 +48,20 @@ SUPABASE_ASSETS_BUCKET = os.environ.get("SUPABASE_ASSETS_BUCKET", "public-assets
 DATABASE_URL = os.environ.get("DATABASE_URL", "")
 
 # Trial
-TRIAL_DURATION_DAYS = int(os.environ.get("TRIAL_DURATION_DAYS", "15"))
+TRIAL_DURATION_DAYS = int(os.environ.get("TRIAL_DURATION_DAYS", "7"))
+
+# Lemon Squeezy
+LEMON_SQUEEZY_API_KEY = os.environ.get("LEMON_SQUEEZY_API_KEY", "")
+LEMON_SQUEEZY_WEBHOOK_SECRET = os.environ.get("LEMON_SQUEEZY_WEBHOOK_SECRET", "")
+LEMON_SQUEEZY_STORE_ID = os.environ.get("LEMON_SQUEEZY_STORE_ID", "")
+
+# Plan to Variant ID Mapping (PlanType -> Variant ID)
+# You must get these IDs from your Lemon Squeezy dashboard
+LEMON_SQUEEZY_VARIANTS = {
+    "SMALL": os.environ.get("LEMON_SQUEEZY_VARIANT_SMALL", ""),
+    "MEDIUM": os.environ.get("LEMON_SQUEEZY_VARIANT_MEDIUM", ""),
+    "BIG": os.environ.get("LEMON_SQUEEZY_VARIANT_BIG", ""),
+}
 
 # App
 APP_HOST = os.environ.get("APP_HOST", "0.0.0.0")

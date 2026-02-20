@@ -21,7 +21,11 @@ CREATE TABLE IF NOT EXISTS users (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     email TEXT UNIQUE NOT NULL,
     plan TEXT NOT NULL DEFAULT 'FREE',
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    lemon_squeezy_customer_id TEXT,
+    lemon_squeezy_subscription_id TEXT,
+    subscription_status TEXT,
+    variant_id TEXT
 );
 
 CREATE TABLE IF NOT EXISTS projects (
