@@ -16,6 +16,21 @@ PLAN_LIMITS = {
         "planner_calls": float("inf"),
         "generation_calls": float("inf"),
     },
+    PlanType.SMALL: {
+        "max_projects": 10,
+        "planner_calls": 100,
+        "generation_calls": 100,
+    },
+    PlanType.MEDIUM: {
+        "max_projects": 40,
+        "planner_calls": 500,
+        "generation_calls": 500,
+    },
+    PlanType.BIG: {
+        "max_projects": 100,
+        "planner_calls": float("inf"),
+        "generation_calls": float("inf"),
+    },
 }
 
 

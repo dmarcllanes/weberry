@@ -6,11 +6,26 @@ from user_app.frontend.layout import page_layout
 def billing_page(user):
     """Render the billing dashboard."""
     
-    # Mock data for now - in a real app this would come from the user object or DB
-    plan_name = user.plan.value.title() if user.plan else "Free Plan"
+    # Plan Details
+    plan_details = {
+        "small": {"limit": 10, "price": "$10"},
+        "medium": {"limit": 40, "price": "$30"},
+        "big": {"limit": 100, "price": "$80"}
+    }
+    
+    current_plan = user.plan.value.lower() if user.plan else "free"
+    # Default to small if plan not found or is free/starter
+    if current_plan not in plan_details:
+        current_plan = "small" # Fallback/Default
+        
+    plan_info = plan_details.get(current_plan, plan_details["small"])
+    page_limit = plan_info["limit"]
+    price = plan_info["price"]
+
+    plan_name = current_plan.title()
     status = "Active"
     renewal_date = "Oct 24, 2026"
-    amount = "$0.00" if "free" in plan_name.lower() else "$29.00"
+    amount = f"{price}.00"
 
     # Current Plan Card
     plan_card = Div(
@@ -21,6 +36,7 @@ def billing_page(user):
                 Span(status, cls="state-badge state-badge--published", style="margin-left:0.5rem;vertical-align:middle"),
                 style="display:flex;align-items:baseline"
             ),
+             P(f"{page_limit} Pages included", style="color:var(--color-primary);font-weight:600;margin-top:0.25rem"),
             P(f"Renews on {renewal_date} for {amount}/month", style="color:var(--color-text-light);margin-top:0.5rem"),
             style="flex:1"
         ),

@@ -7,6 +7,9 @@ class PlanType(Enum):
     DRAFTER = "DRAFTER"
     VALIDATOR = "VALIDATOR"
     AGENCY = "AGENCY"
+    SMALL = "SMALL"
+    MEDIUM = "MEDIUM"
+    BIG = "BIG"
 
 
 @dataclass

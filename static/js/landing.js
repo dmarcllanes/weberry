@@ -261,3 +261,24 @@ document.addEventListener('click', (e) => {
         }
     }
 });
+
+// Billing Toggle
+function toggleBilling() {
+    const isYearly = document.getElementById('billing-toggle').checked;
+    const monthlyPrices = document.querySelectorAll('.price-monthly');
+    const yearlyPrices = document.querySelectorAll('.price-yearly');
+    const labelMonthly = document.getElementById('label-monthly');
+    const labelYearly = document.getElementById('label-yearly');
+
+    if (isYearly) {
+        monthlyPrices.forEach(el => el.style.display = 'none');
+        yearlyPrices.forEach(el => el.style.display = 'block');
+        labelMonthly.classList.remove('active');
+        labelYearly.classList.add('active');
+    } else {
+        monthlyPrices.forEach(el => el.style.display = 'block');
+        yearlyPrices.forEach(el => el.style.display = 'none');
+        labelMonthly.classList.add('active');
+        labelYearly.classList.remove('active');
+    }
+}

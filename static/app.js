@@ -460,7 +460,7 @@ function initOnboardingExitGuard() {
 }
 
 function exitOnboarding(deleteUrl) {
-    if (confirm('Are you sure you want to leave? This project will not be saved.')) {
+    if (confirm('Are you sure you want to leave? This page will not be saved.')) {
         window.removeEventListener('beforeunload', window._onboardingBeforeUnload);
         submitDeleteAndRedirect(deleteUrl, '/');
     }

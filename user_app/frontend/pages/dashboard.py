@@ -68,7 +68,7 @@ def dashboard_page(user, projects, show_new_button=True, active_tab="unfinished"
         ))
     elif not paginated_projects:
         # Filter empty state
-        cards.append(Div(P("No projects in this category.", style="color:var(--color-text-light);font-style:italic"), style="grid-column:1/-1;text-align:center;padding:2rem"))
+        cards.append(Div(P("No pages in this category.", style="color:var(--color-text-light);font-style:italic"), style="grid-column:1/-1;text-align:center;padding:2rem"))
     else:
         for p in paginated_projects:
             name = p.brand_memory.business_name if p.brand_memory else "Untitled"
@@ -79,24 +79,24 @@ def dashboard_page(user, projects, show_new_button=True, active_tab="unfinished"
                     A(
                         Div(name, cls="project-card-name"),
                         Span(friendly, cls=f"state-badge state-badge--{state}"),
-                        href=f"/projects/{p.id}",
+                        href=f"/pages/{p.id}",
                         cls="project-card-link",
                     ),
                     Div(
                         Div(
-                            A("View", cls="btn btn-outline btn-sm", href=f"/projects/{p.id}"),
-                            A("Edit", cls="btn btn-outline btn-sm", href=f"/projects/{p.id}/edit"),
+                            A("View", cls="btn btn-outline btn-sm", href=f"/pages/{p.id}"),
+                            A("Edit", cls="btn btn-outline btn-sm", href=f"/pages/{p.id}/edit"),
                             Button("Details", 
                                     cls="btn btn-outline btn-sm",
-                                    hx_get=f"/projects/{p.id}/details",
+                                    hx_get=f"/pages/{p.id}/details",
                                     hx_target="#modal-body",
                                     onclick="document.getElementById('project-modal').style.display = 'flex'"),
                             cls="project-card-buttons"
                         ),
                         Form(
                             Button("Delete", cls="btn btn-ghost btn-sm btn-delete", type="submit",
-                                onclick="return confirm('Delete this project? This cannot be undone.')"),
-                            method="post", action=f"/projects/{p.id}/delete",
+                                onclick="return confirm('Delete this page? This cannot be undone.')"),
+                            method="post", action=f"/pages/{p.id}/delete",
                         ),
                         cls="project-card-actions"
                     ),
@@ -118,7 +118,7 @@ def dashboard_page(user, projects, show_new_button=True, active_tab="unfinished"
         )
 
     children = [
-        H1("Your Projects", cls="step-title"),
+        H1("Your Pages", cls="step-title"),
         tabs,
         Div(*cards, cls="project-grid"),
         pagination if pagination else "",
@@ -128,9 +128,9 @@ def dashboard_page(user, projects, show_new_button=True, active_tab="unfinished"
         children.append(
             Div(
                 Form(
-                    Button("New Project", cls="button button-primary", type="submit",
+                    Button("New Page", cls="button button-primary", type="submit",
                             style="max-width:300px"),
-                    method="post", action="/projects",
+                    method="post", action="/pages",
                 ),
                 style="display:flex;justify-content:center;margin-top:2rem"
             )
@@ -138,9 +138,9 @@ def dashboard_page(user, projects, show_new_button=True, active_tab="unfinished"
     else:
         children.append(
             Div(
-                Button("Project Limit Reached", cls="button button-primary", disabled=True,
+                Button("Page Limit Reached", cls="button button-primary", disabled=True,
                         style="max-width:300px;opacity:0.6;cursor:not-allowed"),
-                P("Upgrade to create more projects.", style="margin-top:0.5rem;color:#666;font-size:0.9rem"),
+                P("Upgrade to create more pages.", style="margin-top:0.5rem;color:#666;font-size:0.9rem"),
                 style="display:flex;flex-direction:column;align-items:center;margin-top:2rem"
             )
         )
@@ -150,8 +150,8 @@ def dashboard_page(user, projects, show_new_button=True, active_tab="unfinished"
         Div(
             Div(
                 Div(
-                    Div("Project Details", style="font-weight:700;font-size:1.25rem"),
-                    Button("\u2715", onclick="document.getElementById('project-modal').style.display = 'none'", 
+                    Div("Page Details", style="font-weight:700;font-size:1.25rem"),
+                    Button("\u2715", onclick="document.getElementById('project-modal').style.display = 'none'",
                             cls="modal-close"),
                     style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;border-bottom:1px solid var(--color-border);padding-bottom:1rem"
                 ),
@@ -173,7 +173,7 @@ def dashboard_page(user, projects, show_new_button=True, active_tab="unfinished"
 
     analytics_footer = Div(
         Div(
-            Div(icon_project, Span("Total Projects:", cls="analytics-label"), Span(str(total_projects), cls="analytics-value"), cls="analytics-item"),
+            Div(icon_project, Span("Total Pages:", cls="analytics-label"), Span(str(total_projects), cls="analytics-value"), cls="analytics-item"),
             Div(cls="analytics-divider"),
             Div(icon_published, Span("Published:", cls="analytics-label"), Span(str(published_count), cls="analytics-value"), cls="analytics-item"),
             Div(cls="analytics-divider"),
@@ -190,4 +190,4 @@ def dashboard_page(user, projects, show_new_button=True, active_tab="unfinished"
         cls="dashboard-content",
     )
 
-    return page_layout(content, user=user, title="Okenaba - Projects", active_nav="projects", hide_footer=True)
+    return page_layout(content, user=user, title="Okenaba - Pages", active_nav="pages", hide_footer=True)

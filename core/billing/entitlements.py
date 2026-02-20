@@ -27,7 +27,7 @@ def can_change_theme(user: User) -> bool:
 
 
 def can_use_custom_domain(user: User) -> bool:
-    return user.plan != PlanType.DRAFTER
+    return user.plan not in (PlanType.DRAFTER, PlanType.SMALL)
 
 
 def can_export_files(user: User) -> bool:

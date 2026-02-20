@@ -30,7 +30,7 @@ async function syncSession(session) {
 
         if (response.ok) {
             console.log('Session synced, redirecting to dashboard...');
-            window.location.href = '/projects';
+            window.location.href = '/pages';
         } else {
             console.error('Session sync failed:', response.status);
         }

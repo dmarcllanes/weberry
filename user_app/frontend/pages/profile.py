@@ -60,7 +60,7 @@ def brand_profile_page(project):
                 H1("Brand Profile", cls="step-title"),
                 P("No profile information yet. Complete the onboarding first.",
                   cls="step-description"),
-                A("Go to Setup", href=f"/projects/{pid}", cls="button button-primary",
+                A("Go to Setup", href=f"/pages/{pid}", cls="button button-primary",
                   style="max-width:300px;display:inline-block"),
                 cls="step-content",
             ),

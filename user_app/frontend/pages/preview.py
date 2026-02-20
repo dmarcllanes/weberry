@@ -91,7 +91,7 @@ def preview_page(user, project):
                 Button("Update", type="submit", cls="btn btn-sm btn-primary"),
                 cls="img-editor-kw-row",
             ),
-            method="post", action=f"/projects/{pid}/edit-image",
+            method="post", action=f"/pages/{pid}/edit-image",
         )
 
         header_children = [Span(friendly, cls="img-editor-slot-name")]
@@ -109,7 +109,7 @@ def preview_page(user, project):
                 cls="btn btn-sm btn-outline-primary",
                 style="cursor:pointer; width:100%; text-align:center; margin-top:0.5rem; display:block;"
             ),
-            method="post", action=f"/projects/{pid}/edit-image",
+            method="post", action=f"/pages/{pid}/edit-image",
             enctype="multipart/form-data",
             style="width:100%"
         )
@@ -146,7 +146,7 @@ def preview_page(user, project):
                    style="align-self:flex-end"),
             cls="img-editor-upload-row",
         ),
-        method="post", action=f"/projects/{pid}/edit-image",
+        method="post", action=f"/pages/{pid}/edit-image",
         enctype="multipart/form-data",
     ) if upload_options else Div()
 
@@ -176,7 +176,7 @@ def preview_page(user, project):
             style="margin-bottom:0",
         ),
         method="post",
-        action=f"/projects/{pid}/bulk-upload",
+        action=f"/pages/{pid}/bulk-upload",
         enctype="multipart/form-data",
     ) if used_slots else Div()
 
@@ -213,19 +213,19 @@ def preview_page(user, project):
             Div(
                 browser_bar,
                 Iframe(
-                    src=f"/projects/{pid}/preview-render",
+                    src=f"/pages/{pid}/preview-render",
                     cls="site-preview-frame",
                     title="Site preview",
                 ),
                 cls="browser-chrome",
             ),
             Div(
-                A("Back to Projects", href="/", cls="button button-secondary"),
-                A("Edit Content", href=f"/projects/{pid}/edit", cls="button button-secondary"),
+                A("Back to Pages", href="/pages", cls="button button-secondary"),
+                A("Edit Content", href=f"/pages/{pid}/edit", cls="button button-secondary"),
                 Form(
                     Button("Publish My Site", cls="button button-primary", type="submit",
                            onclick="return showLoading('Publishing your site...')"),
-                    method="post", action=f"/projects/{pid}/publish",
+                    method="post", action=f"/pages/{pid}/publish",
                 ),
                 cls="button-group",
                 style="margin-top:var(--spacing-lg)",
@@ -236,4 +236,4 @@ def preview_page(user, project):
         cls="step preview-page-step",
     )
 
-    return page_layout(content, user=user, title="Okenaba - Preview", project_id=pid, active_nav="projects")
+    return page_layout(content, user=user, title="Okenaba - Preview", project_id=pid, active_nav="pages")

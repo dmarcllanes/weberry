@@ -57,10 +57,10 @@ def plan_review_page(user, project):
             meta,
             Div(*section_cards, cls="plan-sections"),
             Div(
-                A("Back to Projects", href="/", cls="button button-secondary"),
+                A("Back to Pages", href="/pages", cls="button button-secondary"),
                 Form(
                     Button("Approve & Continue", cls="button button-primary", type="submit"),
-                    method="post", action=f"/projects/{pid}/approve",
+                    method="post", action=f"/pages/{pid}/approve",
                 ),
                 cls="button-group",
             ),
@@ -69,4 +69,4 @@ def plan_review_page(user, project):
         cls="step",
     )
 
-    return page_layout(content, user=user, title="Okenaba - Review Plan", project_id=pid, active_nav="projects")
+    return page_layout(content, user=user, title="Okenaba - Review Plan", project_id=pid, active_nav="pages")

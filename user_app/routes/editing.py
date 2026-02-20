@@ -34,7 +34,7 @@ async def edit_text(req, project_id: str):
     except CoreError as e:
         return error_page(str(e))
 
-    return RedirectResponse(f"/projects/{project_id}", status_code=303)
+    return RedirectResponse(f"/pages/{project_id}", status_code=303)
 
 
 async def show_edit_page(req, project_id: str):
@@ -82,7 +82,7 @@ async def edit_content(req, project_id: str):
         except CoreError as e:
             return error_page(str(e))
 
-    return RedirectResponse(f"/projects/{project_id}/edit", status_code=303)
+    return RedirectResponse(f"/pages/{project_id}/edit", status_code=303)
 
 
 async def bulk_upload_images(req, project_id: str):
@@ -142,7 +142,7 @@ async def bulk_upload_images(req, project_id: str):
     except CoreError as e:
         return error_page(str(e))
 
-    return RedirectResponse(f"/projects/{project_id}", status_code=303)
+    return RedirectResponse(f"/pages/{project_id}", status_code=303)
 
 
 async def edit_image(req, project_id: str):
@@ -228,4 +228,4 @@ async def edit_image(req, project_id: str):
     # Return to preview (or whereever)
     # If called from an iframe or htmx, we might want to return just the updated image?
     # But for simplicity, redirect to preview which reloads.
-    return RedirectResponse(f"/projects/{project_id}", status_code=303)
+    return RedirectResponse(f"/pages/{project_id}", status_code=303)

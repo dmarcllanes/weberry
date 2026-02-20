@@ -49,7 +49,7 @@ def published_page(user, project, public_url, trial_info=None):
                     cls="next-steps",
                 ),
                 Div(
-                    A("Edit Content", href=f"/projects/{pid}/edit", cls="button button-primary"),
+                    A("Edit Content", href=f"/pages/{pid}/edit", cls="button button-primary"),
                     A("Back to Dashboard", href="/", cls="button button-secondary"),
                     cls="button-group",
                     style="margin-top:1rem",
@@ -61,4 +61,4 @@ def published_page(user, project, public_url, trial_info=None):
         cls="project-page",
     )
 
-    return page_layout(content, user=user, title="Okenaba - Published!", project_id=pid, active_nav="projects")
+    return page_layout(content, user=user, title="Okenaba - Published!", project_id=pid, active_nav="pages")

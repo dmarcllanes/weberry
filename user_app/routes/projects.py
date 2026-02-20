@@ -69,7 +69,7 @@ def create_project(req):
         project = create_project_for_user(user)
     except CoreError as e:
         return error_page(str(e))
-    return RedirectResponse(f"/projects/{project.id}", status_code=303)
+    return RedirectResponse(f"/pages/{project.id}", status_code=303)
 
 
 async def show_project(req, project_id: str):
@@ -171,7 +171,7 @@ async def delete_project(req, project_id: str):
         return error_page("Project not found", 404)
 
     db.delete_project(project_id)
-    return RedirectResponse("/projects", status_code=303)
+    return RedirectResponse("/pages", status_code=303)
 
 
 def _auto_label(width, height, index):
@@ -335,7 +335,7 @@ async def save_memory(req, project_id: str):
     except CoreError as e:
         return error_page(str(e))
 
-    return RedirectResponse(f"/projects/{project_id}", status_code=303)
+    return RedirectResponse(f"/pages/{project_id}", status_code=303)
 
 
 # Goal -> (website_type, project_intent) mapping
@@ -427,4 +427,4 @@ async def braindump(req, project_id: str):
         # If AI fails, project lands in MEMORY_READY — show_project renders retry page
         pass
 
-    return RedirectResponse(f"/projects/{project_id}", status_code=303)
+    return RedirectResponse(f"/pages/{project_id}", status_code=303)

@@ -18,7 +18,7 @@ def render_asset_card(asset, project_id):
             cls="asset-card-info",
         ),
         Button("Remove", type="button", cls="btn btn-sm btn-ghost btn-delete",
-               hx_delete=f"/projects/{project_id}/assets?url={asset.url}",
+               hx_delete=f"/pages/{project_id}/assets?url={asset.url}",
                hx_target="closest .asset-card", hx_swap="outerHTML"),
         cls="asset-card",
     )
@@ -233,16 +233,16 @@ def onboarding_page(user, project):
     )
 
     form = Form(
-        Div(id="onboarding-active", data_delete_url=f"/projects/{pid}/delete",
+        Div(id="onboarding-active", data_delete_url=f"/pages/{pid}/delete",
             style="display:none"),
         _step_indicator(),
         Div(step1, step2, step3, cls="wizard"),
-        method="post", action=f"/projects/{pid}/braindump",
+        method="post", action=f"/pages/{pid}/braindump",
     )
 
     content = Div(form, cls="onboarding-layout")
 
-    return page_layout(content, user=user, title="Okenaba - Brain Dump", project_id=pid, active_nav="projects")
+    return page_layout(content, user=user, title="Okenaba - Brain Dump", project_id=pid, active_nav="pages")
 
 
 def waiting_for_plan_page(user, project):
@@ -279,11 +279,11 @@ def waiting_for_plan_page(user, project):
                 cls="action-features",
             ),
             Div(
-                A("Back to Projects", href="/", cls="button button-secondary"),
+                A("Back to Pages", href="/pages", cls="button button-secondary"),
                 Form(
                     Button("Generate My Site", cls="button button-primary", type="submit",
                            onclick="return showLoading('Generating your site...')"),
-                    method="post", action=f"/projects/{pid}/plan",
+                    method="post", action=f"/pages/{pid}/plan",
                 ),
                 cls="button-group",
             ),
@@ -292,4 +292,4 @@ def waiting_for_plan_page(user, project):
         cls="step",
     )
 
-    return page_layout(content, user=user, title="Okenaba - Generate Site", project_id=pid, active_nav="projects")
+    return page_layout(content, user=user, title="Okenaba - Generate Site", project_id=pid, active_nav="pages")

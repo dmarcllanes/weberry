@@ -41,11 +41,11 @@ def generating_page(user, project):
                 cls="action-features",
             ),
             Div(
-                A("Back to Projects", href="/", cls="button button-secondary"),
+                A("Back to Pages", href="/pages", cls="button button-secondary"),
                 Form(
                     Button("Generate My Site", cls="button button-primary", type="submit",
                            onclick="return showLoading('Building your website...')"),
-                    method="post", action=f"/projects/{pid}/generate",
+                    method="post", action=f"/pages/{pid}/generate",
                 ),
                 cls="button-group",
             ),
@@ -54,4 +54,4 @@ def generating_page(user, project):
         cls="step",
     )
 
-    return page_layout(content, user=user, title="Okenaba - Generate Site", project_id=pid, active_nav="projects")
+    return page_layout(content, user=user, title="Okenaba - Generate Site", project_id=pid, active_nav="pages")

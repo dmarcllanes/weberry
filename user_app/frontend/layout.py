@@ -8,7 +8,7 @@ def page_layout(content, user=None, title="Okenaba", step_indicator=None, projec
     nav_links = []
     if not hide_nav:
         items = [
-            ("Projects", "/projects", "projects"),
+            ("Pages", "/pages", "pages"),
             ("Help", "/help", "help"),
         ]
         

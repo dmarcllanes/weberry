@@ -65,7 +65,7 @@ async function syncSession(session) {
         });
 
         if (response.ok) {
-            window.location.href = '/projects';
+            window.location.href = '/pages';
         }
     } catch (err) {
         console.error('Session sync error:', err);

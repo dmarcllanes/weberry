@@ -30,7 +30,7 @@ async def run_planner(req, project_id: str):
     except CoreError as e:
         return error_page(str(e))
 
-    return RedirectResponse(f"/projects/{project_id}", status_code=303)
+    return RedirectResponse(f"/pages/{project_id}", status_code=303)
 
 
 async def approve(req, project_id: str):
@@ -44,7 +44,7 @@ async def approve(req, project_id: str):
     except CoreError as e:
         return error_page(str(e))
 
-    return RedirectResponse(f"/projects/{project_id}", status_code=303)
+    return RedirectResponse(f"/pages/{project_id}", status_code=303)
 
 
 async def run_generator(req, project_id: str):
@@ -65,4 +65,4 @@ async def run_generator(req, project_id: str):
     except CoreError as e:
         return error_page(str(e))
 
-    return RedirectResponse(f"/projects/{project_id}", status_code=303)
+    return RedirectResponse(f"/pages/{project_id}", status_code=303)

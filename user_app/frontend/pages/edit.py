@@ -112,11 +112,11 @@ def edit_page(user, project):
         *fields,
         Div(
             Button("Save Changes", cls="button button-primary", type="submit"),
-            A("Cancel", href=f"/projects/{pid}", cls="button button-secondary"),
+            A("Cancel", href=f"/pages/{pid}", cls="button button-secondary"),
             cls="button-group",
         ),
         method="post",
-        action=f"/projects/{pid}/edit-content",
+        action=f"/pages/{pid}/edit-content",
         cls="form edit-form",
     )
 
@@ -137,7 +137,7 @@ def edit_page(user, project):
                     Div(
                         H2("Preview", cls="edit-preview-title"),
                         Iframe(
-                            src=f"/projects/{pid}/preview-render",
+                            src=f"/pages/{pid}/preview-render",
                             cls="site-preview-frame",
                             title="Site preview",
                         ),
@@ -152,4 +152,4 @@ def edit_page(user, project):
         cls="project-page",
     )
 
-    return page_layout(content, user=user, title="Okenaba - Edit Content", project_id=pid, active_nav="projects")
+    return page_layout(content, user=user, title="Okenaba - Edit Content", project_id=pid, active_nav="pages")

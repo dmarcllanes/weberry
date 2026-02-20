@@ -12,7 +12,7 @@ def landing_page():
         Meta(name='viewport', content='width=device-width, initial-scale=1.0'),
         Title('Okenaba - Build AI Websites in Minutes'),
         Link(rel='icon', type='image/svg+xml', href='/static/img/favicon.svg'),
-        Link(rel='stylesheet', href='/static/css/landing.css'),
+        Link(rel='stylesheet', href='/static/css/landing.css?v=8'),
         Link(rel="preconnect", href="https://fonts.googleapis.com"),
         Link(rel="preconnect", href="https://fonts.gstatic.com", crossorigin=""),
         Link(href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap", rel="stylesheet"),
@@ -242,59 +242,178 @@ def landing_page():
             cls='stats'
         ),
         Section(
+            Div(
                 Div(
-                    H2('Simple Pricing'),
+                    H2('Simple Pricing', cls='text-glow'),
+                    P('Start small and scale as you grow.', cls='section-subtitle'),
+                    
                     Div(
-                        Div(
-                            H3('Starter'),
-                            P('Free', cls='price'),
-                            Ul(
-                                Li('✓ 1 Idea Submission'),
-                                Li('✓ Basic Feedback'),
-                                Li('✓ Community Access'),
-                                Li('✗ Advanced Analytics'),
-                                cls='features-list'
-                            ),
-                            Button('Get Started', cls='btn-secondary'),
-                            cls='pricing-card'
-                        ),
-                        Div(
-                            Span('Popular', cls='badge'),
-                            H3('Pro'),
-                            P(
-                                '$49',
-                                Span('/month'),
-                                cls='price'
-                            ),
-                            Ul(
-                                Li('✓ Unlimited Ideas'),
-                                Li('✓ Priority Feedback'),
-                                Li('✓ Advanced Analytics'),
-                                Li('✓ 1-on-1 Coaching'),
-                                cls='features-list'
-                            ),
-                            A('Start Free Trial', cls='btn-primary', href='/login'),
-                            cls='pricing-card featured'
-                        ),
-                        Div(
-                            H3('Enterprise'),
-                            P('Custom', cls='price'),
-                            Ul(
-                                Li('✓ Everything in Pro'),
-                                Li('✓ Team Collaboration'),
-                                Li('✓ Custom Branding'),
-                                Li('✓ Dedicated Support'),
-                                cls='features-list'
-                            ),
-                            Button('Contact Sales', cls='btn-secondary'),
-                            cls='pricing-card'
-                        ),
-                        cls='pricing-grid'
+                        Span('✨ 7 Days Free Trial', cls='badge-save', style='margin:0 0 1rem 0;display:inline-block'),
+                        style='text-align:center'
                     ),
-                    cls='container'
+
+                    # Billing Toggle
+                    Div(
+                        Span('Monthly', cls='billing-label active', id='label-monthly'),
+                        Label(
+                            Input(type='checkbox', id='billing-toggle', onclick='toggleBilling()'),
+                            Span(cls='slider round'),
+                            cls='switch'
+                        ),
+                        Span('Yearly', cls='billing-label', id='label-yearly'),
+                        cls='pricing-toggle-container'
+                    ),
+                    cls='pricing-header'
                 ),
+                
+                Div(
+                    # Small Plan
+                    Div(
+                        H3('Small'),
+                        Div(
+                            # Monthly Price
+                            Div(
+                                H4('$10', cls='price-amount'),
+                                Span('/month', cls='price-period'),
+                                cls='price-display price-monthly'
+                            ),
+                            # Yearly Price
+                            Div(
+                                H4('$100', cls='price-amount'),
+                                Span('/year', cls='price-period'),
+                                P('$8.33/mo', cls='price-subtext'),
+                                cls='price-display price-yearly',
+                                style='display:none'
+                            ),
+                            cls='price-wrapper'
+                        ),
+                        P('Perfect for hobbyists and checking out the platform.', cls='plan-desc'),
+                        Ul(
+                            Li('✓ 10 Pages'),
+                            Li('✓ Basic Analytics'),
+                            Li('✓ Community Support'),
+                            Li('✓ Export to HTML/CSS'),
+                            cls='features-list'
+                        ),
+                        Button('Get Started', cls='btn-secondary'),
+                        cls='pricing-card'
+                    ),
+                    
+                    # Medium Plan
+                    Div(
+                        Span('Most Popular', cls='badge'),
+                        H3('Medium'),
+                        Div(
+                            # Monthly Price
+                            Div(
+                                H4('$30', cls='price-amount'),
+                                Span('/month', cls='price-period'),
+                                cls='price-display price-monthly'
+                            ),
+                            # Yearly Price
+                            Div(
+                                H4('$300', cls='price-amount'),
+                                Span('/year', cls='price-period'),
+                                P('$25/mo', cls='price-subtext'),
+                                cls='price-display price-yearly',
+                                style='display:none'
+                            ),
+                            cls='price-wrapper'
+                        ),
+                        P('For freelancers and creators building multiple sites.', cls='plan-desc'),
+                        Ul(
+                            Li('✓ 40 Pages'),
+                            Li('✓ Advanced Analytics'),
+                            Li('✓ Priority Support'),
+                            Li('✓ Remove Branding'),
+                            Li('✓ Custom Domain'),
+                            cls='features-list'
+                        ),
+                        A('Start Free Trial', cls='btn-primary', href='/login'),
+                        cls='pricing-card featured'
+                    ),
+                    
+                    # Big Plan
+                    Div(
+                        H3('Big'),
+                        Div(
+                            # Monthly Price
+                            Div(
+                                H4('$80', cls='price-amount'),
+                                Span('/month', cls='price-period'),
+                                cls='price-display price-monthly'
+                            ),
+                            # Yearly Price
+                            Div(
+                                H4('$800', cls='price-amount'),
+                                Span('/year', cls='price-period'),
+                                P('$66/mo', cls='price-subtext'),
+                                cls='price-display price-yearly',
+                                style='display:none'
+                            ),
+                            cls='price-wrapper'
+                        ),
+                        P('For agencies and power users who need scale.', cls='plan-desc'),
+                        Ul(
+                            Li('✓ 100 Pages'),
+                            Li('✓ Team Collaboration'),
+                            Li('✓ White Labeling'),
+                            Li('✓ Dedicated Success Manager'),
+                            Li('✓ API Access'),
+                            cls='features-list'
+                        ),
+                        Button('Contact Sales', cls='btn-secondary'),
+                        cls='pricing-card'
+                    ),
+                    cls='pricing-grid'
+                ),
+                cls='container'
+            ),
             id='pricing',
             cls='pricing'
+        ),
+        Section(
+            Div(
+                Div(
+                    H2('Tell Us About Your Business'),
+                    P('Help us tailor Okenaba to your needs. What kind of business are you building?', cls='section-subtitle'),
+                    
+                    Form(
+                        Div(
+                            Label('Business Name', cls='form-label'),
+                            Input(type='text', name='business_name', placeholder='e.g. Acme Corp', cls='form-input'),
+                            cls='form-group'
+                        ),
+                        Div(
+                            Label('Industry', cls='form-label'),
+                            Select(
+                                Option('Select an industry...', value='', disabled=True, selected=True),
+                                Option('Technology', value='tech'),
+                                Option('E-commerce', value='ecommerce'),
+                                Option('Professional Services', value='services'),
+                                Option('Creative & Design', value='creative'),
+                                Option('Health & Wellness', value='health'),
+                                Option('Other', value='other'),
+                                name='industry',
+                                cls='form-select'
+                            ),
+                            cls='form-group'
+                        ),
+                        Div(
+                            Label('Business Description', cls='form-label'),
+                            Textarea(name='description', placeholder='Briefly describe what your business does...', cls='form-textarea', rows='4'),
+                            cls='form-group'
+                        ),
+                        Button('Submit Details', cls='btn-primary', style='width:100%'),
+                        cls='survey-form',
+                        onclick="alert('Thank you! We will use this to improve our templates.'); return false;"
+                    ),
+                    cls='survey-container'
+                ),
+                cls='container'
+            ),
+            id='business-survey',
+            cls='survey-section'
         ),
         Section(
                 Div(
@@ -309,7 +428,7 @@ def landing_page():
                                 Svg(Path(d='M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z'), viewBox='0 0 24 24', fill='#fbbf24', stroke='none', cls='icon-star'),
                                 cls='stars'
                             ),
-                            P('"IdeaVault helped me validate my SaaS concept before building. I saved 6 months and $50k!"', cls='testimonial-text'),
+                            P('"Okenaba helped me validate my SaaS concept before building. I saved 6 months and $50k!"', cls='testimonial-text'),
                             Div(
                                 Div('SC', cls='avatar-placeholder', style='background: linear-gradient(135deg, #FF6B6B, #EE5D5D)'),
                                 Div(

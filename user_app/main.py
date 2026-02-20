@@ -89,31 +89,31 @@ async def post(req, sess):
 # --- Routes: Landing page (public, no auth) ---
 # TODO: Import and wire up your landing page here.
 
-# --- Routes: Projects ---
+# --- Routes: Pages ---
 
 @rt("/")
 def get(req, sess):
     if sess.get("user_id"):
-        return RedirectResponse("/projects", status_code=303)
+        return RedirectResponse("/pages", status_code=303)
     return landing_page()
 
 
 @rt("/dashboard")
 def get(req):
-    return RedirectResponse("/projects", status_code=303)
+    return RedirectResponse("/pages", status_code=303)
 
 
-@rt("/project")
+@rt("/page")
 def get(req):
-    return RedirectResponse("/projects", status_code=303)
+    return RedirectResponse("/pages", status_code=303)
 
 
-@rt("/projects")
+@rt("/pages")
 def get(req):
     return projects.dashboard(req)
 
 
-@rt("/projects")
+@rt("/pages")
 async def post(req):
     return projects.create_project(req)
 
@@ -127,116 +127,116 @@ def get(req):
 
 # --- Routes: Project detail ---
 
-@rt("/projects/{project_id}")
-async def get(req, project_id: str):
-    return await projects.show_project(req, project_id)
+@rt("/pages/{page_id}")
+async def get(req, page_id: str):
+    return await projects.show_project(req, page_id)
 
 
-@rt("/projects/{project_id}/delete")
-async def post(req, project_id: str):
-    return await projects.delete_project(req, project_id)
+@rt("/pages/{page_id}/delete")
+async def post(req, page_id: str):
+    return await projects.delete_project(req, page_id)
 
 
-@rt("/projects/{project_id}/memory")
-async def post(req, project_id: str):
-    return await projects.save_memory(req, project_id)
+@rt("/pages/{page_id}/memory")
+async def post(req, page_id: str):
+    return await projects.save_memory(req, page_id)
 
 
-@rt("/projects/{project_id}/braindump")
-async def post(req, project_id: str):
-    return await projects.braindump(req, project_id)
+@rt("/pages/{page_id}/braindump")
+async def post(req, page_id: str):
+    return await projects.braindump(req, page_id)
 
 
-@rt("/projects/{project_id}/assets")
-async def post(req, project_id: str):
-    return await projects.upload_asset(req, project_id)
+@rt("/pages/{page_id}/assets")
+async def post(req, page_id: str):
+    return await projects.upload_asset(req, page_id)
 
 
-@rt("/projects/{project_id}/assets")
-async def delete(req, project_id: str):
-    return await projects.delete_asset(req, project_id)
+@rt("/pages/{page_id}/assets")
+async def delete(req, page_id: str):
+    return await projects.delete_asset(req, page_id)
 
 
 # --- Routes: Profile & Site detail ---
 
-@rt("/projects/{project_id}/details")
-async def get(req, project_id: str):
-    return await projects.get_brand_details(req, project_id)
+@rt("/pages/{page_id}/details")
+async def get(req, page_id: str):
+    return await projects.get_brand_details(req, page_id)
 
 
-@rt("/projects/{project_id}/site")
-async def get(req, project_id: str):
-    return await projects.show_site(req, project_id)
+@rt("/pages/{page_id}/site")
+async def get(req, page_id: str):
+    return await projects.show_site(req, page_id)
 
 
 # --- Routes: Preview render (iframe) ---
 
-@rt("/projects/{project_id}/preview-render")
-async def get(req, project_id: str):
-    return await projects.preview_render(req, project_id)
+@rt("/pages/{page_id}/preview-render")
+async def get(req, page_id: str):
+    return await projects.preview_render(req, page_id)
 
 
 # --- Routes: AI Generation ---
 
-@rt("/projects/{project_id}/plan")
-async def post(req, project_id: str):
-    return await generation.run_planner(req, project_id)
+@rt("/pages/{page_id}/plan")
+async def post(req, page_id: str):
+    return await generation.run_planner(req, page_id)
 
 
-@rt("/projects/{project_id}/approve")
-async def post(req, project_id: str):
-    return await generation.approve(req, project_id)
+@rt("/pages/{page_id}/approve")
+async def post(req, page_id: str):
+    return await generation.approve(req, page_id)
 
 
-@rt("/projects/{project_id}/generate")
-async def post(req, project_id: str):
-    return await generation.run_generator(req, project_id)
+@rt("/pages/{page_id}/generate")
+async def post(req, page_id: str):
+    return await generation.run_generator(req, page_id)
 
 
 # --- Routes: Editing ---
 
-@rt("/projects/{project_id}/edit")
-async def get(req, project_id: str):
-    return await editing.show_edit_page(req, project_id)
+@rt("/pages/{page_id}/edit")
+async def get(req, page_id: str):
+    return await editing.show_edit_page(req, page_id)
 
 
-@rt("/projects/{project_id}/edit")
-async def post(req, project_id: str):
-    return await editing.edit_text(req, project_id)
+@rt("/pages/{page_id}/edit")
+async def post(req, page_id: str):
+    return await editing.edit_text(req, page_id)
 
 
-@rt("/projects/{project_id}/edit-content")
-async def post(req, project_id: str):
-    return await editing.edit_content(req, project_id)
+@rt("/pages/{page_id}/edit-content")
+async def post(req, page_id: str):
+    return await editing.edit_content(req, page_id)
 
 
-@rt("/projects/{project_id}/edit-image")
-async def post(req, project_id: str):
-    return await editing.edit_image(req, project_id)
+@rt("/pages/{page_id}/edit-image")
+async def post(req, page_id: str):
+    return await editing.edit_image(req, page_id)
 
 
-@rt("/projects/{project_id}/bulk-upload")
-async def post(req, project_id: str):
-    return await editing.bulk_upload_images(req, project_id)
+@rt("/pages/{page_id}/bulk-upload")
+async def post(req, page_id: str):
+    return await editing.bulk_upload_images(req, page_id)
 
 
 # --- Routes: Publishing ---
 
-@rt("/projects/{project_id}/publish")
-async def post(req, project_id: str):
-    return await publishing.publish(req, project_id)
+@rt("/pages/{page_id}/publish")
+async def post(req, page_id: str):
+    return await publishing.publish(req, page_id)
 
 
-@rt("/sites/{project_id}")
-async def get(req, project_id: str):
-    return await publishing.view_published(req, project_id)
+@rt("/sites/{page_id}")
+async def get(req, page_id: str):
+    return await publishing.view_published(req, page_id)
 
 
 # --- Routes: Billing ---
 
-@rt("/projects/{project_id}/trial")
-async def get(req, project_id: str):
-    return await billing.trial_status(req, project_id)
+@rt("/pages/{page_id}/trial")
+async def get(req, page_id: str):
+    return await billing.trial_status(req, page_id)
 
 
 @rt("/billing")

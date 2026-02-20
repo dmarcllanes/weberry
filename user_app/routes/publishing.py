@@ -19,7 +19,7 @@ async def publish(req, project_id: str):
     except CoreError as e:
         return error_page(str(e))
 
-    return RedirectResponse(f"/projects/{project_id}", status_code=303)
+    return RedirectResponse(f"/pages/{project_id}", status_code=303)
 
 
 async def view_published(req, project_id: str):

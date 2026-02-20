@@ -67,7 +67,7 @@ def site_detail_page(user, project, public_url=None, trial_info=None):
         preview_section = Div(
             H2("Preview", cls="info-section-title"),
             Iframe(
-                src=f"/projects/{pid}/preview-render",
+                src=f"/pages/{pid}/preview-render",
                 cls="site-preview-frame",
                 title="Site preview",
             ),
@@ -124,4 +124,4 @@ def site_detail_page(user, project, public_url=None, trial_info=None):
 
     content = Div(*sections, cls="project-page")
 
-    return page_layout(content, user=user, title=f"Okenaba - {name} Site", project_id=pid, active_nav="projects")
+    return page_layout(content, user=user, title=f"Okenaba - {name} Site", project_id=pid, active_nav="pages")
