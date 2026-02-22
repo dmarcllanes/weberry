@@ -152,13 +152,9 @@ def get_user(user_id: str) -> User | None:
     if not result.data:
         return None
     row = result.data[0]
-    plan_str = row["plan"]
-    if plan_str == "FREE":
-        plan = PlanType.DRAFTER
-    elif plan_str == "PAID":
-        plan = PlanType.VALIDATOR
-    else:
-        plan = PlanType(plan_str)
+
+    # Payment disabled during beta — all users get full access
+    plan = PlanType.AGENCY
 
     return User(
         id=row["id"],
@@ -196,13 +192,9 @@ def get_user_by_email(email: str) -> User | None:
     if not result.data:
         return None
     row = result.data[0]
-    plan_str = row["plan"]
-    if plan_str == "FREE":
-        plan = PlanType.DRAFTER
-    elif plan_str == "PAID":
-        plan = PlanType.VALIDATOR
-    else:
-        plan = PlanType(plan_str)
+
+    # Payment disabled during beta — all users get full access
+    plan = PlanType.AGENCY
 
     return User(
         id=row["id"],
