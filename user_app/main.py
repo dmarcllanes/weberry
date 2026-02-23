@@ -20,7 +20,7 @@ from user_app.auth.guards import auth_beforeware
 from user_app.auth.login import get_or_create_user
 from user_app.frontend.pages.login import login_page
 from user_app.frontend.pages.landing import landing_page
-from user_app.routes import projects, generation, editing, publishing, billing
+from user_app.routes import pages, generation, editing, publishing, billing
 from user_app.routes import help as help_routes
 
 # --- Beforeware ---
@@ -110,70 +110,70 @@ def get(req):
 
 @rt("/pages")
 def get(req):
-    return projects.dashboard(req)
+    return pages.dashboard(req)
 
 
 @rt("/pages")
 async def post(req):
-    return projects.create_project(req)
+    return pages.create_page(req)
 
 
 # --- Routes: Profile (top-level) ---
 
 @rt("/profile")
 def get(req):
-    return projects.show_user_profile(req)
+    return pages.show_user_profile(req)
 
 
-# --- Routes: Project detail ---
+# --- Routes: Page detail ---
 
 @rt("/pages/{page_id}")
 async def get(req, page_id: str):
-    return await projects.show_project(req, page_id)
+    return await pages.show_page(req, page_id)
 
 
 @rt("/pages/{page_id}/delete")
 async def post(req, page_id: str):
-    return await projects.delete_project(req, page_id)
+    return await pages.delete_page(req, page_id)
 
 
 @rt("/pages/{page_id}/memory")
 async def post(req, page_id: str):
-    return await projects.save_memory(req, page_id)
+    return await pages.save_memory(req, page_id)
 
 
 @rt("/pages/{page_id}/braindump")
 async def post(req, page_id: str):
-    return await projects.braindump(req, page_id)
+    return await pages.braindump(req, page_id)
 
 
 @rt("/pages/{page_id}/assets")
 async def post(req, page_id: str):
-    return await projects.upload_asset(req, page_id)
+    return await pages.upload_asset(req, page_id)
 
 
 @rt("/pages/{page_id}/assets")
 async def delete(req, page_id: str):
-    return await projects.delete_asset(req, page_id)
+    return await pages.delete_asset(req, page_id)
 
 
 # --- Routes: Profile & Site detail ---
 
 @rt("/pages/{page_id}/details")
 async def get(req, page_id: str):
-    return await projects.get_brand_details(req, page_id)
+    return await pages.get_brand_details(req, page_id)
 
 
 @rt("/pages/{page_id}/site")
 async def get(req, page_id: str):
-    return await projects.show_site(req, page_id)
+    return await pages.show_site(req, page_id)
 
 
 # --- Routes: Preview render (iframe) ---
 
 @rt("/pages/{page_id}/preview-render")
 async def get(req, page_id: str):
-    return await projects.preview_render(req, page_id)
+    return await pages.preview_render(req, page_id)
 
 
 # --- Routes: AI Generation ---

@@ -163,6 +163,38 @@ All checks happen BEFORE AI calls.
 
 ---
 
+## Performance Layer
+
+### LRU Cache (in-process)
+Template files (manifests, HTML, CSS) are read from disk once per process lifetime using `functools.lru_cache`.
+- `list_templates()` — cached, stops rglob on every AI call
+- `load_template_manifest(template_id)` — cached per template ID
+- `get_templates_summary()` — cached, stops per-call re-formatting
+- `_get_jinja_env(template_dir)` — cached Jinja2 Environment per template
+- `_scan_extra_slots(template_id)` — cached regex scan of template HTML
+- `_get_template_slots(template_id)` in preview — cached per template ID
+
+### HTTP Caching (published sites)
+`GET /sites/{id}` returns:
+- `Cache-Control: public, max-age=3600`
+- `ETag: "{md5_of_rendered_html}"`
+- `304 Not Modified` when `If-None-Match` matches — no DB hit, no body
+
+### Rate Limiting (in-process, sliding window)
+File: `user_app/middleware/rate_limiter.py`
+Applied at route entry before DB or AI calls.
+
+| Endpoint | Limit | Window |
+|:---|:---|:---|
+| `POST braindump` | 10/user | 1 hour |
+| `GET /sites/{id}` | 120/IP | 1 minute |
+| `POST edit-image` | 30/user | 1 hour |
+| `POST bulk-upload` | 10/user | 1 hour |
+
+Returns HTTP 429 when exceeded. In-memory only — resets on server restart. No Redis required at current scale.
+
+---
+
 ## Admin Interaction Rules
 
 Admin can:

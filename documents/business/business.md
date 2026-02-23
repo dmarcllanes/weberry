@@ -142,6 +142,23 @@ All AI usage is limited, tracked, and gated.
 
 ---
 
+## Abuse Protection Rules
+
+The system enforces limits at two layers:
+
+**Business layer (core/)** — enforces tier-based caps (1 project, 1 AI call for free users).
+
+**HTTP layer (rate limiter)** — independent of tiers, prevents request flooding:
+- AI generation: max 10 requests per user per hour
+- Public site serving: max 120 requests per IP per minute
+- Image editing: max 30 requests per user per hour
+- Bulk image upload: max 10 requests per user per hour
+
+Users who exceed these limits receive an HTTP 429 response. Limits reset on server restart.
+This layer protects infrastructure cost and prevents automated abuse regardless of user plan.
+
+---
+
 ## Admin Philosophy
 
 Admin exists to:

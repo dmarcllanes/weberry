@@ -3,15 +3,35 @@
 import json
 import re
 import hashlib
+from functools import lru_cache
 from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader
 
 from core.ai.schemas import SitePlan
+from core.ai.template_loader import load_template_manifest
 from core.models.brand_memory import BrandMemory
 from core.models.site_version import SiteVersion
 
 TEMPLATES_DIR = Path(__file__).resolve().parent.parent.parent / "templates"
+
+
+@lru_cache(maxsize=None)
+def _get_jinja_env(template_dir: str) -> Environment:
+    """Return a cached Jinja2 Environment for a given template directory."""
+    return Environment(loader=FileSystemLoader(template_dir), autoescape=False)
+
+
+@lru_cache(maxsize=None)
+def _scan_extra_slots(template_id: str) -> dict:
+    """Scan template HTML for _url references not declared in the manifest."""
+    template_html_path = TEMPLATES_DIR / template_id / "template.html"
+    extra: dict = {}
+    if template_html_path.exists():
+        html_source = template_html_path.read_text()
+        for match in re.findall(r"\{\{\s*(\w+)_url\s*\}\}", html_source):
+            extra[match] = "landscape"
+    return extra
 
 
 def render_template(template_id: str, site_plan: SitePlan, memory: BrandMemory) -> SiteVersion:
@@ -20,10 +40,7 @@ def render_template(template_id: str, site_plan: SitePlan, memory: BrandMemory) 
     if not template_dir.exists():
         raise FileNotFoundError(f"Template directory '{template_id}' not found")
 
-    env = Environment(
-        loader=FileSystemLoader(str(template_dir)),
-        autoescape=False,
-    )
+    env = _get_jinja_env(str(template_dir))
 
     # Build context dict from copy_blocks
     context = {}
@@ -55,27 +72,19 @@ def render_template(template_id: str, site_plan: SitePlan, memory: BrandMemory) 
     context["page_title"] = site_plan.page_title
     context["meta_description"] = site_plan.meta_description
 
-    # Load manifest to identify image slots
-    manifest_path = template_dir / "manifest.json"
-    if manifest_path.exists():
-        try:
-            manifest = json.loads(manifest_path.read_text())
-            slots = manifest.get("slots", {})
-            default_keywords = manifest.get("keywords", ["business"])
-        except json.JSONDecodeError:
-            slots = {}
-            default_keywords = ["business"]
-    else:
+    # Load manifest to identify image slots (cached)
+    try:
+        manifest = load_template_manifest(template_id)
+        slots = dict(manifest.get("slots", {}))  # copy — never mutate the cached dict
+        default_keywords = manifest.get("keywords", ["business"])
+    except FileNotFoundError:
         slots = {}
         default_keywords = ["business"]
 
-    # Also scan template HTML for _url references not in the manifest
-    template_html_path = template_dir / "template.html"
-    if template_html_path.exists():
-        html_source = template_html_path.read_text()
-        for match in re.findall(r"\{\{\s*(\w+)_url\s*\}\}", html_source):
-            if match not in slots:
-                slots[match] = "landscape"
+    # Merge any extra _url references found in the template HTML (cached scan)
+    for slot_name, slot_type in _scan_extra_slots(template_id).items():
+        if slot_name not in slots:
+            slots[slot_name] = slot_type
 
     # Generate image URLs for each slot or use overrides
     for slot_name, slot_type in slots.items():

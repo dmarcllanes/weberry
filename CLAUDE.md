@@ -24,12 +24,12 @@
 | 3. Contact & Details | Email, Phone, Address | All optional |
 
 ### How It Works (Technical)
-*   `POST /projects/{id}/braindump` handles the entire flow in one request:
+*   `POST /pages/{id}/braindump` handles the entire flow in one request:
     1.  Parses form → builds `BrandMemory` (infers `website_type` and `project_intent` from `primary_goal`, stores industry in `services` field)
     2.  `save_brand_memory()` → transitions DRAFT → INPUT_READY → MEMORY_READY
     3.  `run_generate_and_render()` → AI picks template + writes copy → Jinja2 renders → SITE_GENERATED
     4.  `move_to_preview()` → PREVIEW
-    5.  Redirects to `/projects/{id}` which shows the preview page
+    5.  Redirects to `/pages/{id}` which shows the preview page
 
 ### Goal-to-Type Mapping
 | Primary Goal | Website Type | Project Intent |
@@ -41,7 +41,7 @@
 | Direct Traffic | saas | VALIDATION |
 
 ### Error Recovery
-If the AI call fails mid-braindump, the project lands in MEMORY_READY state. The `show_project` router renders a "Ready to Generate" page with a retry button.
+If the AI call fails mid-braindump, the project lands in MEMORY_READY state. The `show_page` router renders a "Ready to Generate" page with a retry button.
 
 ---
 
@@ -73,7 +73,7 @@ If the AI call fails mid-braindump, the project lands in MEMORY_READY state. The
 | File | Purpose |
 |:---|:---|
 | `user_app/frontend/pages/onboarding.py` | Brain Dump form (3-step wizard) |
-| `user_app/routes/projects.py` | `braindump()` handler + project CRUD |
+| `user_app/routes/pages.py` | `braindump()` handler + page CRUD |
 | `user_app/routes/editing.py` | `edit_image()` for keyword/upload swaps |
 | `user_app/frontend/pages/preview.py` | Preview page with collapsible image editor |
 | `core/ai/copy_writer.py` | AI writes copy + picks template |
@@ -142,7 +142,38 @@ DRAFT → INPUT_READY → MEMORY_READY → SITE_GENERATED → PREVIEW
 
 ---
 
-## 5. Development
+## 5. Performance & Protection
+
+### LRU Cache (in-process, `functools.lru_cache`)
+Stops repeated disk reads on every request. All caches are populated on first call and live for the process lifetime (reset on server restart).
+
+| What | File | Cache key | Why |
+|:---|:---|:---|:---|
+| All template manifests | `core/ai/template_loader.py` | none (`maxsize=1`) | Stops `rglob` dir scan per generation |
+| Single manifest by ID | `core/ai/template_loader.py` | `template_id` | Stops per-render manifest file read |
+| Templates AI summary | `core/ai/template_loader.py` | none (`maxsize=1`) | Stops full re-format per AI call |
+| Jinja2 Environment | `core/ai/template_renderer.py` | `template_dir` | Stops `Environment()` recreation per render |
+| Extra slot scan | `core/ai/template_renderer.py` | `template_id` | Stops regex scan of template HTML per render |
+| Preview slot list | `user_app/frontend/pages/preview.py` | `template_id` | Stops disk read per preview page load |
+
+### HTTP Caching (`/sites/{id}`)
+Public site responses carry:
+- `Cache-Control: public, max-age=3600` — browser/CDN caches for 1 hour, DB never hit during TTL
+- `ETag: "{md5}"` — conditional requests return 304 if content unchanged, no body transferred
+
+### Rate Limiting (`user_app/middleware/rate_limiter.py`)
+In-memory sliding window. No Redis. Resets on server restart. Applied at route entry — before any DB or AI call.
+
+| Route | Key | Limit | Window | Protects against |
+|:---|:---|:---|:---|:---|
+| `POST /pages/{id}/braindump` | `braindump:{user_id}` | 10 | 1 hour | AI gateway flooding |
+| `GET /sites/{id}` | `site:{ip}` | 120 | 1 minute | Public site scraping/DoS |
+| `POST /pages/{id}/edit-image` | `edit_image:{user_id}` | 30 | 1 hour | Image upload spam |
+| `POST /pages/{id}/bulk-upload` | `bulk_upload:{user_id}` | 10 | 1 hour | Bulk upload spam |
+
+---
+
+## 6. Development
 
 ### Run
 ```bash

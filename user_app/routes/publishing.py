@@ -1,3 +1,5 @@
+import hashlib
+
 from fasthtml.common import RedirectResponse, Response
 
 from core.errors import CoreError
@@ -5,26 +7,30 @@ from core.publishing.pauser import should_pause_site, get_paused_html
 from core.publishing.renderer import render_final_page
 from user_app import db
 from user_app.routes import error_page
+from user_app.middleware.rate_limiter import is_rate_limited, rate_limit_response
 from user_app.services.publish_service import publish_project
 
 
-async def publish(req, project_id: str):
+async def publish(req, page_id: str):
     user = req.scope["user"]
-    project = db.get_project(project_id)
+    project = db.get_project(page_id)
     if project is None or project.user_id != user.id:
-        return error_page("Project not found", 404)
+        return error_page("Page not found", 404)
 
     try:
         public_url = publish_project(project, user)
     except CoreError as e:
         return error_page(str(e))
 
-    return RedirectResponse(f"/pages/{project_id}", status_code=303)
+    return RedirectResponse(f"/pages/{page_id}", status_code=303)
 
 
-async def view_published(req, project_id: str):
+async def view_published(req, page_id: str):
     """Serve the published site. Enforces trial on every request."""
-    row = db.get_project_row(project_id)
+    ip = req.client.host if req.client else "unknown"
+    if is_rate_limited(f"site:{ip}", limit=120, window_seconds=60):
+        return rate_limit_response("Too many requests.")
+    row = db.get_project_row(page_id)
     if row is None:
         return Response("Not found", status_code=404)
 
@@ -40,15 +46,28 @@ async def view_published(req, project_id: str):
 
     if should_pause_site(user.plan, trial_ends_at):
         if not row.get("is_paused"):
-            db.set_project_paused(project_id, True)
-        project = db.get_project(project_id)
+            db.set_project_paused(page_id, True)
+        project = db.get_project(page_id)
         name = project.brand_memory.business_name if project and project.brand_memory else ""
         return Response(get_paused_html(name), media_type="text/html")
 
     # Serve the published site directly
-    project = db.get_project(project_id)
+    project = db.get_project(page_id)
     if project is None or project.site_version is None or not project.site_version.html:
         return Response("Published site not found", status_code=404)
 
     rendered = render_final_page(project.site_version.html, project.site_version.css or "")
-    return Response(rendered, media_type="text/html")
+    etag = f'"{hashlib.md5(rendered.encode()).hexdigest()}"'
+
+    if_none_match = req.headers.get("if-none-match", "")
+    if if_none_match == etag:
+        return Response(status_code=304)
+
+    return Response(
+        rendered,
+        media_type="text/html",
+        headers={
+            "Cache-Control": "public, max-age=3600",
+            "ETag": etag,
+        },
+    )

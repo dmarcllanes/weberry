@@ -2,6 +2,7 @@
 
 import re
 import hashlib
+from functools import lru_cache
 from pathlib import Path
 
 from fasthtml.common import (
@@ -30,6 +31,7 @@ def _get_thumb_url(slot_name: str, site_plan) -> str:
     return f"https://loremflickr.com/300/200/{keyword}?lock={lock}"
 
 
+@lru_cache(maxsize=None)
 def _get_template_slots(template_id: str) -> list[str]:
     """Get all image slot names actually used in the template HTML."""
     template_path = TEMPLATES_DIR / template_id / "template.html"

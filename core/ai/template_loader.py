@@ -1,11 +1,13 @@
 """Load and inspect template manifests from the templates/ directory."""
 
 import json
+from functools import lru_cache
 from pathlib import Path
 
 TEMPLATES_DIR = Path(__file__).resolve().parent.parent.parent / "templates"
 
 
+@lru_cache(maxsize=1)
 def list_templates() -> list[dict]:
     """Scan templates/*/manifest.json and return all manifests."""
     templates = []
@@ -17,6 +19,7 @@ def list_templates() -> list[dict]:
     return templates
 
 
+@lru_cache(maxsize=None)
 def load_template_manifest(template_id: str) -> dict:
     """Load a single template manifest by ID."""
     manifest_path = TEMPLATES_DIR / template_id / "manifest.json"
@@ -26,6 +29,7 @@ def load_template_manifest(template_id: str) -> dict:
         return json.load(f)
 
 
+@lru_cache(maxsize=1)
 def get_templates_summary() -> str:
     """Formatted summary of all templates for the AI prompt."""
     templates = list_templates()

@@ -4,11 +4,11 @@ from user_app import db
 from user_app.routes import json_error
 
 
-async def trial_status(req, project_id: str):
+async def trial_status(req, page_id: str):
     user = req.scope["user"]
-    row = db.get_project_row(project_id)
+    row = db.get_project_row(page_id)
     if row is None or row["user_id"] != user.id:
-        return json_error("Project not found", 404)
+        return json_error("Page not found", 404)
 
     return {
         "plan": user.plan.value,

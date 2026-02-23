@@ -12,6 +12,7 @@ from core.errors import CoreError
 from user_app import db
 from user_app.routes import error_page
 from core.billing.entitlements import can_create_project
+from user_app.middleware.rate_limiter import is_rate_limited, rate_limit_response
 from user_app.services.project_service import (
     create_project_for_user,
     get_user_projects,
@@ -29,12 +30,12 @@ from user_app.frontend.pages.profile import user_profile_page, brand_profile_pag
 from user_app.frontend.pages.site_detail import site_detail_page
 
 
-async def get_brand_details(req, project_id: str):
+async def get_brand_details(req, page_id: str):
     """Return only the brand info component for HTMX modal loading."""
     user = req.scope["user"]
-    project = db.get_project(project_id)
+    project = db.get_project(page_id)
     if project is None or project.user_id != user.id:
-        return Div(P("Project not found.", style="text-align:center;padding:2rem;color:#991B1B"))
+        return Div(P("Page not found.", style="text-align:center;padding:2rem;color:#991B1B"))
     try:
         return brand_info_component(project)
     except Exception as e:
@@ -51,8 +52,8 @@ def dashboard(req):
         page = int(req.query_params.get("page", "1"))
     except ValueError:
         page = 1
-    
-    # Always show dashboard to allow creating new projects/managing existing ones
+
+    # Always show dashboard to allow creating new pages/managing existing ones
     show_new = can_create_project(user, len(projects))
     return dashboard_page(user, projects, show_new_button=show_new, active_tab=tab, page=page)
 
@@ -63,7 +64,7 @@ def show_user_profile(req):
     return user_profile_page(user)
 
 
-def create_project(req):
+def create_page(req):
     user = req.scope["user"]
     try:
         project = create_project_for_user(user)
@@ -72,11 +73,11 @@ def create_project(req):
     return RedirectResponse(f"/pages/{project.id}", status_code=303)
 
 
-async def show_project(req, project_id: str):
+async def show_page(req, page_id: str):
     user = req.scope["user"]
-    project = db.get_project(project_id)
+    project = db.get_project(page_id)
     if project is None or project.user_id != user.id:
-        return error_page("Project not found", 404)
+        return error_page("Page not found", 404)
 
     state = project.state
 
@@ -100,8 +101,8 @@ async def show_project(req, project_id: str):
 
     if state == ProjectState.PUBLISHED:
         base = str(req.url.scheme) + "://" + req.headers.get("host", "localhost")
-        public_url = f"{base}/sites/{project_id}"
-        row = db.get_project_row(project_id)
+        public_url = f"{base}/sites/{page_id}"
+        row = db.get_project_row(page_id)
         trial_info = None
         if row and row.get("trial_ends_at"):
             from datetime import datetime
@@ -109,13 +110,13 @@ async def show_project(req, project_id: str):
             trial_info = {"days_remaining": trial_days_remaining(trial_ends)}
         return published_page(user, project, public_url, trial_info)
 
-    return error_page("Unknown project state")
+    return error_page("Unknown page state")
 
 
-async def preview_render(req, project_id: str):
+async def preview_render(req, page_id: str):
     """Serve the generated HTML for the preview iframe."""
     user = req.scope["user"]
-    project = db.get_project(project_id)
+    project = db.get_project(page_id)
     if project is None or project.user_id != user.id:
         return Response("Not found", status_code=404)
 
@@ -135,26 +136,26 @@ async def preview_render(req, project_id: str):
     return Response(html, media_type="text/html")
 
 
-async def show_profile(req, project_id: str):
+async def show_profile(req, page_id: str):
     user = req.scope["user"]
-    project = db.get_project(project_id)
+    project = db.get_project(page_id)
     if project is None or project.user_id != user.id:
-        return error_page("Project not found", 404)
+        return error_page("Page not found", 404)
     return brand_profile_page(project)
 
 
-async def show_site(req, project_id: str):
+async def show_site(req, page_id: str):
     user = req.scope["user"]
-    project = db.get_project(project_id)
+    project = db.get_project(page_id)
     if project is None or project.user_id != user.id:
-        return error_page("Project not found", 404)
+        return error_page("Page not found", 404)
 
     public_url = None
     trial_info = None
     if project.state == ProjectState.PUBLISHED:
         base = str(req.url.scheme) + "://" + req.headers.get("host", "localhost")
-        public_url = f"{base}/sites/{project_id}"
-        row = db.get_project_row(project_id)
+        public_url = f"{base}/sites/{page_id}"
+        row = db.get_project_row(page_id)
         if row and row.get("trial_ends_at"):
             from datetime import datetime
             trial_ends = datetime.fromisoformat(row["trial_ends_at"]) if isinstance(row["trial_ends_at"], str) else row["trial_ends_at"]
@@ -163,14 +164,14 @@ async def show_site(req, project_id: str):
     return site_detail_page(user, project, public_url, trial_info)
 
 
-async def delete_project(req, project_id: str):
-    """Delete a project and redirect to dashboard."""
+async def delete_page(req, page_id: str):
+    """Delete a page and redirect to dashboard."""
     user = req.scope["user"]
-    project = db.get_project(project_id)
+    project = db.get_project(page_id)
     if project is None or project.user_id != user.id:
-        return error_page("Project not found", 404)
+        return error_page("Page not found", 404)
 
-    db.delete_project(project_id)
+    db.delete_project(page_id)
     return RedirectResponse("/pages", status_code=303)
 
 
@@ -188,10 +189,10 @@ def _auto_label(width, height, index):
     return "product"
 
 
-async def upload_asset(req, project_id: str):
+async def upload_asset(req, page_id: str):
     """Upload up to 4 images, auto-read metadata, store in Supabase."""
     user = req.scope["user"]
-    project = db.get_project(project_id)
+    project = db.get_project(page_id)
     if project is None or project.user_id != user.id:
         return Response("Not found", status_code=404)
 
@@ -237,7 +238,7 @@ async def upload_asset(req, project_id: str):
         label = _auto_label(width, height, len(existing) + i)
 
         ext = upload.filename.rsplit(".", 1)[-1] if "." in upload.filename else "png"
-        storage_path = f"{project_id}/assets/{uuid.uuid4().hex}.{ext}"
+        storage_path = f"{page_id}/assets/{uuid.uuid4().hex}.{ext}"
         content_type = upload.content_type or "image/png"
 
         storage.from_(SUPABASE_ASSETS_BUCKET).upload(storage_path, contents, {"content-type": content_type})
@@ -264,14 +265,14 @@ async def upload_asset(req, project_id: str):
     # Return all asset cards (full replace via hx-swap="innerHTML")
     from user_app.frontend.pages.onboarding import render_asset_card
     all_assets = project.brand_memory.labeled_assets
-    cards = [render_asset_card(a, project_id) for a in all_assets]
+    cards = [render_asset_card(a, page_id) for a in all_assets]
     return Div(*cards)
 
 
-async def delete_asset(req, project_id: str):
+async def delete_asset(req, page_id: str):
     """Remove an asset from brand_memory and Supabase storage."""
     user = req.scope["user"]
-    project = db.get_project(project_id)
+    project = db.get_project(page_id)
     if project is None or project.user_id != user.id:
         return Response("Not found", status_code=404)
 
@@ -297,11 +298,11 @@ async def delete_asset(req, project_id: str):
     return Response("", status_code=200)
 
 
-async def save_memory(req, project_id: str):
+async def save_memory(req, page_id: str):
     user = req.scope["user"]
-    project = db.get_project(project_id)
+    project = db.get_project(page_id)
     if project is None or project.user_id != user.id:
-        return error_page("Project not found", 404)
+        return error_page("Page not found", 404)
 
     form = await req.form()
 
@@ -335,7 +336,7 @@ async def save_memory(req, project_id: str):
     except CoreError as e:
         return error_page(str(e))
 
-    return RedirectResponse(f"/pages/{project_id}", status_code=303)
+    return RedirectResponse(f"/pages/{page_id}", status_code=303)
 
 
 # Goal -> (website_type, project_intent) mapping
@@ -359,12 +360,14 @@ def _darken_hex(hex_color: str, factor: float = 0.75) -> str:
     return f"#{min(r,255):02x}{min(g,255):02x}{min(b,255):02x}"
 
 
-async def braindump(req, project_id: str):
+async def braindump(req, page_id: str):
     """Brain Dump: collect minimal input, build memory, generate site, redirect to preview."""
     user = req.scope["user"]
-    project = db.get_project(project_id)
+    if is_rate_limited(f"braindump:{user.id}", limit=10, window_seconds=3600):
+        return rate_limit_response("You've made too many generation requests. Please wait before trying again.")
+    project = db.get_project(page_id)
     if project is None or project.user_id != user.id:
-        return error_page("Project not found", 404)
+        return error_page("Page not found", 404)
 
     form = await req.form()
 
@@ -424,7 +427,7 @@ async def braindump(req, project_id: str):
         # SITE_GENERATED -> PREVIEW
         move_to_preview(project)
     except CoreError as e:
-        # If AI fails, project lands in MEMORY_READY — show_project renders retry page
+        # If AI fails, project lands in MEMORY_READY — show_page renders retry page
         pass
 
-    return RedirectResponse(f"/pages/{project_id}", status_code=303)
+    return RedirectResponse(f"/pages/{page_id}", status_code=303)
