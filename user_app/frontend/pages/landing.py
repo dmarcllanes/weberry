@@ -36,7 +36,7 @@ def landing_page():
         Nav(
             Div(
                 Div(
-                    Div('Okenaba', cls='logo'),
+                    A(Img(src='/static/img/logo.png', alt='Okenaba', style='height: 40px; width: auto;'), href='/', cls='logo'),
                     
                     # Desktop Nav
                     Ul(
