@@ -12,7 +12,7 @@ def landing_page():
         Meta(name='viewport', content='width=device-width, initial-scale=1.0'),
         Title('Okenaba - Build AI Websites in Minutes'),
         Link(rel='icon', type='image/svg+xml', href='/static/img/favicon.svg'),
-        Link(rel='stylesheet', href='/static/css/landing.css?v=8'),
+        Link(rel='stylesheet', href='/static/css/landing.css?v=9'),
         Link(rel="preconnect", href="https://fonts.googleapis.com"),
         Link(rel="preconnect", href="https://fonts.gstatic.com", crossorigin=""),
         Link(href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap", rel="stylesheet"),
@@ -567,6 +567,34 @@ def landing_page():
                 cls='container'
             ),
             cls='footer'
+        ),
+        # Cookie Banner
+        Div(
+            Div(
+                Div(
+                    Div(
+                        Svg(
+                            Path(d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z', fill='currentColor'),
+                            viewBox='0 0 24 24', cls='cookie-icon'
+                        ),
+                        Div(
+                            P('We use cookies', cls='cookie-title'),
+                            P('We use cookies to enhance your browsing experience and analyze site traffic. By clicking "Accept", you consent to our use of cookies.', cls='cookie-desc'),
+                            cls='cookie-text'
+                        ),
+                        cls='cookie-info'
+                    ),
+                    Div(
+                        Button('Decline', cls='btn-secondary cookie-btn', id='cookie-decline'),
+                        Button('Accept All', cls='btn-primary cookie-btn', id='cookie-accept'),
+                        cls='cookie-actions'
+                    ),
+                    cls='cookie-inner'
+                ),
+                cls='container'
+            ),
+            id='cookie-banner',
+            cls='cookie-banner'
         ),
         Script(src='/static/js/landing.js')
     ),

@@ -262,6 +262,14 @@ document.addEventListener('click', (e) => {
     }
 });
 
+// Cookie Banner
+document.getElementById('cookie-accept').addEventListener('click', function () {
+    document.getElementById('cookie-banner').style.display = 'none';
+});
+document.getElementById('cookie-decline').addEventListener('click', function () {
+    document.getElementById('cookie-banner').style.display = 'none';
+});
+
 // Billing Toggle
 function toggleBilling() {
     const isYearly = document.getElementById('billing-toggle').checked;
