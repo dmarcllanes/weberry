@@ -36,7 +36,7 @@ def landing_page():
         Nav(
             Div(
                 Div(
-                    A(Img(src='/static/img/logo.png', alt='Okenaba', style='height: 40px; width: auto;'), href='/', cls='logo'),
+                    A(Img(src='/static/img/logo.png', alt='Okenaba', style='height: 56px; width: auto; transform: scale(2.2); transform-origin: left center;'), href='/', cls='logo'),
                     
                     # Desktop Nav
                     Ul(
@@ -503,8 +503,8 @@ def landing_page():
             Div(
                 Div(
                     Div(
-                        H4('Okenaba'),
-                        P('Build your professional online presence with AI. Fast, beautiful, and effortless.'),
+                        A(Img(src='/static/img/logo.png', alt='Okenaba', style='height: 56px; width: auto; transform: scale(2.2); transform-origin: left center;'), href='/'),
+                        P('Build your professional online presence with AI. Fast, beautiful, and effortless.', style='margin-top: 1.5rem;'),
                         cls='footer-section'
                     ),
                     Div(

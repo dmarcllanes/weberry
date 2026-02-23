@@ -79,7 +79,7 @@ def page_layout(content, user=None, title="Okenaba", step_indicator=None, projec
         Div(
             Div(
                 A(
-                    Img(src="/static/img/logo.png", alt="Okenaba", style="height: 40px; width: auto;"),
+                    Img(src="/static/img/logo.png", alt="Okenaba", style="height: 56px; width: auto; transform: scale(2.2); transform-origin: left center;"),
                     href="/", cls="logo",
                 ),
                 Div(

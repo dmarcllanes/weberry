@@ -23,22 +23,8 @@ def login_page():
         ),
         Body(
             Div(
-                # Glowing Icon
-                Div(
-                    # SVG Arrow Icon
-                    Svg(
-                        Path(d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"),
-                        Polyline(points="10 17 15 12 10 7"),
-                        Line(x1="15", y1="12", x2="3", y2="12"),
-                        viewBox="0 0 24 24",
-                        fill="none",
-                        stroke="currentColor",
-                        stroke_width="2",
-                        stroke_linecap="round",
-                        stroke_linejoin="round",
-                    ),
-                    cls="icon-container"
-                ),
+                # Logo
+                Img(src="/static/img/logo.png", alt="Okenaba", cls="login-logo"),
                 
                 H1("Welcome back"),
                 P("Sign in to continue to your account", cls="subtitle"),

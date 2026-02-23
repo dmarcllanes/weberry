@@ -105,6 +105,26 @@ body::after {
     align-items: center;
 }
 
+/* Login Logo */
+.login-logo {
+    height: 56px;
+    width: auto;
+    transform: scale(2.2);
+    transform-origin: center;
+    margin-bottom: 2rem;
+    animation: logo-float 3s ease-in-out infinite, logo-glow-pulse 3s ease-in-out infinite;
+}
+
+@keyframes logo-float {
+    0%, 100% { transform: scale(2.2) translateY(0px); }
+    50%       { transform: scale(2.2) translateY(-6px); }
+}
+
+@keyframes logo-glow-pulse {
+    0%, 100% { filter: drop-shadow(0 0 10px rgba(99, 102, 241, 0.5)) drop-shadow(0 0 24px rgba(99, 102, 241, 0.25)); }
+    50%       { filter: drop-shadow(0 0 18px rgba(99, 102, 241, 0.9)) drop-shadow(0 0 40px rgba(99, 102, 241, 0.5)); }
+}
+
 .icon-container {
     width: 64px;
     height: 64px;
