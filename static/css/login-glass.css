@@ -107,9 +107,12 @@ body::after {
 
 /* Login Logo */
 .login-logo {
-    height: 120px;
+    max-height: 60px;
+    max-width: 75%;
     width: auto;
-    margin-bottom: 2rem;
+    height: auto;
+    object-fit: contain;
+    margin: 0 auto 2rem auto;
     display: block;
     animation: logo-float 3s ease-in-out infinite, logo-glow-pulse 3s ease-in-out infinite;
 }
