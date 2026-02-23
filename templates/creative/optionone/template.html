@@ -47,7 +47,25 @@
         <img src="{{ hero_bg_url }}" alt="background" class="header__bg-1" />
     </header>
 
-    
+
+    <footer>
+        <div class="section__container footer__container">
+            <h4>{{ business_name }}</h4>
+            {% if contact_email %}
+            <p><a href="mailto:{{ contact_email }}">{{ contact_email }}</a></p>
+            {% endif %}
+            <ul class="footer__socials">
+                <li><a href="#"><i class="ri-twitter-fill"></i></a></li>
+                <li><a href="#"><i class="ri-linkedin-fill"></i></a></li>
+                <li><a href="#"><i class="ri-behance-fill"></i></a></li>
+                <li><a href="#"><i class="ri-dribbble-line"></i></a></li>
+            </ul>
+        </div>
+        <div class="footer__bar">
+            Copyright &copy; 2025 {{ business_name }}. All rights reserved.
+        </div>
+    </footer>
+
 </body>
 
 </html>

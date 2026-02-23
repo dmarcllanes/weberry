@@ -370,3 +370,54 @@ header::before {
         padding-block: 6rem;
     }
 }
+
+footer {
+    background-color: var(--primary-color);
+}
+
+.footer__container {
+    padding-block: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    text-align: center;
+}
+
+.footer__container h4 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--white);
+}
+
+.footer__container p,
+.footer__container p a {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.footer__container p a:hover {
+    color: var(--white);
+}
+
+.footer__socials {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.footer__socials a {
+    font-size: 1.5rem;
+    color: var(--white);
+}
+
+.footer__socials a:hover {
+    color: var(--secondary-color);
+}
+
+.footer__bar {
+    padding: 1rem;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.7);
+    text-align: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
