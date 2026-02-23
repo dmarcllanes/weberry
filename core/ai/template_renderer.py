@@ -2,7 +2,6 @@
 
 import json
 import re
-import hashlib
 from functools import lru_cache
 from pathlib import Path
 
@@ -112,9 +111,8 @@ def render_template(template_id: str, site_plan: SitePlan, memory: BrandMemory) 
                 keyword = default_keywords[hash(slot_name) % len(default_keywords)]
             else:
                 keyword = slot_name
-        keyword_safe = keyword.strip().replace(" ", ",")
-        lock = int(hashlib.md5(slot_name.encode()).hexdigest()[:8], 16) % 10000
-        url = f"https://loremflickr.com/{w}/{h}/{keyword_safe}?lock={lock}"
+        keyword_safe = keyword.strip().replace(" ", "-")
+        url = f"https://picsum.photos/seed/{keyword_safe}/{w}/{h}"
 
         context[f"{slot_name}_url"] = url
 
