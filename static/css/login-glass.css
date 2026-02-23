@@ -107,17 +107,16 @@ body::after {
 
 /* Login Logo */
 .login-logo {
-    height: 56px;
+    height: 120px;
     width: auto;
-    transform: scale(2.2);
-    transform-origin: center;
     margin-bottom: 2rem;
+    display: block;
     animation: logo-float 3s ease-in-out infinite, logo-glow-pulse 3s ease-in-out infinite;
 }
 
 @keyframes logo-float {
-    0%, 100% { transform: scale(2.2) translateY(0px); }
-    50%       { transform: scale(2.2) translateY(-6px); }
+    0%, 100% { transform: translateY(0px); }
+    50%       { transform: translateY(-6px); }
 }
 
 @keyframes logo-glow-pulse {
