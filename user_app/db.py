@@ -217,7 +217,7 @@ def update_user_subscription(user_id: str, plan: str, customer_id: str, subscrip
     }).eq("id", user_id).execute()
 
 
-# --- Project CRUD ---
+# --- Page CRUD ---
 
 def _row_to_project(row: dict) -> Project:
     return Project(
@@ -238,19 +238,19 @@ def _row_to_project(row: dict) -> Project:
 def get_project(project_id: str) -> Project | None:
     if not project_id:
         return None
-    result = get_client().table("projects").select("*").eq("id", project_id).execute()
+    result = get_client().table("pages").select("*").eq("id", project_id).execute()
     if not result.data:
         return None
     return _row_to_project(result.data[0])
 
 
 def get_projects_for_user(user_id: str) -> list[Project]:
-    result = get_client().table("projects").select("*").eq("user_id", user_id).order("created_at").execute()
+    result = get_client().table("pages").select("*").eq("user_id", user_id).order("created_at").execute()
     return [_row_to_project(row) for row in result.data]
 
 
 def count_projects_for_user(user_id: str) -> int:
-    result = get_client().table("projects").select("id", count="exact").eq("user_id", user_id).execute()
+    result = get_client().table("pages").select("id", count="exact").eq("user_id", user_id).execute()
     return result.count or 0
 
 
@@ -260,7 +260,7 @@ def create_project(user_id: str) -> Project:
         "state": ProjectState.DRAFT.value,
         "ai_usage": _serialize_ai_usage(AIUsage()),
     }
-    result = get_client().table("projects").insert(row).execute()
+    result = get_client().table("pages").insert(row).execute()
     return _row_to_project(result.data[0])
 
 
@@ -274,11 +274,11 @@ def save_project(project: Project) -> None:
         "template_id": project.template_id,
         "published_at": project.published_at.isoformat() if project.published_at else None,
     }
-    get_client().table("projects").update(data).eq("id", project.id).execute()
+    get_client().table("pages").update(data).eq("id", project.id).execute()
 
 
 def update_project_trial(project_id: str, trial_ends_at: datetime, is_paused: bool = False) -> None:
-    get_client().table("projects").update({
+    get_client().table("pages").update({
         "trial_ends_at": trial_ends_at.isoformat(),
         "is_paused": is_paused,
     }).eq("id", project_id).execute()
@@ -288,24 +288,24 @@ def get_project_row(project_id: str) -> dict | None:
     """Get raw project row (includes trial_ends_at, is_paused)."""
     if not project_id:
         return None
-    result = get_client().table("projects").select("*").eq("id", project_id).execute()
+    result = get_client().table("pages").select("*").eq("id", project_id).execute()
     if not result.data:
         return None
     return result.data[0]
 
 
 def delete_project(project_id: str) -> None:
-    """Delete a project and its published sites by ID."""
+    """Delete a page and its published records by ID."""
     client = get_client()
-    client.table("published_sites").delete().eq("project_id", project_id).execute()
-    client.table("projects").delete().eq("id", project_id).execute()
+    client.table("published_pages").delete().eq("page_id", project_id).execute()
+    client.table("pages").delete().eq("id", project_id).execute()
 
 
 def set_project_paused(project_id: str, paused: bool) -> None:
-    get_client().table("projects").update({"is_paused": paused}).eq("id", project_id).execute()
+    get_client().table("pages").update({"is_paused": paused}).eq("id", project_id).execute()
 
 
-# --- Published Sites ---
+# --- Published Pages ---
 
 def save_published_site(
     project_id: str,
@@ -315,8 +315,8 @@ def save_published_site(
     html_content: str,
     css_content: str,
 ) -> None:
-    get_client().table("published_sites").insert({
-        "project_id": project_id,
+    get_client().table("published_pages").insert({
+        "page_id": project_id,
         "version": version,
         "storage_path": storage_path,
         "public_url": public_url,
@@ -330,9 +330,9 @@ def get_latest_published_site(project_id: str) -> dict | None:
         return None
     result = (
         get_client()
-        .table("published_sites")
+        .table("published_pages")
         .select("*")
-        .eq("project_id", project_id)
+        .eq("page_id", project_id)
         .order("version", desc=True)
         .limit(1)
         .execute()
