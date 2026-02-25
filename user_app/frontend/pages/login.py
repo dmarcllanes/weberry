@@ -4,7 +4,7 @@ from fasthtml.common import *
 from fasthtml.svg import *
 from fasthtml.common import Link # Explicit import if not in * or to be safe
 
-from config.settings import SUPABASE_URL, SUPABASE_KEY
+from config.settings import SUPABASE_URL, SUPABASE_KEY, TURNSTILE_SITE_KEY
 
 
 def login_page():
@@ -20,6 +20,7 @@ def login_page():
             Link(href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap", rel="stylesheet"),
             Script(src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"),
             Script(f"window.SUPABASE_URL='{SUPABASE_URL}';window.SUPABASE_KEY='{SUPABASE_KEY}';"),
+            Script(src="https://challenges.cloudflare.com/turnstile/v0/api.js", async_=True, defer=True),
         ),
         Body(
             Div(
@@ -42,7 +43,19 @@ def login_page():
                 H1("Welcome back"),
                 P("Sign in to continue to your account", cls="subtitle"),
                 
-                # Google Button
+                # Turnstile widget — must be solved before Google button activates
+                Div(
+                    Div(
+                        data_sitekey=TURNSTILE_SITE_KEY,
+                        data_callback="onTurnstileSuccess",
+                        data_expired_callback="onTurnstileExpired",
+                        data_theme="dark",
+                        cls="cf-turnstile",
+                    ),
+                    cls="turnstile-container",
+                ),
+
+                # Google Button (disabled until Turnstile passes)
                 Button(
                     # Google Icon SVG
                     Svg(
@@ -53,6 +66,7 @@ def login_page():
                     Span("Continue with Google"),
                     id="googleBtn",
                     cls="btn-google",
+                    disabled=True,
                 ),
 
                 Div(

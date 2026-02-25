@@ -5,6 +5,10 @@ Start with: python user_app/main.py
 
 import os
 import sys
+import json as _json
+import urllib.request
+import urllib.parse as _urlparse
+from asyncio import to_thread as _to_thread
 from pathlib import Path
 
 # Ensure project root is on sys.path
@@ -16,6 +20,7 @@ load_dotenv()
 from fasthtml.common import fast_app, serve, Beforeware, RedirectResponse
 from starlette.responses import JSONResponse
 
+from config.settings import TURNSTILE_SECRET_KEY
 from user_app.auth.guards import auth_beforeware
 from user_app.auth.login import get_or_create_user
 from user_app.frontend.pages.login import login_page
@@ -78,6 +83,35 @@ async def post(req, sess):
     if avatar_url:
         sess["avatar_url"] = avatar_url
     return JSONResponse({"status": "success"})
+
+
+@rt("/api/auth/verify-turnstile")
+async def post(req):
+    try:
+        body = await req.json()
+    except Exception:
+        body = dict(await req.form())
+    token = body.get("token", "")
+    if not token:
+        return JSONResponse({"success": False, "error": "missing token"}, status_code=400)
+
+    def _verify():
+        data = _urlparse.urlencode({
+            "secret": TURNSTILE_SECRET_KEY,
+            "response": token,
+        }).encode()
+        r = urllib.request.Request(
+            "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+            data=data,
+            headers={"Content-Type": "application/x-www-form-urlencoded"},
+        )
+        with urllib.request.urlopen(r, timeout=10) as resp:
+            return _json.loads(resp.read())
+
+    result = await _to_thread(_verify)
+    if result.get("success"):
+        return JSONResponse({"success": True})
+    return JSONResponse({"success": False, "error": result.get("error-codes", [])}, status_code=400)
 
 
 @rt("/logout")

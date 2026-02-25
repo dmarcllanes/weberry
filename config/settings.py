@@ -63,6 +63,12 @@ LEMON_SQUEEZY_VARIANTS = {
     "BIG": os.environ.get("LEMON_SQUEEZY_VARIANT_BIG", ""),
 }
 
+# Cloudflare Turnstile
+# Get your keys at https://dash.cloudflare.com → Turnstile
+# Default values are Cloudflare's official test keys (always pass in dev)
+TURNSTILE_SITE_KEY = os.environ.get("TURNSTILE_SITE_KEY", "1x00000000000000000000AA")
+TURNSTILE_SECRET_KEY = os.environ.get("TURNSTILE_SECRET_KEY", "1x0000000000000000000000000000000AA")
+
 # App
 APP_HOST = os.environ.get("APP_HOST", "0.0.0.0")
 APP_PORT = int(os.environ.get("APP_PORT", os.environ.get("PORT", "5001")))

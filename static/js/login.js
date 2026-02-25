@@ -11,19 +11,70 @@ function getSupabase() {
     return supabaseClient;
 }
 
-// Google sign-in button
+// --- Cloudflare Turnstile ---
+
+let turnstileToken = null;
+
+function onTurnstileSuccess(token) {
+    turnstileToken = token;
+    const btn = document.getElementById('googleBtn');
+    if (btn) btn.disabled = false;
+}
+
+function onTurnstileExpired() {
+    turnstileToken = null;
+    const btn = document.getElementById('googleBtn');
+    if (btn) btn.disabled = true;
+}
+
+// --- Google sign-in button ---
+
 document.addEventListener('DOMContentLoaded', () => {
     const googleBtn = document.getElementById('googleBtn');
     if (googleBtn) {
         googleBtn.addEventListener('click', async () => {
+            if (!turnstileToken) {
+                alert('Please complete the security challenge first.');
+                return;
+            }
+
             const client = getSupabase();
             if (!client) {
                 console.error('Supabase client not initialized');
                 alert('System error: Supabase not initialized. Check console.');
                 return;
             }
+
             googleBtn.disabled = true;
-            googleBtn.textContent = 'Redirecting...';
+            googleBtn.querySelector('span').textContent = 'Verifying...';
+
+            // Verify Turnstile token server-side before proceeding
+            try {
+                const verifyRes = await fetch('/api/auth/verify-turnstile', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token: turnstileToken }),
+                });
+
+                if (!verifyRes.ok) {
+                    alert('Security check failed. Please try again.');
+                    if (window.turnstile) window.turnstile.reset();
+                    turnstileToken = null;
+                    googleBtn.disabled = true;
+                    googleBtn.querySelector('span').textContent = 'Continue with Google';
+                    return;
+                }
+            } catch (err) {
+                console.error('Turnstile verify error:', err);
+                alert('Security check failed. Please try again.');
+                if (window.turnstile) window.turnstile.reset();
+                turnstileToken = null;
+                googleBtn.disabled = true;
+                googleBtn.querySelector('span').textContent = 'Continue with Google';
+                return;
+            }
+
+            googleBtn.querySelector('span').textContent = 'Redirecting...';
 
             const { data, error } = await client.auth.signInWithOAuth({
                 provider: 'google',
@@ -39,8 +90,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (error) {
                 console.error('Google login error:', error);
                 alert('Login failed: ' + error.message);
-                googleBtn.disabled = false;
-                googleBtn.textContent = 'Continue with Google';
+                if (window.turnstile) window.turnstile.reset();
+                turnstileToken = null;
+                googleBtn.disabled = true;
+                googleBtn.querySelector('span').textContent = 'Continue with Google';
             }
         });
     } else {

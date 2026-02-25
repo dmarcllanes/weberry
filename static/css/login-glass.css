@@ -137,6 +137,14 @@ h1 {
     margin-bottom: 2.5rem;
 }
 
+/* Turnstile */
+.turnstile-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+}
+
 /* Google Button */
 .btn-google {
     width: 100%;
@@ -160,6 +168,13 @@ h1 {
     background: rgba(255, 255, 255, 0.12);
     border-color: rgba(255, 255, 255, 0.2);
     transform: translateY(-1px);
+}
+
+.btn-google:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none;
 }
 
 .btn-google:active {
