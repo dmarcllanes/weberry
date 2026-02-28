@@ -1,9 +1,10 @@
 from core.billing.trial import is_trial_expired
-from core.models.user import PlanType
 
 
-def should_pause_site(plan: PlanType, trial_ends_at) -> bool:
-    if plan in (PlanType.VALIDATOR, PlanType.AGENCY):
+def should_pause_site(trial_ends_at) -> bool:
+    """Pause only free-credit pages after their 7-day trial expires.
+    Paid-credit pages have trial_ends_at = None and are never paused."""
+    if trial_ends_at is None:
         return False
     return is_trial_expired(trial_ends_at)
 
@@ -43,7 +44,7 @@ def get_paused_html(business_name: str = "") -> str:
 <body>
     <div class="container">
         <h1>{name}</h1>
-        <p>This site is currently paused. The owner can reactivate it by upgrading their plan.</p>
+        <p>This site is currently paused. The owner can reactivate it by purchasing more credits.</p>
     </div>
 </body>
 </html>"""

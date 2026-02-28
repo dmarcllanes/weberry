@@ -11,11 +11,10 @@ async def trial_status(req, page_id: str):
         return json_error("Page not found", 404)
 
     return {
-        "plan": user.plan.value,
-        "trial_ends_at": None,
-        "is_trial_active": True,
-        "is_trial_expired": False,
-        "days_remaining": None,
+        "available_credits": user.available_credits,
+        "paid_credits": user.paid_credits,
+        "free_credits": user.free_credits if user.free_credit_active else 0,
+        "free_credit_expires_at": user.free_credits_expires_at.isoformat() if user.free_credits_expires_at else None,
         "is_paused": row.get("is_paused", False),
     }
 

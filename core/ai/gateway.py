@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 
-from core.models.user import User, PlanType
+from core.models.user import User
 from core.models.project import Project
 from core.ai.schemas import SitePlan
 from core.ai.planner import run_planner
@@ -12,19 +12,17 @@ from core.state_machine.engine import transition, transition_to_error
 from core.limits.ai_limits import check_ai_limit, increment_usage
 from core.limits.rate_limits import check_rate_limit, record_call
 from core.limits.cooldowns import check_cooldown
-from config.settings import TRIAL_DURATION_DAYS
 from core.errors import AIGenerationError, TrialExpiredError
 from core.ai.copy_writer import run_copy_writer
 from core.ai.template_loader import get_templates_summary
 from core.ai.template_renderer import render_template
 
 
-def check_trial_validity(user: User) -> None:
-    """Check if the user's trial has expired."""
-    if user.plan == PlanType.DRAFTER:
+def check_credits(user: User) -> None:
+    """Guard: raise if user has no credits. Route layer deducts after success."""
+    if not user.has_credits:
         days_active = (datetime.now(timezone.utc) - user.created_at).days
-        if days_active > TRIAL_DURATION_DAYS:
-            raise TrialExpiredError(user.plan.value, days_active)
+        raise TrialExpiredError("no_credits", days_active)
 
 
 def generate_plan(project: Project, user: User) -> SitePlan:
@@ -38,15 +36,14 @@ def generate_plan(project: Project, user: User) -> SitePlan:
     # (transition() will enforce this via is_valid_transition)
 
     # 2. Trial check (Time-Bomb)
-    check_trial_validity(user)
+    check_credits(user)
 
     # 3. Limit check
-    check_ai_limit(project.ai_usage, user.plan, "planner")
+    check_ai_limit(project.ai_usage, "planner")
 
-    # 4. Cooldown & Rate limit checks (Skip for AGENCY)
-    if user.plan != PlanType.AGENCY:
-        check_cooldown(project.ai_usage)
-        check_rate_limit(user.id)
+    # 4. Cooldown & Rate limit checks
+    check_cooldown(project.ai_usage)
+    check_rate_limit(user.id)
 
     # 5. Call planner
     try:
@@ -77,15 +74,14 @@ def generate_site(project: Project, user: User) -> SiteVersion:
     The ONLY entry point for site generation AI calls.
     """
     # 1. Trial check (Time-Bomb)
-    check_trial_validity(user)
+    check_credits(user)
 
     # 2. Limit check
-    check_ai_limit(project.ai_usage, user.plan, "generation")
+    check_ai_limit(project.ai_usage, "generation")
 
-    # 3. Cooldown & Rate limit checks (Skip for AGENCY)
-    if user.plan != PlanType.AGENCY:
-        check_cooldown(project.ai_usage)
-        check_rate_limit(user.id)
+    # 3. Cooldown & Rate limit checks
+    check_cooldown(project.ai_usage)
+    check_rate_limit(user.id)
 
     # 4. Generate HTML
     try:
@@ -127,15 +123,14 @@ def generate_and_render(project: Project, user: User) -> SiteVersion:
     Transitions MEMORY_READY -> SITE_GENERATED directly.
     """
     # 1. Trial check
-    check_trial_validity(user)
+    check_credits(user)
 
     # 2. Limit check (counts as one generation call)
-    check_ai_limit(project.ai_usage, user.plan, "generation")
+    check_ai_limit(project.ai_usage, "generation")
 
-    # 3. Cooldown & Rate limit (skip for AGENCY)
-    if user.plan != PlanType.AGENCY:
-        check_cooldown(project.ai_usage)
-        check_rate_limit(user.id)
+    # 3. Cooldown & Rate limit
+    check_cooldown(project.ai_usage)
+    check_rate_limit(user.id)
 
     # 4. Load templates summary
     templates_summary = get_templates_summary()

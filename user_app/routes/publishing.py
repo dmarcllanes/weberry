@@ -44,7 +44,7 @@ async def view_published(req, page_id: str):
         from datetime import datetime
         trial_ends_at = datetime.fromisoformat(row["trial_ends_at"]) if isinstance(row["trial_ends_at"], str) else row["trial_ends_at"]
 
-    if should_pause_site(user.plan, trial_ends_at):
+    if should_pause_site(trial_ends_at):
         if not row.get("is_paused"):
             db.set_project_paused(page_id, True)
         project = db.get_project(page_id)

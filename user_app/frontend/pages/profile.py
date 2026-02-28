@@ -27,7 +27,7 @@ def user_profile_page(user):
             Div(
                 _info_row("Email", user.email),
                 _info_row("User ID", user.id),
-                _info_row("Current Plan", user.plan.value.title()),
+                _info_row("Credits", str(user.available_credits)),
                 cls="info-rows"
             ),
             cls="profile-card"

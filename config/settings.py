@@ -14,22 +14,6 @@ HF_MODELS = {
     "code": "meta-llama/Llama-3.3-70B-Instruct",
 }
 
-# AI usage limits per plan
-AI_LIMITS = {
-    "DRAFTER": {
-        "planner_calls": 1,
-        "generation_calls": 1,
-    },
-    "VALIDATOR": {
-        "planner_calls": 10,
-        "generation_calls": 10,
-    },
-    "AGENCY": {
-        "planner_calls": float("inf"),
-        "generation_calls": float("inf"),
-    },
-}
-
 # Rate limiting: max calls per window
 RATE_LIMIT_MAX_CALLS = int(os.environ.get("RATE_LIMIT_MAX_CALLS", "10"))
 RATE_LIMIT_WINDOW_SECONDS = int(os.environ.get("RATE_LIMIT_WINDOW_SECONDS", "60"))
@@ -47,20 +31,21 @@ SUPABASE_ASSETS_BUCKET = os.environ.get("SUPABASE_ASSETS_BUCKET", "public-assets
 # Database
 DATABASE_URL = os.environ.get("DATABASE_URL", "")
 
-# Trial
-TRIAL_DURATION_DAYS = int(os.environ.get("TRIAL_DURATION_DAYS", "7"))
+# Trial durations
+FREE_CREDIT_TRIAL_DAYS  = int(os.environ.get("FREE_CREDIT_TRIAL_DAYS", "7"))   # signup free credit
+PAID_CREDIT_TRIAL_DAYS  = int(os.environ.get("PAID_CREDIT_TRIAL_DAYS", "30"))  # purchased credits
 
 # Lemon Squeezy
 LEMON_SQUEEZY_API_KEY = os.environ.get("LEMON_SQUEEZY_API_KEY", "")
 LEMON_SQUEEZY_WEBHOOK_SECRET = os.environ.get("LEMON_SQUEEZY_WEBHOOK_SECRET", "")
 LEMON_SQUEEZY_STORE_ID = os.environ.get("LEMON_SQUEEZY_STORE_ID", "")
 
-# Plan to Variant ID Mapping (PlanType -> Variant ID)
-# You must get these IDs from your Lemon Squeezy dashboard
-LEMON_SQUEEZY_VARIANTS = {
-    "SMALL": os.environ.get("LEMON_SQUEEZY_VARIANT_SMALL", ""),
-    "MEDIUM": os.environ.get("LEMON_SQUEEZY_VARIANT_MEDIUM", ""),
-    "BIG": os.environ.get("LEMON_SQUEEZY_VARIANT_BIG", ""),
+# Credit pack variant IDs → credits awarded on purchase (one-time products).
+# Get Variant IDs from your Lemon Squeezy dashboard → product → Variants tab.
+LEMON_SQUEEZY_CREDIT_PACKS: dict[str, int] = {
+    os.environ.get("LEMON_SQUEEZY_VARIANT_STARTER", ""): 5,   # Starter: 5 credits / $9
+    os.environ.get("LEMON_SQUEEZY_VARIANT_GROWTH", ""):  15,  # Growth:  15 credits / $19
+    os.environ.get("LEMON_SQUEEZY_VARIANT_STUDIO", ""):  50,  # Studio:  50 credits / $49
 }
 
 # Cloudflare Turnstile

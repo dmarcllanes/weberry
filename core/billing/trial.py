@@ -1,10 +1,4 @@
-from datetime import datetime, timedelta, timezone
-
-from config.settings import TRIAL_DURATION_DAYS
-
-
-def calculate_trial_end(published_at: datetime) -> datetime:
-    return published_at + timedelta(days=TRIAL_DURATION_DAYS)
+from datetime import datetime, timezone
 
 
 def is_trial_active(trial_ends_at: datetime | None) -> bool:

@@ -9,14 +9,14 @@ sys.path.append(os.getcwd())
 
 from core.models.brand_memory import BrandMemory, ProjectIntent
 from core.models.project import Project
-from core.models.user import User, PlanType
+from core.models.user import User
 from core.ai.schemas import SitePlan, SectionPlan, CopyBlock
 from core.state_machine.states import ProjectState
 from user_app.services.project_service import rerender_site
 
 def test_image_editing_logic():
     # 1. Setup Data
-    user = User(id="test_user", email="test@example.com", plan=PlanType.DRAFTER)
+    user = User(id="test_user", email="test@example.com", paid_credits=1)
     memory = BrandMemory(
         business_name="TestEdit",
         primary_goal="Bookings",

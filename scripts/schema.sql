@@ -12,7 +12,8 @@
 --   Okenaba is a Rapid Idea Validator. Users fill a Brain Dump
 --   wizard → one AI call generates a complete static site →
 --   user previews, edits images, then publishes.
---   A 15-day trial starts on publish. After trial: site is paused.
+--   Business model: 1 credit = 1 published page.
+--   Signup gives 1 free credit valid for 7 days. Purchased credits never expire.
 -- =============================================================
 
 
@@ -26,28 +27,30 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 -- =============================================================
 -- TABLE: users
 --
--- Business rules:
---   Tier 1 DRAFTER   — 1 page, 1 AI call, 15-day trial (default on signup)
---   Tier 2 VALIDATOR — 3 pages, 10 AI calls per page, permanent hosting
---   Tier 3 AGENCY    — unlimited pages, bypasses rate limits, white label
+-- Business model: credit-based. 1 credit = 1 published page.
+--   free_credits   — 1 credit granted on signup, expires after 7 days.
+--   paid_credits   — purchased via Lemon Squeezy one-time packs. Never expire.
+--   Pages published with a free credit get a 7-day trial (is_paused after).
+--   Pages published with a paid credit are permanent (no trial).
 --
 -- id = Supabase Auth user ID (always provided by auth, no auto-gen needed).
 -- avatar_url is stored in the session cookie only — never written to DB.
--- Billing columns (lemon_squeezy_*) reserved; payment disabled in beta.
+-- lemon_squeezy_customer_id kept for purchase tracking.
 -- =============================================================
 
 CREATE TABLE users (
     id                             UUID        PRIMARY KEY,
     email                          TEXT        NOT NULL UNIQUE,
     full_name                      TEXT,
-    plan                           TEXT        NOT NULL DEFAULT 'DRAFTER',
-    -- plan values: DRAFTER | VALIDATOR | AGENCY
 
-    -- billing — reserved for Lemon Squeezy integration
+    -- credits
+    paid_credits                   INT         NOT NULL DEFAULT 0,
+    free_credits                   INT         NOT NULL DEFAULT 1,
+    free_credits_expires_at        TIMESTAMPTZ,
+    -- set to created_at + 7 days on user creation (see upsert_user in db.py)
+
+    -- billing — Lemon Squeezy one-time purchase tracking
     lemon_squeezy_customer_id      TEXT,
-    lemon_squeezy_subscription_id  TEXT,
-    subscription_status            TEXT,
-    variant_id                     TEXT,
 
     created_at                     TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -127,10 +130,11 @@ CREATE TABLE pages (
     updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     published_at    TIMESTAMPTZ,
     trial_ends_at   TIMESTAMPTZ,
-    -- 15 days after first publish (set by core/publishing/publisher.py)
+    -- set to published_at + 7 days only when published using a free credit.
+    -- NULL when published with a paid credit (page never expires).
 
     is_paused       BOOLEAN     NOT NULL DEFAULT FALSE
-    -- true when trial expired and plan = DRAFTER
+    -- true when trial_ends_at has passed (free-credit pages only)
 );
 
 
@@ -198,10 +202,12 @@ CREATE TRIGGER trg_pages_updated_at
 -- Skip this block in production.
 -- =============================================================
 
-INSERT INTO users (id, email, plan)
+INSERT INTO users (id, email, paid_credits, free_credits, free_credits_expires_at)
 VALUES (
     '00000000-0000-0000-0000-000000000001',
     'dev@okenaba.local',
-    'DRAFTER'
+    999,
+    999,
+    '2099-12-31 00:00:00+00'  -- never expires for dev
 )
 ON CONFLICT (id) DO NOTHING;

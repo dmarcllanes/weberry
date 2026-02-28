@@ -11,7 +11,7 @@ from config.settings import SUPABASE_ASSETS_BUCKET
 from core.errors import CoreError
 from user_app import db
 from user_app.routes import error_page
-from core.billing.entitlements import can_create_project
+from core.billing.entitlements import can_generate_site, next_credit_type
 from user_app.middleware.rate_limiter import is_rate_limited, rate_limit_response
 from user_app.services.project_service import (
     create_project_for_user,
@@ -54,7 +54,7 @@ def dashboard(req):
         page = 1
 
     # Always show dashboard to allow creating new pages/managing existing ones
-    show_new = can_create_project(user, len(projects))
+    show_new = can_generate_site(user)
     return dashboard_page(user, projects, show_new_button=show_new, active_tab=tab, page=page)
 
 
@@ -419,6 +419,12 @@ async def braindump(req, page_id: str):
         labeled_assets=existing_assets,
     )
 
+    # Check credits before spending an AI call
+    if not can_generate_site(user):
+        return error_page("You have no credits. Purchase a pack to generate more sites.")
+
+    credit_type = next_credit_type(user)
+
     try:
         # DRAFT -> INPUT_READY -> MEMORY_READY
         save_brand_memory(project, memory)
@@ -428,6 +434,18 @@ async def braindump(req, page_id: str):
         move_to_preview(project)
     except CoreError as e:
         # If AI fails, project lands in MEMORY_READY — show_page renders retry page
-        pass
+        return RedirectResponse(f"/pages/{page_id}", status_code=303)
+
+    # Generation succeeded — consume 1 credit
+    db.deduct_credit(user)
+
+    # Set trial duration based on credit type:
+    #   free credit  → 7 days
+    #   paid credit  → 30 days
+    from datetime import datetime, timezone, timedelta
+    from config.settings import FREE_CREDIT_TRIAL_DAYS, PAID_CREDIT_TRIAL_DAYS
+    days = FREE_CREDIT_TRIAL_DAYS if credit_type == "free" else PAID_CREDIT_TRIAL_DAYS
+    trial_ends = datetime.now(timezone.utc) + timedelta(days=days)
+    db.update_project_trial(page_id, trial_ends_at=trial_ends)
 
     return RedirectResponse(f"/pages/{page_id}", status_code=303)

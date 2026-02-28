@@ -1,34 +1,17 @@
-from core.models.user import User, PlanType
-from core.models.project import Project
-from core.billing.plans import get_plan_limits
+from core.models.user import User
 
 
-def can_create_project(user: User, project_count: int) -> bool:
-    limits = get_plan_limits(user.plan)
-    return project_count < limits["max_projects"]
+def can_generate_site(user: User) -> bool:
+    """User needs at least 1 credit to generate a site."""
+    return user.has_credits
 
 
-def can_regenerate(user: User, project: Project) -> bool:
-    if user.plan == PlanType.DRAFTER:
-        return False
-    limits = get_plan_limits(user.plan)
-    return project.ai_usage.generation_calls < limits["generation_calls"]
-
-
-def can_replan(user: User, project: Project) -> bool:
-    if user.plan == PlanType.DRAFTER:
-        return False
-    limits = get_plan_limits(user.plan)
-    return project.ai_usage.planner_calls < limits["planner_calls"]
-
-
-def can_change_theme(user: User) -> bool:
-    return user.plan != PlanType.DRAFTER
-
-
-def can_use_custom_domain(user: User) -> bool:
-    return user.plan not in (PlanType.DRAFTER, PlanType.SMALL)
-
-
-def can_export_files(user: User) -> bool:
-    return user.plan != PlanType.DRAFTER
+def next_credit_type(user: User) -> str:
+    """
+    Returns which credit bucket will be consumed on the next generation.
+    'paid'  → page is permanent (no trial).
+    'free'  → page gets a 7-day trial, then is paused.
+    """
+    if user.paid_credits > 0:
+        return "paid"
+    return "free"

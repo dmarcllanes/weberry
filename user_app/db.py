@@ -10,7 +10,7 @@ from datetime import datetime, timezone
 from supabase import create_client, Client
 
 from config.settings import SUPABASE_URL, SUPABASE_SERVICE_KEY
-from core.models.user import User, PlanType
+from core.models.user import User
 from core.models.project import Project
 from core.models.brand_memory import BrandMemory, LabeledAsset, ProjectIntent
 from core.models.ai_usage import AIUsage
@@ -152,37 +152,38 @@ def get_user(user_id: str) -> User | None:
     if not result.data:
         return None
     row = result.data[0]
-
-    # Payment disabled during beta — all users get full access
-    plan = PlanType.AGENCY
-
     return User(
         id=row["id"],
         email=row["email"],
-        plan=plan,
+        paid_credits=row.get("paid_credits", 0),
+        free_credits=row.get("free_credits", 1),
+        free_credits_expires_at=_parse_timestamp(row.get("free_credits_expires_at")),
         full_name=row.get("full_name"),
         avatar_url=row.get("avatar_url"),
+        lemon_squeezy_customer_id=row.get("lemon_squeezy_customer_id"),
     )
 
 
 def upsert_user(user_id: str, email: str, full_name: str | None = None, avatar_url: str | None = None) -> User:
     """Create or update a user by Supabase auth ID."""
+    from datetime import timedelta
     result = get_client().table("users").select("*").eq("id", user_id).execute()
     if result.data:
         update_data = {"email": email}
         if full_name:
             update_data["full_name"] = full_name
-        # avatar_url is stored in session, not DB
         get_client().table("users").update(update_data).eq("id", user_id).execute()
     else:
+        expires_at = (datetime.now(timezone.utc) + timedelta(days=7)).isoformat()
         user_data = {
             "id": user_id,
             "email": email,
-            "plan": PlanType.DRAFTER.value,
+            "paid_credits": 0,
+            "free_credits": 1,
+            "free_credits_expires_at": expires_at,
         }
         if full_name:
             user_data["full_name"] = full_name
-        # avatar_url is stored in session, not DB
         get_client().table("users").insert(user_data).execute()
     return get_user(user_id)
 
@@ -192,29 +193,46 @@ def get_user_by_email(email: str) -> User | None:
     if not result.data:
         return None
     row = result.data[0]
-
-    # Payment disabled during beta — all users get full access
-    plan = PlanType.AGENCY
-
     return User(
         id=row["id"],
         email=row["email"],
-        plan=plan,
+        paid_credits=row.get("paid_credits", 0),
+        free_credits=row.get("free_credits", 1),
+        free_credits_expires_at=_parse_timestamp(row.get("free_credits_expires_at")),
         full_name=row.get("full_name"),
         avatar_url=row.get("avatar_url"),
+        lemon_squeezy_customer_id=row.get("lemon_squeezy_customer_id"),
     )
 
 
+def add_paid_credits(user_id: str, amount: int, customer_id: str | None = None) -> None:
+    """Add purchased credits to a user. Called by the Lemon Squeezy webhook on order_created."""
+    result = get_client().table("users").select("paid_credits").eq("id", user_id).execute()
+    if not result.data:
+        return
+    current = result.data[0].get("paid_credits", 0)
+    update: dict = {"paid_credits": current + amount}
+    if customer_id:
+        update["lemon_squeezy_customer_id"] = customer_id
+    get_client().table("users").update(update).eq("id", user_id).execute()
 
-def update_user_subscription(user_id: str, plan: str, customer_id: str, subscription_id: str, status: str, variant_id: str) -> None:
-    """Update user subscription details."""
-    get_client().table("users").update({
-        "plan": plan,
-        "lemon_squeezy_customer_id": customer_id,
-        "lemon_squeezy_subscription_id": subscription_id,
-        "subscription_status": status,
-        "variant_id": variant_id,
-    }).eq("id", user_id).execute()
+
+def deduct_credit(user: User) -> str:
+    """
+    Consume one credit from the user. Paid credits are used first.
+    Returns 'paid' or 'free' to indicate which bucket was consumed.
+    The caller uses this to decide whether to set trial_ends_at on the page.
+    """
+    if user.paid_credits > 0:
+        get_client().table("users").update(
+            {"paid_credits": user.paid_credits - 1}
+        ).eq("id", user.id).execute()
+        return "paid"
+
+    get_client().table("users").update(
+        {"free_credits": user.free_credits - 1}
+    ).eq("id", user.id).execute()
+    return "free"
 
 
 # --- Page CRUD ---

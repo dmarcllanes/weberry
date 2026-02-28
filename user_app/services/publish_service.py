@@ -8,7 +8,6 @@ from core.publishing.validator import validate_for_publish
 from core.publishing.renderer import render_final_page
 from core.publishing.storage import upload_site
 from core.publishing.urls import get_public_url
-from core.billing.trial import calculate_trial_end
 from core.errors import CoreError
 from config.settings import SUPABASE_STORAGE_BUCKET
 from user_app import db
@@ -78,8 +77,6 @@ def publish_project(project: Project, user: User) -> str:
     # 7. Persist project
     db.save_project(project)
 
-    # 8. Set trial timer (for free users)
-    trial_end = calculate_trial_end(now)
-    db.update_project_trial(project.id, trial_end)
+    # trial_ends_at is set at generation time in braindump() — not touched here.
 
     return public_url

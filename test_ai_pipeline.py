@@ -38,14 +38,10 @@ print("\n--- config/settings.py ---")
 
 def test_settings_loads():
     from config.settings import (
-        HF_API_KEY, HF_MODELS, AI_LIMITS,
+        HF_API_KEY, HF_MODELS,
         RATE_LIMIT_MAX_CALLS, RATE_LIMIT_WINDOW_SECONDS,
         AI_COOLDOWN_SECONDS,
     )
-    assert isinstance(AI_LIMITS, dict)
-    assert "DRAFTER" in AI_LIMITS and "VALIDATOR" in AI_LIMITS
-    assert AI_LIMITS["DRAFTER"]["planner_calls"] == 1
-    assert AI_LIMITS["VALIDATOR"]["planner_calls"] == 10
     assert isinstance(RATE_LIMIT_MAX_CALLS, int)
     assert isinstance(AI_COOLDOWN_SECONDS, int)
     assert "copy" in HF_MODELS and "code" in HF_MODELS
@@ -111,13 +107,21 @@ test("all 9 states exist", test_all_states_exist)
 print("\n--- core/models/user.py ---")
 
 def test_user_creation():
-    from core.models.user import User, PlanType
+    from core.models.user import User
+    from datetime import datetime, timezone, timedelta
     u = User(id="u1", email="a@b.com")
-    assert u.plan == PlanType.DRAFTER  # default is DRAFTER
-    u2 = User(id="u2", email="b@b.com", plan=PlanType.VALIDATOR)
-    assert u2.plan == PlanType.VALIDATOR
+    assert u.paid_credits == 0
+    assert u.free_credits == 1
+    assert not u.has_credits  # no expiry set yet, so free credit not active
+    u2 = User(
+        id="u2", email="b@b.com",
+        paid_credits=5,
+        free_credits=1,
+        free_credits_expires_at=datetime.now(timezone.utc) + timedelta(days=7),
+    )
+    assert u2.available_credits == 6  # 5 paid + 1 free
 
-test("user defaults to DRAFTER plan", test_user_creation)
+test("user credit model works", test_user_creation)
 
 
 # ============================================================
@@ -314,36 +318,20 @@ test("guard blocks without site plan", test_guard_site_plan)
 # ============================================================
 print("\n--- core/limits/ai_limits.py ---")
 
-def test_free_plan_limit():
-    from core.limits.ai_limits import check_ai_limit, increment_usage
+def test_ai_limit_per_project():
+    from core.limits.ai_limits import check_ai_limit, increment_usage, AI_CALLS_PER_PROJECT
     from core.models.ai_usage import AIUsage
-    from core.models.user import PlanType
     from core.errors import AILimitExceeded
-    u = AIUsage()
-    check_ai_limit(u, PlanType.DRAFTER, "planner")  # 0 < 1
+    u = AIUsage(planner_calls=AI_CALLS_PER_PROJECT - 1)
+    check_ai_limit(u, "planner")  # one call left
     increment_usage(u, "planner")
     try:
-        check_ai_limit(u, PlanType.DRAFTER, "planner")  # 1 >= 1
+        check_ai_limit(u, "planner")  # now at limit
         assert False
     except AILimitExceeded:
         pass
 
-def test_paid_plan_limit():
-    from core.limits.ai_limits import check_ai_limit, increment_usage
-    from core.models.ai_usage import AIUsage
-    from core.models.user import PlanType
-    from core.errors import AILimitExceeded
-    u = AIUsage(planner_calls=9)
-    check_ai_limit(u, PlanType.VALIDATOR, "planner")  # 9 < 10
-    increment_usage(u, "planner")
-    try:
-        check_ai_limit(u, PlanType.VALIDATOR, "planner")  # 10 >= 10
-        assert False
-    except AILimitExceeded:
-        pass
-
-test("drafter plan: 1 planner call allowed", test_free_plan_limit)
-test("validator plan: 10 planner calls allowed", test_paid_plan_limit)
+test("per-project AI limit enforced", test_ai_limit_per_project)
 
 
 # ============================================================
@@ -553,17 +541,22 @@ if LIVE_MODE:
     load_dotenv()
 
     def test_gateway_full_pipeline():
-        from core.models.user import User, PlanType
+        from core.models.user import User
         from core.models.project import Project
         from core.models.brand_memory import BrandMemory
         from core.state_machine.states import ProjectState
         from core.state_machine.engine import transition
         from core.ai.gateway import generate_plan, generate_site
         from core.limits.rate_limits import reset
+        from datetime import datetime, timezone, timedelta
 
         reset()
 
-        user = User(id="test-user", email="t@t.com", plan=PlanType.DRAFTER)
+        user = User(
+            id="test-user", email="t@t.com",
+            paid_credits=5,
+            free_credits_expires_at=datetime.now(timezone.utc) + timedelta(days=7),
+        )
         project = Project(id="test-project", user_id=user.id)
         project.brand_memory = BrandMemory(
             business_name="Sunrise Bakery",
@@ -602,20 +595,26 @@ if LIVE_MODE:
         print("        Saved test_output.html")
 
     def test_gateway_limit_enforcement():
-        from core.models.user import User, PlanType
+        from core.models.user import User
         from core.models.project import Project
         from core.models.brand_memory import BrandMemory
         from core.models.ai_usage import AIUsage
         from core.state_machine.states import ProjectState
         from core.ai.gateway import generate_plan
         from core.errors import AILimitExceeded
+        from core.limits.ai_limits import AI_CALLS_PER_PROJECT
+        from datetime import datetime, timezone, timedelta
 
-        user = User(id="limit-user", email="t@t.com", plan=PlanType.DRAFTER)
+        user = User(
+            id="limit-user", email="t@t.com",
+            paid_credits=5,
+            free_credits_expires_at=datetime.now(timezone.utc) + timedelta(days=7),
+        )
         project = Project(id="limit-project", user_id=user.id, state=ProjectState.MEMORY_READY)
         project.brand_memory = BrandMemory(
             business_name="Test", website_type="test", primary_goal="test",
         )
-        project.ai_usage = AIUsage(planner_calls=1)  # already used
+        project.ai_usage = AIUsage(planner_calls=AI_CALLS_PER_PROJECT)  # already at limit
         try:
             generate_plan(project, user)
             assert False, "should have raised"
