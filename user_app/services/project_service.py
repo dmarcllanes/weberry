@@ -3,20 +3,12 @@ from core.models.project import Project
 from core.models.brand_memory import BrandMemory
 from core.state_machine.engine import transition
 from core.state_machine.states import ProjectState
-from core.billing.entitlements import can_create_project
 from core.errors import CoreError
 from user_app import db
 
 
-class ProjectLimitError(CoreError):
-    def __init__(self):
-        super().__init__("Project limit reached for your plan")
-
-
 def create_project_for_user(user: User) -> Project:
-    count = db.count_projects_for_user(user.id)
-    if not can_create_project(user, count):
-        raise ProjectLimitError()
+    # Creating a draft is free — credits are checked at generation time (braindump).
     project = db.create_project(user.id)
     return project
 
