@@ -124,23 +124,35 @@ def dashboard_page(user, projects, show_new_button=True, active_tab="unfinished"
         pagination if pagination else "",
     ]
     
+    available = user.available_credits
     if show_new_button:
+        credit_label = (
+            f"{available} credit{'s' if available != 1 else ''} remaining"
+        )
+        credit_color = "var(--color-success)" if available > 1 else "var(--color-warning)"
         children.append(
             Div(
                 Form(
-                    Button("New Page", cls="button button-primary", type="submit",
+                    Button("+ New Page", cls="button button-primary", type="submit",
                             style="max-width:300px"),
                     method="post", action="/pages",
                 ),
-                style="display:flex;justify-content:center;margin-top:2rem"
+                P(credit_label,
+                  style=f"margin-top:0.5rem;font-size:0.8rem;color:{credit_color};font-weight:500"),
+                style="display:flex;flex-direction:column;align-items:center;margin-top:2rem"
             )
         )
     else:
         children.append(
             Div(
-                Button("Page Limit Reached", cls="button button-primary", disabled=True,
-                        style="max-width:300px;opacity:0.6;cursor:not-allowed"),
-                P("Upgrade to create more pages.", style="margin-top:0.5rem;color:#666;font-size:0.9rem"),
+                Button("+ New Page", cls="button button-primary", disabled=True,
+                        style="max-width:300px;opacity:0.5;cursor:not-allowed"),
+                P(
+                    "No credits left. ",
+                    A("Buy credits →", href="/billing",
+                      style="color:var(--color-primary);font-weight:600;text-decoration:none"),
+                    style="margin-top:0.5rem;font-size:0.85rem;color:var(--color-text-light)"
+                ),
                 style="display:flex;flex-direction:column;align-items:center;margin-top:2rem"
             )
         )

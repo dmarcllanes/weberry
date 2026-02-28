@@ -23,12 +23,12 @@ def landing_page():
     Body(
         Div(
             Div(
-                Span("🚀 Launch Special: Build your dream site in minutes! "),
-                Span("✨ New AI features just dropped! "),
-                Span("🔥 Join 10,000+ creators on Okenaba. "),
-                Span("🚀 Launch Special: Build your dream site in minutes! "),
-                Span("✨ New AI features just dropped! "),
-                Span("🔥 Join 10,000+ creators on Okenaba. "),
+                Span("🚀 1 free credit on signup — no card required! "),
+                Span("✨ AI-generated sites in under 60 seconds. "),
+                Span("🔥 1 credit = 1 page. Buy only what you need. "),
+                Span("🚀 1 free credit on signup — no card required! "),
+                Span("✨ AI-generated sites in under 60 seconds. "),
+                Span("🔥 1 credit = 1 page. Buy only what you need. "),
                 cls='marquee-content'
             ),
             cls='announcement-banner'
@@ -245,128 +245,102 @@ def landing_page():
             Div(
                 Div(
                     H2('Simple Pricing', cls='text-glow'),
-                    P('Start small and scale as you grow.', cls='section-subtitle'),
-                    
+                    P('Pay only for what you use. No subscriptions, no surprises.', cls='section-subtitle'),
                     Div(
-                        Span('✨ 7 Days Free Trial', cls='badge-save', style='margin:0 0 1rem 0;display:inline-block'),
+                        Span('🎁 1 Free Credit on Signup — no card required', cls='badge-save', style='margin:0 0 1rem 0;display:inline-block'),
                         style='text-align:center'
-                    ),
-
-                    # Billing Toggle
-                    Div(
-                        Span('Monthly', cls='billing-label active', id='label-monthly'),
-                        Label(
-                            Input(type='checkbox', id='billing-toggle', onclick='toggleBilling()'),
-                            Span(cls='slider round'),
-                            cls='switch'
-                        ),
-                        Span('Yearly', cls='billing-label', id='label-yearly'),
-                        cls='pricing-toggle-container'
                     ),
                     cls='pricing-header'
                 ),
-                
+
                 Div(
-                    # Small Plan
+                    # Starter Pack
                     Div(
-                        H3('Small'),
+                        H3('Starter'),
                         Div(
-                            # Monthly Price
-                            Div(
-                                H4('$10', cls='price-amount'),
-                                Span('/month', cls='price-period'),
-                                cls='price-display price-monthly'
-                            ),
-                            # Yearly Price
-                            Div(
-                                H4('$100', cls='price-amount'),
-                                Span('/year', cls='price-period'),
-                                P('$8.33/mo', cls='price-subtext'),
-                                cls='price-display price-yearly',
-                                style='display:none'
-                            ),
+                            H4('$9', cls='price-amount'),
+                            Span(' one-time', cls='price-period'),
                             cls='price-wrapper'
                         ),
-                        P('Perfect for hobbyists and checking out the platform.', cls='plan-desc'),
+                        P('Try it out — perfect for your first real project.', cls='plan-desc'),
+                        Div(
+                            Span('5 credits', style='font-size:1.5rem;font-weight:800;color:var(--color-primary)'),
+                            Span(' · $1.80 / credit', style='font-size:0.85rem;color:#94A3B8;margin-left:0.25rem'),
+                            style='margin-bottom:1.25rem'
+                        ),
                         Ul(
-                            Li('✓ 10 Pages'),
-                            Li('✓ Basic Analytics'),
-                            Li('✓ Community Support'),
-                            Li('✓ Export to HTML/CSS'),
+                            Li('✓ 5 AI-generated pages'),
+                            Li('✓ 30-day page lifetime each'),
+                            Li('✓ Custom brand colors & images'),
+                            Li('✓ Credits never expire'),
                             cls='features-list'
                         ),
                         A('Get Started', cls='btn-secondary', href='/login'),
                         cls='pricing-card'
                     ),
-                    
-                    # Medium Plan
+
+                    # Growth Pack
                     Div(
                         Span('Most Popular', cls='badge'),
-                        H3('Medium'),
+                        H3('Growth'),
                         Div(
-                            # Monthly Price
-                            Div(
-                                H4('$30', cls='price-amount'),
-                                Span('/month', cls='price-period'),
-                                cls='price-display price-monthly'
-                            ),
-                            # Yearly Price
-                            Div(
-                                H4('$300', cls='price-amount'),
-                                Span('/year', cls='price-period'),
-                                P('$25/mo', cls='price-subtext'),
-                                cls='price-display price-yearly',
-                                style='display:none'
-                            ),
+                            H4('$19', cls='price-amount'),
+                            Span(' one-time', cls='price-period'),
                             cls='price-wrapper'
                         ),
-                        P('For freelancers and creators building multiple sites.', cls='plan-desc'),
+                        P('Best value for founders validating multiple ideas.', cls='plan-desc'),
+                        Div(
+                            Span('15 credits', style='font-size:1.5rem;font-weight:800;color:var(--color-primary)'),
+                            Span(' · $1.27 / credit', style='font-size:0.85rem;color:#94A3B8;margin-left:0.25rem'),
+                            style='margin-bottom:1.25rem'
+                        ),
                         Ul(
-                            Li('✓ 40 Pages'),
-                            Li('✓ Advanced Analytics'),
-                            Li('✓ Priority Support'),
-                            Li('✓ Remove Branding'),
-                            Li('✓ Custom Domain'),
+                            Li('✓ 15 AI-generated pages'),
+                            Li('✓ 30-day page lifetime each'),
+                            Li('✓ Custom brand colors & images'),
+                            Li('✓ Credits never expire'),
+                            Li('✓ Priority support'),
                             cls='features-list'
                         ),
-                        A('Start Free Trial', cls='btn-primary', href='/login'),
+                        A('Buy Growth Pack', cls='btn-primary', href='/login'),
                         cls='pricing-card featured'
                     ),
-                    
-                    # Big Plan
+
+                    # Studio Pack
                     Div(
-                        H3('Big'),
+                        H3('Studio'),
                         Div(
-                            # Monthly Price
-                            Div(
-                                H4('$80', cls='price-amount'),
-                                Span('/month', cls='price-period'),
-                                cls='price-display price-monthly'
-                            ),
-                            # Yearly Price
-                            Div(
-                                H4('$800', cls='price-amount'),
-                                Span('/year', cls='price-period'),
-                                P('$66/mo', cls='price-subtext'),
-                                cls='price-display price-yearly',
-                                style='display:none'
-                            ),
+                            H4('$49', cls='price-amount'),
+                            Span(' one-time', cls='price-period'),
                             cls='price-wrapper'
                         ),
-                        P('For agencies and power users who need scale.', cls='plan-desc'),
+                        P('For agencies and prolific builders who move fast.', cls='plan-desc'),
+                        Div(
+                            Span('50 credits', style='font-size:1.5rem;font-weight:800;color:var(--color-primary)'),
+                            Span(' · $0.98 / credit', style='font-size:0.85rem;color:#94A3B8;margin-left:0.25rem'),
+                            style='margin-bottom:1.25rem'
+                        ),
                         Ul(
-                            Li('✓ 100 Pages'),
-                            Li('✓ Team Collaboration'),
-                            Li('✓ White Labeling'),
-                            Li('✓ Dedicated Success Manager'),
-                            Li('✓ API Access'),
+                            Li('✓ 50 AI-generated pages'),
+                            Li('✓ 30-day page lifetime each'),
+                            Li('✓ Custom brand colors & images'),
+                            Li('✓ Credits never expire'),
+                            Li('✓ Priority support'),
                             cls='features-list'
                         ),
-                        A('Contact Sales', cls='btn-secondary', href='/login'),
+                        A('Buy Studio Pack', cls='btn-secondary', href='/login'),
                         cls='pricing-card'
                     ),
                     cls='pricing-grid'
                 ),
+
+                # How credits work note
+                Div(
+                    Span('💡 ', style='font-size:1rem'),
+                    Span('1 credit = 1 AI-generated page. Free signup credit lasts 7 days. Purchased credits give each page a 30-day lifetime. Credits never expire — use them whenever you\'re ready.', style='color:#64748B;font-size:0.9rem'),
+                    style='text-align:center;margin-top:2rem;padding:1rem 2rem;background:rgba(37,99,235,0.04);border-radius:0.75rem;border:1px solid rgba(37,99,235,0.1)'
+                ),
+
                 cls='container'
             ),
             id='pricing',
