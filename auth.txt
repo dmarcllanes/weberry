@@ -1,4 +1,4 @@
-# Google Auth Implementation Guide (Supabase + FastHTML)
+\# Google Auth Implementation Guide (Supabase + FastHTML)
 
 This guide documents how Google Authentication is currently implemented in the LuluPet project, so you can copy and implement it in another application.
 

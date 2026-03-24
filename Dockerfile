@@ -31,6 +31,12 @@ COPY --from=builder /app /app
 # Activate venv path
 ENV PATH="/app/.venv/bin:$PATH"
 
-EXPOSE 8000
+# HuggingFace Spaces requires port 7860
+ENV PORT=7860
+EXPOSE 7860
+
+# Run as non-root user (HF Spaces best practice)
+RUN useradd -m -u 1000 appuser && chown -R appuser:appuser /app
+USER appuser
 
 CMD ["python", "user_app/main.py"]
