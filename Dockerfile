@@ -22,10 +22,7 @@ FROM python:3.11-slim AS runtime
 
 WORKDIR /app
 
-# Copy installed virtual environment from builder
-COPY --from=builder /app/.venv /app/.venv
-
-# Copy application source code
+# Copy application source code and virtual environment from builder
 COPY --from=builder /app /app
 
 # Activate venv path
