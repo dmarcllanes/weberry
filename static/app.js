@@ -33,16 +33,35 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
+// --- Sidebar Navigation ---
+
+function toggleSidebar() {
+    var sidebar = document.getElementById('app-sidebar');
+    var overlay = document.getElementById('sidebar-overlay');
+    if (sidebar) {
+        var isOpen = sidebar.classList.toggle('sidebar-open');
+        if (overlay) overlay.classList.toggle('sidebar-open', isOpen);
+        document.body.style.overflow = isOpen ? 'hidden' : '';
+    }
+}
+
 // --- Mobile Navigation ---
 
 function toggleMobileMenu() {
     var nav = document.getElementById('main-nav');
     var toggle = document.querySelector('.mobile-toggle');
     if (nav) {
-        nav.classList.toggle('nav-open');
-        toggle.classList.toggle('active');
-        // Prevent scrolling when menu is open
-        document.body.style.overflow = nav.classList.contains('nav-open') ? 'hidden' : '';
+        var isOpen = nav.classList.toggle('nav-open');
+        if (toggle) toggle.classList.toggle('active', isOpen);
+    }
+}
+
+function closeMobileMenu() {
+    var nav = document.getElementById('main-nav');
+    var toggle = document.querySelector('.mobile-toggle');
+    if (nav) {
+        nav.classList.remove('nav-open');
+        if (toggle) toggle.classList.remove('active');
     }
 }
 
@@ -53,8 +72,15 @@ function toggleUserMenu() {
     }
 }
 
-// Close dropdowns when clicking outside
+// Close mobile nav + user dropdown when clicking outside
 document.addEventListener('click', function (e) {
+    // Close mobile nav if click is outside header
+    var header = document.querySelector('.header');
+    if (header && !header.contains(e.target)) {
+        closeMobileMenu();
+    }
+
+    // Close user dropdown
     if (!e.target.closest('.user-menu-container')) {
         var menu = document.getElementById('user-dropdown');
         if (menu && menu.classList.contains('show')) {
@@ -499,24 +525,24 @@ function submitDeleteAndRedirect(deleteUrl, redirectTo) {
 // --- Theme Toggle ---
 
 function initTheme() {
+    // Default is cosmic dark; only switch to light if explicitly saved
     var storedTheme = localStorage.getItem('theme');
-    var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-    if (storedTheme === 'dark' || (!storedTheme && prefersDark)) {
-        document.documentElement.setAttribute('data-theme', 'dark');
-        updateThemeIcon('dark');
+    if (storedTheme === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+        updateThemeIcon('light');
     } else {
         document.documentElement.removeAttribute('data-theme');
-        updateThemeIcon('light');
+        updateThemeIcon('dark');
     }
 }
 
 function toggleTheme() {
     var currentTheme = document.documentElement.getAttribute('data-theme');
-    var newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    // cosmic dark is the default (no attribute); light is the toggled-away state
+    var newTheme = currentTheme === 'light' ? 'dark' : 'light';
 
-    if (newTheme === 'dark') {
-        document.documentElement.setAttribute('data-theme', 'dark');
+    if (newTheme === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
     } else {
         document.documentElement.removeAttribute('data-theme');
     }

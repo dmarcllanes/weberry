@@ -18,15 +18,18 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from fasthtml.common import fast_app, serve, Beforeware, RedirectResponse
-from starlette.responses import JSONResponse
+from starlette.middleware import Middleware
+from starlette.middleware.gzip import GZipMiddleware
+from starlette.responses import JSONResponse, FileResponse
 
 from config.settings import TURNSTILE_SECRET_KEY
 from user_app.auth.guards import auth_beforeware
 from user_app.auth.login import get_or_create_user
 from user_app.frontend.pages.login import login_page
 from user_app.frontend.pages.landing import landing_page
-from user_app.routes import pages, generation, editing, publishing, billing
+from user_app.routes import pages, generation, editing, publishing, billing, template_preview
 from user_app.routes import help as help_routes
+from user_app.routes import upload_routes
 
 # --- Beforeware ---
 
@@ -37,6 +40,8 @@ bw = Beforeware(
         r'/favicon\.ico',
         r'/static/.*',
         r'/sites/.*',
+        r'/raw-asset/.*',
+        r'/tpl-preview/.*',
         r'/landing',
         r'/login',
         r'/api/auth/.*',
@@ -54,9 +59,18 @@ SECRET_KEY = os.environ.get("SESSION_SECRET", "okenaba-dev-secret-change-me")
 app, rt = fast_app(
     before=bw,
     static_path=PROJECT_ROOT,
+    middleware=[
+        Middleware(GZipMiddleware, minimum_size=500),
+    ],
     secret_key=SECRET_KEY,
     pico=False,
 )
+
+# --- PWA Manifest ---
+
+@rt("/static/manifest.json")
+def get(req):
+    return FileResponse(PROJECT_ROOT + "/static/manifest.json", media_type="application/manifest+json")
 
 # --- Routes: Auth ---
 
@@ -85,8 +99,14 @@ async def post(req, sess):
     return JSONResponse({"status": "success"})
 
 
+_TURNSTILE_DISABLED = os.environ.get("TURNSTILE_DISABLED", "false").lower() == "true"
+
+
 @rt("/api/auth/verify-turnstile")
 async def post(req):
+    if _TURNSTILE_DISABLED:
+        return JSONResponse({"success": True})
+
     try:
         body = await req.json()
     except Exception:
@@ -147,9 +167,14 @@ def get(req):
     return pages.dashboard(req)
 
 
+@rt("/pages/new")
+def get(req):
+    return pages.new_page_picker(req)
+
+
 @rt("/pages")
 async def post(req):
-    return pages.create_page(req)
+    return await pages.create_page(req)
 
 
 # --- Routes: Profile (top-level) ---
@@ -174,6 +199,16 @@ async def post(req, page_id: str):
 @rt("/pages/{page_id}/memory")
 async def post(req, page_id: str):
     return await pages.save_memory(req, page_id)
+
+
+@rt("/pages/{page_id}/upload")
+async def get(req, page_id: str):
+    return await upload_routes.show_upload(req, page_id)
+
+
+@rt("/pages/{page_id}/upload")
+async def post(req, page_id: str):
+    return await upload_routes.handle_upload(req, page_id)
 
 
 @rt("/pages/{page_id}/braindump")
@@ -244,14 +279,15 @@ async def post(req, page_id: str):
     return await editing.edit_content(req, page_id)
 
 
+@rt("/pages/{page_id}/edit-html")
+async def post(req, page_id: str):
+    return await editing.edit_html(req, page_id)
+
+
 @rt("/pages/{page_id}/edit-image")
 async def post(req, page_id: str):
     return await editing.edit_image(req, page_id)
 
-
-@rt("/pages/{page_id}/bulk-upload")
-async def post(req, page_id: str):
-    return await editing.bulk_upload_images(req, page_id)
 
 
 # --- Routes: Publishing ---
@@ -283,6 +319,18 @@ async def get(req):
 @rt("/help")
 async def get(req):
     return await help_routes.show_help(req)
+
+
+@rt("/raw-asset/{rest:path}")
+async def get(req, rest: str):
+    return await upload_routes.serve_raw_asset(req, rest)
+
+
+# --- Routes: Template preview (full-page render, public) ---
+
+@rt("/tpl-preview/{tpl_id:path}")
+def get(req, tpl_id: str):
+    return template_preview.serve(tpl_id)
 
 # --- Start ---
 

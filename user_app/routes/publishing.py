@@ -37,19 +37,7 @@ async def view_published(req, page_id: str):
     if row["state"] != "published":
         return Response("Site not published", status_code=404)
 
-    # Trial enforcement
-    user = db.get_user(row["user_id"])
-    trial_ends_at = None
-    if row.get("trial_ends_at"):
-        from datetime import datetime
-        trial_ends_at = datetime.fromisoformat(row["trial_ends_at"]) if isinstance(row["trial_ends_at"], str) else row["trial_ends_at"]
-
-    if should_pause_site(trial_ends_at):
-        if not row.get("is_paused"):
-            db.set_project_paused(page_id, True)
-        project = db.get_project(page_id)
-        name = project.brand_memory.business_name if project and project.brand_memory else ""
-        return Response(get_paused_html(name), media_type="text/html")
+    # TESTING MODE — trial enforcement disabled
 
     # Serve the published site directly
     project = db.get_project(page_id)

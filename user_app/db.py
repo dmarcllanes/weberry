@@ -4,6 +4,7 @@ Handles all Supabase client init, JSONB serialization, and CRUD operations.
 """
 
 import hashlib
+import time
 from dataclasses import asdict
 from datetime import datetime, timezone
 
@@ -17,6 +18,40 @@ from core.models.ai_usage import AIUsage
 from core.models.site_version import SiteVersion
 from core.ai.schemas import SitePlan, SectionPlan, CopyBlock
 from core.state_machine.states import ProjectState
+
+
+# --- In-process project cache ---
+# Single-process TTL cache: avoids a Supabase round-trip on every page view.
+# Invalidated on every write so reads are never stale past the TTL.
+
+_PROJECT_CACHE:      dict[str, tuple[float, "Project"]]       = {}
+_PROJECT_ROW_CACHE:  dict[str, tuple[float, dict]]            = {}
+_USER_LIST_CACHE:    dict[str, tuple[float, list["Project"]]] = {}
+
+_PROJECT_TTL  = 30   # seconds — single project reads
+_ROW_TTL      = 30   # seconds — raw row (trial_ends_at etc.)
+_LIST_TTL     = 10   # seconds — dashboard project list
+
+
+def _cache_get(store: dict, key: str):
+    entry = store.get(key)
+    if entry and entry[0] > time.monotonic():
+        return entry[1]
+    store.pop(key, None)
+    return None
+
+
+def _cache_put(store: dict, key: str, value, ttl: int) -> None:
+    store[key] = (time.monotonic() + ttl, value)
+
+
+def _invalidate(project_id: str, user_id: str | None = None) -> None:
+    _PROJECT_CACHE.pop(project_id, None)
+    _PROJECT_ROW_CACHE.pop(project_id, None)
+    if user_id:
+        _USER_LIST_CACHE.pop(user_id, None)
+    else:
+        _USER_LIST_CACHE.clear()
 
 
 # --- Client ---
@@ -256,15 +291,26 @@ def _row_to_project(row: dict) -> Project:
 def get_project(project_id: str) -> Project | None:
     if not project_id:
         return None
+    cached = _cache_get(_PROJECT_CACHE, project_id)
+    if cached is not None:
+        return cached
     result = get_client().table("pages").select("*").eq("id", project_id).execute()
     if not result.data:
         return None
-    return _row_to_project(result.data[0])
+    project = _row_to_project(result.data[0])
+    _cache_put(_PROJECT_CACHE, project_id, project, _PROJECT_TTL)
+    _cache_put(_PROJECT_ROW_CACHE, project_id, result.data[0], _ROW_TTL)
+    return project
 
 
 def get_projects_for_user(user_id: str) -> list[Project]:
+    cached = _cache_get(_USER_LIST_CACHE, user_id)
+    if cached is not None:
+        return cached
     result = get_client().table("pages").select("*").eq("user_id", user_id).order("created_at").execute()
-    return [_row_to_project(row) for row in result.data]
+    projects = [_row_to_project(row) for row in result.data]
+    _cache_put(_USER_LIST_CACHE, user_id, projects, _LIST_TTL)
+    return projects
 
 
 def count_projects_for_user(user_id: str) -> int:
@@ -279,7 +325,9 @@ def create_project(user_id: str) -> Project:
         "ai_usage": _serialize_ai_usage(AIUsage()),
     }
     result = get_client().table("pages").insert(row).execute()
-    return _row_to_project(result.data[0])
+    project = _row_to_project(result.data[0])
+    _invalidate(project.id, user_id)
+    return project
 
 
 def save_project(project: Project) -> None:
@@ -293,6 +341,7 @@ def save_project(project: Project) -> None:
         "published_at": project.published_at.isoformat() if project.published_at else None,
     }
     get_client().table("pages").update(data).eq("id", project.id).execute()
+    _invalidate(project.id, project.user_id)
 
 
 def update_project_trial(project_id: str, trial_ends_at: datetime, is_paused: bool = False) -> None:
@@ -303,12 +352,16 @@ def update_project_trial(project_id: str, trial_ends_at: datetime, is_paused: bo
 
 
 def get_project_row(project_id: str) -> dict | None:
-    """Get raw project row (includes trial_ends_at, is_paused)."""
+    """Get raw project row (includes trial_ends_at, is_paused). Uses cache when warm."""
     if not project_id:
         return None
+    cached = _cache_get(_PROJECT_ROW_CACHE, project_id)
+    if cached is not None:
+        return cached
     result = get_client().table("pages").select("*").eq("id", project_id).execute()
     if not result.data:
         return None
+    _cache_put(_PROJECT_ROW_CACHE, project_id, result.data[0], _ROW_TTL)
     return result.data[0]
 
 
@@ -317,6 +370,7 @@ def delete_project(project_id: str) -> None:
     client = get_client()
     client.table("published_pages").delete().eq("page_id", project_id).execute()
     client.table("pages").delete().eq("id", project_id).execute()
+    _invalidate(project_id)
 
 
 def set_project_paused(project_id: str, paused: bool) -> None:

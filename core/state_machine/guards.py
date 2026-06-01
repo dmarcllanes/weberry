@@ -29,7 +29,7 @@ def guard_has_site_version(project) -> None:
 # Guards keyed by the TARGET state they protect
 TRANSITION_GUARDS: dict[ProjectState, list] = {
     ProjectState.PLAN_READY: [guard_has_brand_memory],
-    ProjectState.SITE_GENERATED: [guard_has_site_plan],
+    ProjectState.SITE_GENERATED: [],
     ProjectState.PREVIEW: [guard_has_site_version],
 }
 

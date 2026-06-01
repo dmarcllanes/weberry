@@ -5,7 +5,7 @@ from fasthtml.common import (
     Section, A, Select, Option, Img,
 )
 
-from user_app.frontend.layout import page_layout
+from user_app.frontend.layout import page_layout, sidebar_layout
 
 
 def user_profile_page(user):
@@ -40,11 +40,11 @@ def user_profile_page(user):
         cls="dashboard-content"
     )
 
-    return page_layout(
+    return sidebar_layout(
         content,
         user=user,
         title="Okenaba - Account",
-        active_nav="profile"
+        active_nav="profile",
     )
 
 

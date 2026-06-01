@@ -13,6 +13,7 @@ from core.limits.ai_limits import check_ai_limit, increment_usage
 from core.limits.rate_limits import check_rate_limit, record_call
 from core.limits.cooldowns import check_cooldown
 from core.errors import AIGenerationError, TrialExpiredError
+from core.billing.entitlements import can_generate_site
 from core.ai.copy_writer import run_copy_writer
 from core.ai.template_loader import get_templates_summary
 from core.ai.template_renderer import render_template
@@ -20,7 +21,7 @@ from core.ai.template_renderer import render_template
 
 def check_credits(user: User) -> None:
     """Guard: raise if user has no credits. Route layer deducts after success."""
-    if not user.has_credits:
+    if not can_generate_site(user):
         days_active = (datetime.now(timezone.utc) - user.created_at).days
         raise TrialExpiredError("no_credits", days_active)
 

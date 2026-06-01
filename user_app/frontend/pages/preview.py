@@ -1,52 +1,13 @@
 """Preview page (SITE_GENERATED / PREVIEW states)."""
 
-import re
-import hashlib
-from functools import lru_cache
 from pathlib import Path
 
 from fasthtml.common import (
     Div, H1, H2, H3, P, Form, Button, Section, Iframe, A, Span,
-    Input, Details, Summary, Img, Label, Select, Option,
+    Input, Details, Summary, Img, Label, Select, Option, Safe,
 )
 
 from user_app.frontend.layout import page_layout
-from core.ai.template_loader import load_template_manifest
-
-TEMPLATES_DIR = Path(__file__).resolve().parent.parent.parent.parent / "templates"
-
-THUMB_SIZE = 300  # square thumbnails
-
-
-def _friendly_label(slot_name: str) -> str:
-    return slot_name.replace("_", " ").title()
-
-
-def _get_thumb_url(slot_name: str, site_plan) -> str:
-    override = site_plan.image_overrides.get(slot_name)
-    if override:
-        return override
-    keyword = site_plan.image_keywords.get(slot_name, slot_name).strip().replace(" ", ",")
-    lock = int(hashlib.md5(slot_name.encode()).hexdigest()[:8], 16) % 10000
-    return f"https://loremflickr.com/300/200/{keyword}?lock={lock}"
-
-
-@lru_cache(maxsize=None)
-def _get_template_slots(template_id: str) -> list[str]:
-    """Get all image slot names actually used in the template HTML."""
-    template_path = TEMPLATES_DIR / template_id / "template.html"
-    if not template_path.exists():
-        return []
-    html = template_path.read_text()
-    # Match all xxx_url variable references inside Jinja2 {{ }} blocks,
-    # including conditionals like {{ a_url if ... else b_url }}
-    seen = set()
-    slots = []
-    for m in re.findall(r"(\w+)_url", html):
-        if m not in seen:
-            seen.add(m)
-            slots.append(m)
-    return slots
 
 
 def preview_page(user, project):
@@ -67,149 +28,47 @@ def preview_page(user, project):
         cls="browser-bar",
     )
 
-    # Get slots actually used in the template HTML
-    template_id = project.site_plan.selected_template if project.site_plan else ""
-    used_slots = _get_template_slots(template_id) if template_id else []
 
-    # Build image thumbnail cards (image + label + keyword input)
-    slot_cards = []
-    upload_options = []
-    for slot_name in used_slots:
-        is_override = slot_name in project.site_plan.image_overrides
-        current_keyword = project.site_plan.image_keywords.get(slot_name, "")
-        thumb_url = _get_thumb_url(slot_name, project.site_plan)
-        friendly = _friendly_label(slot_name)
-
-        badge = (Span("Uploaded", cls="img-editor-badge img-editor-badge--uploaded")
-                 if is_override else None)
-
-        keyword_form = Form(
-            Input(type="hidden", name="slot_name", value=slot_name),
-            Input(type="hidden", name="action", value="keyword"),
-            Div(
-                Input(type="text", name="keyword", value=current_keyword,
-                      placeholder="e.g. coffee, pastry",
-                      cls="input input-sm img-editor-kw-input"),
-                Button("Update", type="submit", cls="btn btn-sm btn-primary"),
-                cls="img-editor-kw-row",
-            ),
-            method="post", action=f"/pages/{pid}/edit-image",
-        )
-
-        header_children = [Span(friendly, cls="img-editor-slot-name")]
-        if badge:
-            header_children.append(badge)
-
-        # Per-slot upload form
-        upload_form_dynamic = Form(
-            Input(type="hidden", name="slot_name", value=slot_name),
-            Input(type="hidden", name="action", value="upload"),
-            Label(
-                "Upload Image",
-                Input(type="file", name="file", accept="image/*",
-                      style="display:none", onchange="this.form.submit()"),
-                cls="btn btn-sm btn-outline-primary",
-                style="cursor:pointer; width:100%; text-align:center; margin-top:0.5rem; display:block;"
-            ),
-            method="post", action=f"/pages/{pid}/edit-image",
-            enctype="multipart/form-data",
-            style="width:100%"
-        )
-
-        card = Div(
-            Img(src=thumb_url, alt=friendly, cls="img-editor-thumb"),
-            Div(
-                Div(*header_children, cls="img-editor-card-header"),
-                keyword_form,
-                upload_form_dynamic,
-                cls="img-editor-card-body",
-            ),
-            cls="img-editor-card",
-        )
-        slot_cards.append(card)
-        upload_options.append(Option(friendly, value=slot_name))
-
-    # Single upload form at the bottom
-    upload_form = Form(
-        Input(type="hidden", name="action", value="upload"),
+    action_cards = Div(
+        # Edit card
         Div(
-            Div(
-                Label("Choose image slot", cls="img-editor-field-label"),
-                Select(*upload_options, name="slot_name", cls="input input-sm"),
-                cls="img-editor-upload-field",
+            Div("✏️", cls="preview-action-icon"),
+            H3("Edit Your Content", cls="preview-action-title"),
+            P(
+                "Fine-tune copy, swap images, or go hands-on with the raw HTML editor.",
+                cls="preview-action-desc",
             ),
-            Div(
-                Label("Select file", cls="img-editor-field-label"),
-                Input(type="file", name="file", accept="image/*",
-                      cls="input input-sm", style="font-size:0.85rem"),
-                cls="img-editor-upload-field",
-            ),
-            Button("Upload Image", type="submit", cls="btn btn-primary",
-                   style="align-self:flex-end"),
-            cls="img-editor-upload-row",
+            A("Edit Content →", href=f"/pages/{pid}/edit", cls="button button-secondary"),
+            cls="preview-action-card",
         ),
-        method="post", action=f"/pages/{pid}/edit-image",
-        enctype="multipart/form-data",
-    ) if upload_options else Div()
-
-    # Slot count for the hint
-    slot_count = len(used_slots)
-
-    # Bulk upload form — top of image section
-    bulk_upload_form = Form(
-        P(
-            f"Upload up to {slot_count} photo{'s' if slot_count != 1 else ''} at once. "
-            "They'll be assigned to each image spot on your site in order.",
-            cls="img-editor-hint",
-        ),
+        # Deploy card
         Div(
-            Label(
-                "Choose Photos",
-                Input(
-                    type="file", name="files", accept="image/*",
-                    multiple=True,
-                    style="display:none",
-                    onchange="this.form.submit()",
-                ),
-                cls="btn btn-primary",
-                style="cursor:pointer; display:inline-block;",
+            Div("🚀", cls="preview-action-icon"),
+            H3("Deploy Your Site", cls="preview-action-title"),
+            P(
+                "Make it live in one click. You can keep editing even after deployment.",
+                cls="preview-action-desc",
             ),
-            cls="img-editor-upload-row",
-            style="margin-bottom:0",
+            Form(
+                Button("Deploy Now →", cls="button button-primary", type="submit",
+                       onclick="return showLoading('Deploying your site...')"),
+                method="post", action=f"/pages/{pid}/publish",
+            ),
+            cls="preview-action-card preview-action-card--deploy",
         ),
-        method="post",
-        action=f"/pages/{pid}/bulk-upload",
-        enctype="multipart/form-data",
-    ) if used_slots else Div()
-
-    # Image editor section — open by default
-    image_editor = Details(
-        Summary("Edit Images", cls="img-editor-summary"),
-        Div(
-            Div(
-                H3("Upload All Your Photos", cls="img-editor-upload-title"),
-                bulk_upload_form,
-                cls="img-editor-upload-section",
-                style="margin-bottom:1.5rem",
-            ),
-            P("Or swap individual images below using a keyword or per-slot upload.",
-              cls="img-editor-hint"),
-            Div(*slot_cards, cls="img-editor-grid"),
-            Div(
-                H3("Upload a Single Image", cls="img-editor-upload-title"),
-                upload_form,
-                cls="img-editor-upload-section",
-            ),
-        ),
-        open=True,
-        cls="img-editor-section",
-    ) if slot_cards else Div()
+        cls="preview-actions",
+    )
 
     content = Section(
         Div(
+            A(
+                Safe("← Back to Pages"),
+                href="/pages",
+                cls="preview-back-link",
+            ),
             H1("Preview Your Site", cls="step-title"),
             P(
-                "Here's your generated website. Review it below, then publish when ready.",
+                "Here's your generated website. Review it, then edit or deploy below.",
                 cls="step-description",
             ),
             Div(
@@ -221,18 +80,7 @@ def preview_page(user, project):
                 ),
                 cls="browser-chrome",
             ),
-            Div(
-                A("Back to Pages", href="/pages", cls="button button-secondary"),
-                A("Edit Content", href=f"/pages/{pid}/edit", cls="button button-secondary"),
-                Form(
-                    Button("Publish My Site", cls="button button-primary", type="submit",
-                           onclick="return showLoading('Publishing your site...')"),
-                    method="post", action=f"/pages/{pid}/publish",
-                ),
-                cls="button-group",
-                style="margin-top:var(--spacing-lg)",
-            ),
-            image_editor,
+            action_cards,
             cls="step-content",
         ),
         cls="step preview-page-step",

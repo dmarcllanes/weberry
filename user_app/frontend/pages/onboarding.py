@@ -1,11 +1,40 @@
 """Onboarding — Brain Dump form (3-step wizard)."""
 
+import hashlib
+
 from fasthtml.common import (
-    Div, H1, H2, P, Form, Button, Input, Textarea, Label, Span,
-    Section, Select, Option, A, Img, Small,
+    Div, H1, H2, H3, P, Form, Button, Input, Textarea, Label, Span,
+    Section, Select, Option, A, Img, Small, Script, Safe,
 )
 
 from user_app.frontend.layout import page_layout
+
+_CATEGORY_META = {
+    "tech":       {"icon": "💻", "label": "Tech & SaaS"},
+    "creative":   {"icon": "🎨", "label": "Creative"},
+    "food":       {"icon": "🍽️", "label": "Food & Drink"},
+    "travel":     {"icon": "✈️", "label": "Travel"},
+    "automotive": {"icon": "🚗", "label": "Automotive"},
+    "ecommerce":  {"icon": "🛍️", "label": "E-Commerce"},
+}
+
+_SECTION_LABELS = {
+    "about": "About section",
+    "gallery": "Image gallery",
+    "testimonials": "Customer reviews",
+    "features": "Features section",
+    "contact": "Contact form",
+    "products": "Products showcase",
+    "fleet": "Fleet / Portfolio",
+    "store": "Store section",
+    "subscribe": "Email signup",
+    "instagram": "Social feed",
+    "music": "Media section",
+    "banner": "Promo banner",
+    "help": "FAQ / Help",
+    "discount": "Discount section",
+    "story": "Brand story",
+}
 
 
 def render_asset_card(asset, project_id):
@@ -21,6 +50,73 @@ def render_asset_card(asset, project_id):
                hx_delete=f"/pages/{project_id}/assets?url={asset.url}",
                hx_target="closest .asset-card", hx_swap="outerHTML"),
         cls="asset-card",
+    )
+
+
+def _template_panel(template_id: str, mem) -> Div:
+    """Sticky left panel: template thumbnail + live brand info that updates with the form."""
+    from core.raw_template.loader import get_raw_template, CATEGORY_META as _CAT_META
+    t = get_raw_template(template_id) if template_id else None
+
+    if not t:
+        return Div()
+
+    cat = t["category"]
+    cat_meta = _CAT_META.get(cat, {"icon": "📄", "label": cat.title()})
+    thumb = t["thumb_url"]
+    section_items = []
+
+    init_color = (mem.primary_color if mem and mem.primary_color else "#4F46E5")
+    init_name = (mem.business_name if mem and mem.business_name else "Your Business")
+    init_tone = (mem.theme if mem and mem.theme else "professional")
+    tone_labels = {
+        "professional": "Professional",
+        "friendly": "Friendly & Casual",
+        "bold": "Bold & Energetic",
+        "elegant": "Elegant & Minimal",
+    }
+
+    live_preview = Div(
+        Div("Live Preview", cls="ob-live-preview-title"),
+        Div(
+            Span("Name", cls="ob-live-row-label"),
+            Span(init_name, cls="ob-live-name", id="tpl-preview-name"),
+            cls="ob-live-row",
+        ),
+        Div(
+            Span("Color", cls="ob-live-row-label"),
+            Span(cls="ob-live-color-dot", id="tpl-preview-color",
+                 style=f"background:{init_color}"),
+            Span(init_color, cls="ob-live-color-hex", id="tpl-preview-color-hex"),
+            cls="ob-live-row",
+        ),
+        Div(
+            Span("Tone", cls="ob-live-row-label"),
+            Span(tone_labels.get(init_tone, "Professional"),
+                 cls="ob-live-tone-badge", id="tpl-preview-tone"),
+            cls="ob-live-row",
+        ),
+        cls="ob-live-preview",
+    )
+
+    thumb_el = (
+        Img(src=thumb, alt=t["name"], cls="ob-tpl-thumb", loading="lazy")
+        if thumb else Div(cat_meta["icon"], cls="ob-tpl-thumb ob-tpl-thumb--icon")
+    )
+
+    return Div(
+        Div(
+            thumb_el,
+            Span(f"{cat_meta['icon']} {cat_meta['label']}", cls="ob-tpl-cat-badge"),
+            cls="ob-tpl-thumb-wrap",
+        ),
+        Div(
+            H3(t["name"], cls="ob-tpl-name"),
+            live_preview,
+            cls="ob-tpl-body",
+        ),
+        A("← Change template", href="/pages/new", cls="ob-tpl-change"),
+        cls="ob-tpl-panel",
     )
 
 
@@ -232,15 +328,68 @@ def onboarding_page(user, project):
         id="step3", cls="step",
     )
 
-    form = Form(
-        Div(id="onboarding-active", data_delete_url=f"/pages/{pid}/delete",
-            style="display:none"),
-        _step_indicator(),
-        Div(step1, step2, step3, cls="wizard"),
-        method="post", action=f"/pages/{pid}/braindump",
-    )
+    template_id = project.template_id or ""
 
-    content = Div(form, cls="onboarding-layout")
+    live_js = Script("""
+        (function() {
+            function $(id) { return document.getElementById(id); }
+            var nameEl   = $('business_name');
+            var colorEl  = $('primary_color');
+            var themeEl  = $('theme');
+            var pName    = $('tpl-preview-name');
+            var pColor   = $('tpl-preview-color');
+            var pColorHx = $('tpl-preview-color-hex');
+            var pTone    = $('tpl-preview-tone');
+            var toneMap  = {
+                professional: 'Professional',
+                friendly: 'Friendly & Casual',
+                bold: 'Bold & Energetic',
+                elegant: 'Elegant & Minimal'
+            };
+            if (nameEl && pName) {
+                nameEl.addEventListener('input', function() {
+                    pName.textContent = this.value.trim() || 'Your Business';
+                });
+            }
+            if (colorEl && pColor) {
+                colorEl.addEventListener('input', function() {
+                    pColor.style.background = this.value;
+                    if (pColorHx) pColorHx.textContent = this.value;
+                });
+            }
+            if (themeEl && pTone) {
+                themeEl.addEventListener('change', function() {
+                    pTone.textContent = toneMap[this.value] || this.options[this.selectedIndex].text;
+                });
+            }
+        })();
+    """)
+
+    if template_id:
+        panel = _template_panel(template_id, mem)
+        form = Form(
+            Div(id="onboarding-active", data_delete_url=f"/pages/{pid}/delete",
+                style="display:none"),
+            Input(type="hidden", name="preferred_template_id", value=template_id),
+            Div(
+                _step_indicator(),
+                Div(step1, step2, step3, cls="wizard"),
+                cls="ob-wizard-inner",
+            ),
+            live_js,
+            method="post", action=f"/pages/{pid}/braindump",
+            cls="ob-wizard-panel",
+        )
+        content = Div(panel, form, cls="ob-split")
+    else:
+        form = Form(
+            Div(id="onboarding-active", data_delete_url=f"/pages/{pid}/delete",
+                style="display:none"),
+            _step_indicator(),
+            Div(step1, step2, step3, cls="wizard"),
+            method="post", action=f"/pages/{pid}/braindump",
+        )
+        content = Div(form, cls="onboarding-layout")
 
     return page_layout(content, user=user, title="Okenaba - Brain Dump", project_id=pid, active_nav="pages")
 

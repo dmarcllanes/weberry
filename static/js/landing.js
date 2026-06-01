@@ -1,4 +1,120 @@
-// Smooth scrolling for navigation links
+// ── Cosmic Starfield Canvas ────────────────────────────────
+(function () {
+    var canvas = document.getElementById('cosmos-canvas');
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    var W, H, stars, lastTime = 0, shootCooldown = 0;
+    var shooters = [];
+
+    function rand(a, b) { return a + Math.random() * (b - a); }
+
+    function resize() {
+        W = canvas.width = window.innerWidth;
+        H = canvas.height = window.innerHeight;
+    }
+
+    function makeStars() {
+        var n = Math.floor(W * H / 3800);
+        stars = [];
+        for (var i = 0; i < n; i++) {
+            stars.push({
+                x: Math.random() * W,
+                y: Math.random() * H,
+                r: rand(0.3, 1.8),
+                b: Math.random(),          // brightness phase
+                db: rand(0.003, 0.013),    // brightness delta
+                col: Math.random() > 0.82 ? '#93c5fd'
+                   : Math.random() > 0.90 ? '#93c5fd'
+                   : '#ffffff',
+            });
+        }
+    }
+
+    function addShooter() {
+        var angle = rand(22, 48) * Math.PI / 180;
+        shooters.push({
+            x: rand(0, W * 0.65),
+            y: rand(0, H * 0.45),
+            angle: angle,
+            len: rand(110, 240),
+            spd: rand(700, 1300),
+            t: 0,
+        });
+    }
+
+    function frame(ts) {
+        var dt = Math.min((ts - lastTime) / 1000, 0.05);
+        lastTime = ts;
+
+        ctx.clearRect(0, 0, W, H);
+
+        // Stars
+        for (var i = 0; i < stars.length; i++) {
+            var s = stars[i];
+            s.b += s.db;
+            if (s.b > 1 || s.b < 0) s.db = -s.db;
+            var a = 0.12 + s.b * 0.88;
+            ctx.globalAlpha = a;
+            ctx.fillStyle = s.col;
+            ctx.beginPath();
+            ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+            ctx.fill();
+            // Soft glow on bigger stars
+            if (s.r > 1.3 && s.b > 0.65) {
+                ctx.globalAlpha = a * 0.1;
+                ctx.beginPath();
+                ctx.arc(s.x, s.y, s.r * 5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+        ctx.globalAlpha = 1;
+
+        // Spawn shooting star
+        shootCooldown -= dt;
+        if (shootCooldown <= 0) {
+            addShooter();
+            shootCooldown = rand(5, 11);
+        }
+
+        // Draw shooting stars
+        for (var j = shooters.length - 1; j >= 0; j--) {
+            var sh = shooters[j];
+            sh.t += dt * sh.spd;
+            var progress = sh.t / (sh.len * 2.2);
+            if (progress > 1) { shooters.splice(j, 1); continue; }
+
+            var fade = progress < 0.25 ? progress / 0.25
+                     : progress > 0.7  ? (1 - progress) / 0.3
+                     : 1;
+
+            var hx = sh.x + Math.cos(sh.angle) * sh.t;
+            var hy = sh.y + Math.sin(sh.angle) * sh.t;
+            var tx = hx - Math.cos(sh.angle) * sh.len;
+            var ty = hy - Math.sin(sh.angle) * sh.len;
+
+            var g = ctx.createLinearGradient(tx, ty, hx, hy);
+            g.addColorStop(0, 'rgba(255,255,255,0)');
+            g.addColorStop(0.7, 'rgba(196,181,253,' + (fade * 0.6) + ')');
+            g.addColorStop(1, 'rgba(255,255,255,' + (fade * 0.95) + ')');
+
+            ctx.strokeStyle = g;
+            ctx.lineWidth = 1.4;
+            ctx.beginPath();
+            ctx.moveTo(tx, ty);
+            ctx.lineTo(hx, hy);
+            ctx.stroke();
+        }
+
+        requestAnimationFrame(frame);
+    }
+
+    window.addEventListener('resize', function () { resize(); makeStars(); });
+    resize();
+    makeStars();
+    requestAnimationFrame(frame);
+})();
+
+// ── Smooth scrolling for navigation links
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
         e.preventDefault();
@@ -9,15 +125,13 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     });
 });
 
-// Add scroll effect to navbar
+// ── Navbar scrolled class
 window.addEventListener('scroll', () => {
     const navbar = document.querySelector('.navbar');
-    if (window.scrollY > 50) {
-        navbar.style.borderBottomColor = 'rgba(51, 51, 51, 0.5)';
-    } else {
-        navbar.style.borderBottomColor = '#333333';
+    if (navbar) {
+        navbar.classList.toggle('scrolled', window.scrollY > 60);
     }
-});
+}, { passive: true });
 
 // Button click handlers with visual feedback
 document.querySelectorAll('.btn-primary, .btn-secondary').forEach(button => {
@@ -66,29 +180,119 @@ document.querySelectorAll('.btn-primary, .btn-secondary').forEach(button => {
     });
 });
 
-// Intersection Observer for fade-in animations
-const observerOptions = {
-    threshold: 0.1,
-    rootMargin: '0px 0px -50px 0px'
-};
+// ── Scroll progress bar ──────────────────────────────────────
+(function () {
+    var bar = document.getElementById('scroll-progress');
+    if (!bar) return;
+    function updateProgress() {
+        var scrollTop = window.scrollY;
+        var docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        bar.style.width = (docHeight > 0 ? (scrollTop / docHeight) * 100 : 0) + '%';
+    }
+    window.addEventListener('scroll', updateProgress, { passive: true });
+    updateProgress();
+})();
 
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.style.opacity = '1';
-            entry.target.style.transform = 'translateY(0)';
-            observer.unobserve(entry.target);
-        }
+// ── CSS-class reveal system (replaces old inline-style observer) ─
+(function () {
+    // Auto-add reveal class to cards, steps, and headings
+    var autoReveal = [
+        ['.feature-card',      'reveal',       120],
+        ['.pricing-card',      'reveal-scale', 110],
+        ['.testimonial-card',  'reveal',       130],
+        ['.step',              'reveal',       120],
+        ['.stat-item',         'reveal-scale', 90],
+        ['.pvo-card',          'reveal-scale', 180],
+        ['.sc-card',           'reveal',       90],
+        ['.zs-step',           'reveal',       140],
+        ['.comp-card',         'reveal-scale', 130],
+        ['.faq-item',          'reveal',       70],
+        ['.section-eyebrow',   'reveal',       0],
+        ['.features h2, .how-it-works h2, .pricing h2, .testimonials h2, .stats h2, .pain-vs-orbit h2, .showcase h2, .zero-skills h2, .comparison h2, .faq-section h2', 'reveal', 0],
+    ];
+
+    autoReveal.forEach(function(rule) {
+        var selector = rule[0], cls = rule[1], baseDelay = rule[2];
+        document.querySelectorAll(selector).forEach(function(el, i) {
+            el.classList.add(cls);
+            el.style.setProperty('--reveal-delay', (i * baseDelay) + 'ms');
+        });
     });
-}, observerOptions);
 
-// Observe feature cards, pricing cards, and testimonials
-document.querySelectorAll('.feature-card, .pricing-card, .testimonial-card, .step').forEach(el => {
-    el.style.opacity = '0';
-    el.style.transform = 'translateY(20px)';
-    el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-    observer.observe(el);
-});
+    // Also handle explicit .section-underline
+    document.querySelectorAll('.section-underline').forEach(function(el) {
+        el.classList.add('reveal');
+    });
+
+    // Observe everything with a reveal class
+    var revealObserver = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('in-view');
+                revealObserver.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale, .section-underline').forEach(function(el) {
+        revealObserver.observe(el);
+    });
+})();
+
+// ── Parallax: planet + nebula blobs on scroll ────────────────
+(function () {
+    var heroVisual = document.querySelector('.hero-visual');
+    var blobs = document.querySelectorAll('.nebula-blob');
+
+    window.addEventListener('scroll', function () {
+        var sy = window.scrollY;
+        if (heroVisual) {
+            heroVisual.style.transform = 'translateY(' + (sy * 0.07) + 'px)';
+        }
+        blobs.forEach(function (blob, i) {
+            var speed = [0.025, -0.02, 0.035, -0.015][i % 4];
+            blob.style.transform = 'translateY(' + (sy * speed) + 'px)';
+        });
+    }, { passive: true });
+})();
+
+// ── Cursor comet trail ────────────────────────────────────────
+(function () {
+    var colors = ['#93c5fd', '#3b82f6', '#2563eb', '#60a5fa', '#bfdbfe'];
+    var sizes  = [5, 4, 3, 6, 4];
+
+    document.addEventListener('mousemove', function (e) {
+        var dot = document.createElement('div');
+        dot.className = 'cursor-comet';
+        var idx = Math.floor(Math.random() * colors.length);
+        var sz  = sizes[idx];
+        dot.style.cssText = [
+            'left:' + e.clientX + 'px',
+            'top:' + e.clientY + 'px',
+            'width:' + sz + 'px',
+            'height:' + sz + 'px',
+            'background:' + colors[idx],
+            'box-shadow:0 0 ' + (sz * 3) + 'px ' + colors[idx],
+        ].join(';');
+        document.body.appendChild(dot);
+        setTimeout(function () { dot.parentNode && dot.parentNode.removeChild(dot); }, 560);
+    });
+})();
+
+// ── Magnetic buttons: primary CTAs follow cursor ─────────────
+(function () {
+    document.querySelectorAll('.btn-primary').forEach(function (btn) {
+        btn.addEventListener('mousemove', function (e) {
+            var rect = btn.getBoundingClientRect();
+            var dx = e.clientX - (rect.left + rect.width  / 2);
+            var dy = e.clientY - (rect.top  + rect.height / 2);
+            btn.style.transform = 'translate(' + dx * 0.14 + 'px,' + dy * 0.14 + 'px) translateY(-2px)';
+        });
+        btn.addEventListener('mouseleave', function () {
+            btn.style.transform = '';
+        });
+    });
+})();
 
 // Form submission handler (for CTA buttons)
 document.querySelectorAll('button[class*="btn"]').forEach(button => {
@@ -269,6 +473,15 @@ document.getElementById('cookie-accept').addEventListener('click', function () {
 document.getElementById('cookie-decline').addEventListener('click', function () {
     document.getElementById('cookie-banner').style.display = 'none';
 });
+
+// Survey Submit
+function surveySubmit(e) {
+    e.preventDefault();
+    var card = document.querySelector('.survey-card');
+    if (!card) return;
+    card.classList.add('survey--sent');
+    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
 
 // Billing Toggle
 function toggleBilling() {

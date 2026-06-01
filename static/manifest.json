@@ -1,0 +1,19 @@
+{
+  "name": "Okenaba",
+  "short_name": "Okenaba",
+  "description": "Launch your idea into orbit — AI-generated websites in 60 seconds.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#010108",
+  "theme_color": "#2563eb",
+  "icons": [
+    {
+      "src": "/static/img/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["business", "productivity", "utilities"]
+}

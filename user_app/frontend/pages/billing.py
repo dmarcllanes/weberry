@@ -47,109 +47,71 @@ def _days_until(dt: datetime) -> int:
 
 
 def _credit_balance_card(user):
-    available = user.available_credits
+    available   = user.available_credits
     free_active = user.free_credit_active
-    days_left = _days_until(user.free_credits_expires_at) if free_active else 0
+    days_left   = _days_until(user.free_credits_expires_at) if free_active else 0
 
-    # Badge
-    if available > 0:
-        badge = Span("Active", cls="state-badge state-badge--published")
-    else:
-        badge = Span("No Credits", cls="state-badge state-badge--error")
+    badge = (
+        Span("Active",     cls="state-badge state-badge--published")
+        if available > 0 else
+        Span("No Credits", cls="state-badge state-badge--error")
+    )
 
-    # Free credit notice
     notices = []
     if free_active and user.free_credits > 0:
         notices.append(
             Div(
-                Safe(f"""<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>"""),
+                Safe('<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'),
                 Span(f"Free credit expires in {days_left} day{'s' if days_left != 1 else ''} — pages generated with it stay live for 7 days."),
-                style=(
-                    "display:flex;gap:0.5rem;align-items:flex-start;"
-                    "background:#FEF3C7;border:1px solid #FCD34D;"
-                    "color:#92400E;border-radius:var(--radius-md);"
-                    "padding:0.75rem 1rem;font-size:0.875rem;margin-top:1rem"
-                )
+                cls="bill-notice bill-notice--warning",
             )
         )
     elif not free_active and user.free_credits > 0:
         notices.append(
             Div(
                 Span("Free credit expired. Purchase a pack to generate more pages."),
-                style=(
-                    "background:#FEF2F2;border:1px solid #FECACA;"
-                    "color:#991B1B;border-radius:var(--radius-md);"
-                    "padding:0.75rem 1rem;font-size:0.875rem;margin-top:1rem"
-                )
+                cls="bill-notice bill-notice--error",
             )
         )
 
     return Div(
-        # Header row
         Div(
-            Div(
-                H2("Credit Balance", style="font-size:1.25rem;font-weight:700;margin:0"),
-                badge,
-                style="display:flex;align-items:center;gap:0.75rem"
-            ),
+            H2("Credit Balance", cls="bill-section-title"),
+            badge,
+            cls="bill-card-header",
         ),
-        # Stats row
         Div(
-            _stat_block(str(available), "Available Credits"),
-            _divider_v(),
-            _stat_block(str(user.paid_credits), "Purchased"),
-            _divider_v(),
+            _stat_block(str(available),         "Available Credits"),
+            Div(cls="bill-stat-divider"),
+            _stat_block(str(user.paid_credits),  "Purchased"),
+            Div(cls="bill-stat-divider"),
             _stat_block(
                 str(user.free_credits) if free_active else "0",
-                f"Free ({days_left}d left)" if free_active else "Free (expired)"
+                f"Free ({days_left}d left)" if free_active else "Free (expired)",
             ),
-            style=(
-                "display:flex;gap:0;margin-top:1.5rem;"
-                "background:var(--color-background-alt);"
-                "border:1px solid var(--color-border);"
-                "border-radius:var(--radius-lg);overflow:hidden"
-            )
+            cls="bill-stats",
         ),
         *notices,
-        style=(
-            "padding:1.75rem 2rem;"
-            "background:var(--color-background);"
-            "border:1px solid var(--color-border);"
-            "border-radius:var(--radius-lg);"
-            "margin-bottom:2rem"
-        )
+        cls="bill-card",
     )
 
 
 def _stat_block(value, label):
     return Div(
-        Div(value, style="font-size:1.75rem;font-weight:700;color:var(--color-text)"),
-        Div(label, style="font-size:0.75rem;color:var(--color-text-light);margin-top:0.25rem"),
-        style="flex:1;padding:1.25rem 1.5rem;text-align:center"
+        Div(value, cls="bill-stat-value"),
+        Div(label,  cls="bill-stat-label"),
+        cls="bill-stat",
     )
-
-
-def _divider_v():
-    return Div(style="width:1px;background:var(--color-border);align-self:stretch")
 
 
 def _pack_card(pack, checkout_enabled=False):
     highlight = pack["highlight"]
+    card_cls  = "pack-card pack-card--featured" if highlight else "pack-card"
 
-    border = "2px solid var(--color-primary)" if highlight else "1px solid var(--color-border)"
-    bg = "var(--color-background)" if not highlight else "var(--color-background)"
-    shadow = "var(--color-shadow-lg)" if highlight else "var(--color-shadow)"
-
-    popular_badge = (
-        Div(
-            "Most Popular",
-            style=(
-                "background:var(--color-primary);color:#fff;"
-                "font-size:0.7rem;font-weight:700;letter-spacing:0.05em;"
-                "padding:0.25rem 0.75rem;border-radius:9999px;text-align:center;"
-                "margin-bottom:1rem;display:inline-block"
-            )
-        ) if highlight else Div(style="height:1.75rem;margin-bottom:1rem")
+    badge_el = (
+        Span("Most Popular", cls="pack-badge")
+        if highlight else
+        Div(cls="pack-spacer")
     )
 
     if checkout_enabled:
@@ -157,107 +119,86 @@ def _pack_card(pack, checkout_enabled=False):
             Input(type="hidden", name="pack", value=pack["key"]),
             Button(
                 f"Buy {pack['credits']} Credits",
-                cls="button button-primary" if highlight else "btn btn-outline",
+                cls="button button-primary" if highlight else "button button-secondary",
                 type="submit",
-                style="width:100%;font-size:0.9rem"
+                style="width:100%",
             ),
             method="post", action="/checkout",
-            style="margin-top:auto"
+            cls="pack-cta",
         )
     else:
         cta = Button(
             "Coming Soon",
-            cls="button button-primary" if highlight else "btn btn-outline",
+            cls="button button-secondary",
             disabled=True,
-            style="width:100%;font-size:0.9rem;opacity:0.6;cursor:not-allowed;margin-top:auto"
+            style="width:100%;opacity:0.55;cursor:not-allowed",
         )
 
     return Div(
-        popular_badge,
-        H3(pack["name"], style="font-size:1.1rem;font-weight:700;margin-bottom:0.25rem"),
-        P(pack["description"], style="font-size:0.85rem;color:var(--color-text-light);margin-bottom:1.5rem"),
-        # Price
+        badge_el,
+        H3(pack["name"], cls="pack-name"),
+        P(pack["description"], cls="pack-desc"),
         Div(
-            Span(f"${pack['price']}", style="font-size:2rem;font-weight:800;color:var(--color-text)"),
-            Span(" one-time", style="font-size:0.8rem;color:var(--color-text-light);margin-left:0.25rem"),
-            style="margin-bottom:0.5rem"
+            Span(f"${pack['price']}", cls="pack-price-amount"),
+            Span(" one-time",         cls="pack-price-period"),
         ),
-        # Credits
         Div(
-            Span(
-                f"{pack['credits']} credits",
-                style="font-size:0.9rem;font-weight:600;color:var(--color-primary)"
-            ),
-            Span(
-                f" · ${pack['per_credit']}/credit",
-                style="font-size:0.8rem;color:var(--color-text-lighter)"
-            ),
-            style="margin-bottom:1.5rem"
+            Span(f"{pack['credits']} credits",     cls="pack-credits-count"),
+            Span(f" · ${pack['per_credit']}/credit", cls="pack-credits-rate"),
+            style="margin:0.4rem 0 0",
         ),
-        # What's included
-        _check_item("30-day page lifetime per credit"),
-        _check_item("AI-powered site generation"),
-        _check_item("Custom image editing"),
-        _check_item("Credits never expire"),
+        Div(
+            _check_item("30-day page lifetime per credit"),
+            _check_item("AI-powered site generation"),
+            _check_item("Custom image editing"),
+            _check_item("Credits never expire"),
+            cls="pack-features",
+        ),
         cta,
-        style=(
-            f"padding:1.5rem;border:{border};border-radius:var(--radius-lg);"
-            f"background:{bg};box-shadow:{shadow};"
-            "display:flex;flex-direction:column;flex:1"
-        )
+        cls=card_cls,
     )
 
 
 def _check_item(text):
     return Div(
-        Safe("""<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--color-success);flex-shrink:0;margin-top:1px"><polyline points="20 6 9 17 4 12"/></svg>"""),
-        Span(text, style="font-size:0.85rem;color:var(--color-text-light)"),
-        style="display:flex;gap:0.5rem;align-items:flex-start;margin-bottom:0.5rem"
+        Safe('<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="pack-feature-check"><polyline points="20 6 9 17 4 12"/></svg>'),
+        Span(text, cls="pack-feature-check-text"),
+        cls="pack-feature",
     )
 
 
-def _how_it_works():
-    steps = [
-        ("1 credit", "= 1 generated site", "var(--color-primary)"),
-        ("Free signup", "7-day page lifetime", "#D97706"),
-        ("Paid credits", "30-day page lifetime", "var(--color-success)"),
-        ("Credits", "never expire", "var(--color-text-light)"),
+def _how_credits_work():
+    rules = [
+        ("1 credit",     "= 1 AI-generated site",         "var(--color-primary)"),
+        ("Free signup",  "→ 7-day page lifetime",          "var(--color-warning, #f59e0b)"),
+        ("Paid credits", "→ 30-day page lifetime",         "var(--color-success)"),
+        ("Credits",      "never expire — use any time",    "var(--color-text-light)"),
     ]
     return Div(
-        H3("How credits work", style="font-size:1rem;font-weight:700;margin-bottom:1rem;color:var(--color-text)"),
-        Div(
-            *[
-                Div(
-                    Span(label, style=f"font-weight:700;color:{color}"),
-                    Span(f" {desc}", style="color:var(--color-text-light)"),
-                    style="font-size:0.875rem;padding:0.4rem 0;border-bottom:1px solid var(--color-border)"
-                )
-                for label, desc, color in steps
-            ],
-            style="display:flex;flex-direction:column"
-        ),
-        style=(
-            "padding:1.5rem;"
-            "background:var(--color-background-alt);"
-            "border:1px solid var(--color-border);"
-            "border-radius:var(--radius-lg);"
-            "margin-top:2rem"
-        )
+        H3("How credits work", cls="how-credits-title"),
+        *[
+            Div(
+                Span(label, cls="credit-rule-key", style=f"color:{color}"),
+                Span(f" {desc}"),
+                cls="credit-rule",
+            )
+            for label, desc, color in rules
+        ],
+        cls="how-credits",
     )
 
 
 def billing_page(user, checkout_enabled=False):
     content = Div(
-        H1("Credits", cls="step-title", style="margin-bottom:2rem"),
+        H1("Credits", cls="step-title"),
         _credit_balance_card(user),
-        H2("Buy Credits", style="font-size:1.1rem;font-weight:700;margin-bottom:1.25rem;color:var(--color-text)"),
+        H2("Buy Credits", cls="bill-subsection-title"),
         Div(
             *[_pack_card(p, checkout_enabled) for p in _CREDIT_PACKS],
-            style="display:flex;gap:1.25rem;align-items:stretch"
+            cls="pack-cards",
         ),
-        _how_it_works(),
-        cls="dashboard-content",
-        style="max-width:860px;margin:0 auto"
+        _how_credits_work(),
+        cls="help-content",
     )
 
     return page_layout(content, user=user, title="Okenaba - Credits", active_nav="billing")

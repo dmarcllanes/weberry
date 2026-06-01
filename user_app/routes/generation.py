@@ -1,3 +1,5 @@
+from asyncio import to_thread as _to_thread
+
 from fasthtml.common import RedirectResponse, Response
 
 from core.errors import CoreError
@@ -19,11 +21,10 @@ async def run_planner(req, page_id: str):
         return error_page("Page not found", 404)
 
     try:
-        run_generate_and_render(project, user)
+        await _to_thread(run_generate_and_render, project, user)
     except CoreError as e:
         return error_page(str(e))
 
-    # Auto-transition to PREVIEW
     project = db.get_project(page_id)
     try:
         move_to_preview(project)
@@ -54,11 +55,10 @@ async def run_generator(req, page_id: str):
         return error_page("Page not found", 404)
 
     try:
-        run_generator_for_project(project, user)
+        await _to_thread(run_generator_for_project, project, user)
     except CoreError as e:
         return error_page(str(e))
 
-    # Move to preview after generation
     project = db.get_project(page_id)
     try:
         move_to_preview(project)

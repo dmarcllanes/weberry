@@ -39,7 +39,7 @@ async def edit_text(req, page_id: str):
 
 
 async def show_edit_page(req, page_id: str):
-    """Show the edit-content page with editable text fields."""
+    """Show the edit-content page with editable text fields or HTML editor."""
     user = req.scope["user"]
     project = db.get_project(page_id)
     if project is None or project.user_id != user.id:
@@ -48,7 +48,10 @@ async def show_edit_page(req, page_id: str):
     if not project.site_version or not project.site_version.html:
         return error_page("No site content to edit")
 
-    return edit_page(user, project)
+    active_tab = req.query_params.get("tab", "visual")
+    if active_tab not in ("visual", "text", "html"):
+        active_tab = "visual"
+    return edit_page(user, project, active_tab=active_tab)
 
 
 async def edit_content(req, page_id: str):
@@ -83,69 +86,30 @@ async def edit_content(req, page_id: str):
         except CoreError as e:
             return error_page(str(e))
 
-    return RedirectResponse(f"/pages/{page_id}/edit", status_code=303)
+    return RedirectResponse(f"/pages/{page_id}/edit?tab=text", status_code=303)
 
 
-async def bulk_upload_images(req, page_id: str):
-    """Upload multiple images and assign them to template image slots in order."""
+async def edit_html(req, page_id: str):
+    """Save raw HTML edits directly to site_version.html."""
     user = req.scope["user"]
-    if is_rate_limited(f"bulk_upload:{user.id}", limit=10, window_seconds=3600):
-        return rate_limit_response("Too many uploads. Please wait before uploading again.")
     project = db.get_project(page_id)
     if project is None or project.user_id != user.id:
         return error_page("Page not found", 404)
 
-    plan = project.site_plan
-    if not plan:
-        return error_page("No site plan found")
-
-    from core.ai.template_loader import load_template_manifest
-    try:
-        manifest = load_template_manifest(plan.selected_template)
-    except FileNotFoundError:
-        return error_page("Template not found")
-
-    slots = list(manifest.get("slots", {}).keys())
-    if not slots:
-        return error_page("No image slots in this template")
+    if not project.site_version:
+        return error_page("No site content to edit")
 
     form = await req.form()
-    files = form.getlist("files")
-    if not files:
-        return error_page("No files uploaded")
+    new_html = form.get("html", "")
+    if not new_html.strip():
+        return error_page("HTML content cannot be empty")
 
-    storage = db.get_storage()
-    uploaded_count = 0
+    project.site_version.html = new_html
+    db.save_project(project)
 
-    for slot_name, upload in zip(slots, files):
-        if not hasattr(upload, "read"):
-            continue
-        contents = await upload.read()
-        if not contents or len(contents) > 5 * 1024 * 1024:
-            continue
-        try:
-            img = Image.open(io.BytesIO(contents))
-            img.verify()
-        except Exception:
-            continue
+    return RedirectResponse(f"/pages/{page_id}/edit?tab=html", status_code=303)
 
-        ext = upload.filename.rsplit(".", 1)[-1] if "." in upload.filename else "png"
-        storage_path = f"{page_id}/assets/{uuid.uuid4().hex}.{ext}"
-        content_type = upload.content_type or "image/png"
-        storage.from_(SUPABASE_ASSETS_BUCKET).upload(storage_path, contents, {"content-type": content_type})
-        public_url = storage.from_(SUPABASE_ASSETS_BUCKET).get_public_url(storage_path)
-        plan.image_overrides[slot_name] = public_url
-        uploaded_count += 1
 
-    if uploaded_count == 0:
-        return error_page("No valid images were uploaded")
-
-    try:
-        rerender_site(project)
-    except CoreError as e:
-        return error_page(str(e))
-
-    return RedirectResponse(f"/pages/{page_id}", status_code=303)
 
 
 async def edit_image(req, page_id: str):

@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const googleBtn = document.getElementById('googleBtn');
     if (googleBtn) {
         googleBtn.addEventListener('click', async () => {
-            if (!turnstileToken) {
+            if (!window.TURNSTILE_DISABLED && !turnstileToken) {
                 alert('Please complete the security challenge first.');
                 return;
             }
@@ -48,15 +48,25 @@ document.addEventListener('DOMContentLoaded', () => {
             googleBtn.disabled = true;
             googleBtn.querySelector('span').textContent = 'Verifying...';
 
-            // Verify Turnstile token server-side before proceeding
-            try {
-                const verifyRes = await fetch('/api/auth/verify-turnstile', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ token: turnstileToken }),
-                });
+            // Verify Turnstile token server-side before proceeding (skip when disabled)
+            if (!window.TURNSTILE_DISABLED) {
+                try {
+                    const verifyRes = await fetch('/api/auth/verify-turnstile', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ token: turnstileToken }),
+                    });
 
-                if (!verifyRes.ok) {
+                    if (!verifyRes.ok) {
+                        alert('Security check failed. Please try again.');
+                        if (window.turnstile) window.turnstile.reset();
+                        turnstileToken = null;
+                        googleBtn.disabled = true;
+                        googleBtn.querySelector('span').textContent = 'Continue with Google';
+                        return;
+                    }
+                } catch (err) {
+                    console.error('Turnstile verify error:', err);
                     alert('Security check failed. Please try again.');
                     if (window.turnstile) window.turnstile.reset();
                     turnstileToken = null;
@@ -64,14 +74,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     googleBtn.querySelector('span').textContent = 'Continue with Google';
                     return;
                 }
-            } catch (err) {
-                console.error('Turnstile verify error:', err);
-                alert('Security check failed. Please try again.');
-                if (window.turnstile) window.turnstile.reset();
-                turnstileToken = null;
-                googleBtn.disabled = true;
-                googleBtn.querySelector('span').textContent = 'Continue with Google';
-                return;
             }
 
             googleBtn.querySelector('span').textContent = 'Redirecting...';
@@ -83,7 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         access_type: 'offline',
                         prompt: 'consent',
                     },
-                    redirectTo: window.location.origin + '/login'
+                    redirectTo: window.location.origin.replace('0.0.0.0', 'localhost') + '/login'
                 }
             });
 
