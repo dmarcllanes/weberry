@@ -1,3 +1,4 @@
+import asyncio
 import io
 import logging
 import uuid
@@ -665,8 +666,18 @@ async def braindump(req, page_id: str):
         # 2. Read original HTML
         html = read_template_html(raw_tpl["html_path"])
 
-        # 3. AI rewrites text content — offloaded to thread so event loop stays free
-        rewritten = await _to_thread(rewrite_html, html, memory)
+        # 3. AI rewrites text content — 80 s hard cap; falls back to original on any failure
+        try:
+            rewritten = await asyncio.wait_for(
+                _to_thread(rewrite_html, html, memory),
+                timeout=80,
+            )
+        except asyncio.TimeoutError:
+            log.warning("[braindump] %s — rewrite_html timed out, using original HTML", page_id)
+            rewritten = html
+        except Exception as exc:
+            log.warning("[braindump] %s — rewrite_html failed (%s), using original HTML", page_id, exc)
+            rewritten = html
 
         # 3b. Remove contact info from plain text nodes so it doesn't show raw
         rewritten = _strip_contact_text(rewritten, memory)

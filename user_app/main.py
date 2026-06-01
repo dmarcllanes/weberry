@@ -3,6 +3,7 @@ Okenaba — FastHTML app entry point.
 Start with: python user_app/main.py
 """
 
+import logging
 import os
 import sys
 import json as _json
@@ -10,6 +11,8 @@ import urllib.request
 import urllib.parse as _urlparse
 from asyncio import to_thread as _to_thread
 from pathlib import Path
+
+_log = logging.getLogger(__name__)
 
 # Ensure project root is on sys.path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -47,6 +50,7 @@ bw = Beforeware(
         r'/api/auth/.*',
         r'/logout',
         r'/sw.js',
+        r'/health',
     ],
 )
 
@@ -65,6 +69,34 @@ app, rt = fast_app(
     secret_key=SECRET_KEY,
     pico=False,
 )
+
+# --- Health check ---
+
+@rt("/health")
+async def get(req):
+    checks: dict = {}
+    healthy = True
+
+    try:
+        from user_app import db as _db
+        _db.get_client().table("pages").select("id").limit(1).execute()
+        checks["db"] = "ok"
+    except Exception as exc:
+        checks["db"] = f"error: {exc}"
+        healthy = False
+
+    try:
+        from core.raw_template.loader import list_raw_templates
+        checks["templates"] = len(list_raw_templates())
+    except Exception as exc:
+        checks["templates"] = f"error: {exc}"
+        healthy = False
+
+    return JSONResponse(
+        {"status": "ok" if healthy else "error", **checks},
+        status_code=200 if healthy else 503,
+    )
+
 
 # --- PWA Manifest ---
 
@@ -333,6 +365,23 @@ def get(req, tpl_id: str):
     return template_preview.serve(tpl_id)
 
 # --- Start ---
+
+def _warmup_caches() -> None:
+    """Pre-warm all LRU caches so the first real user request is fast."""
+    try:
+        from core.raw_template.loader import list_raw_templates, read_template_html
+        from core.raw_template.slot_analyzer import analyze_slots
+        templates = list_raw_templates()
+        for tpl in templates:
+            read_template_html(tpl["html_path"])
+            analyze_slots(tpl["html_path"])
+        _log.info("[startup] Warmed caches for %d raw templates", len(templates))
+    except Exception as exc:
+        _log.warning("[startup] Cache warmup failed (non-fatal): %s", exc)
+
+
+_warmup_caches()
+
 
 if __name__ == "__main__":
     from config.settings import APP_HOST, APP_PORT

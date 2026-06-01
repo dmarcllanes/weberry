@@ -205,3 +205,10 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Large archives — never commit these
+*.zip
+*.tar.gz
+*.tar.bz2
+*.rar
+*.7z

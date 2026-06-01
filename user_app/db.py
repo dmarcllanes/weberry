@@ -303,11 +303,22 @@ def get_project(project_id: str) -> Project | None:
     return project
 
 
+_DASHBOARD_COLS = "id,user_id,state,brand_memory,template_id,created_at,updated_at,published_at"
+
+
 def get_projects_for_user(user_id: str) -> list[Project]:
+    """Lightweight list for dashboard — excludes site_version, site_plan, ai_usage blobs."""
     cached = _cache_get(_USER_LIST_CACHE, user_id)
     if cached is not None:
         return cached
-    result = get_client().table("pages").select("*").eq("user_id", user_id).order("created_at").execute()
+    result = (
+        get_client()
+        .table("pages")
+        .select(_DASHBOARD_COLS)
+        .eq("user_id", user_id)
+        .order("created_at")
+        .execute()
+    )
     projects = [_row_to_project(row) for row in result.data]
     _cache_put(_USER_LIST_CACHE, user_id, projects, _LIST_TTL)
     return projects
