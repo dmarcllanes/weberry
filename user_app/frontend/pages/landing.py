@@ -33,6 +33,56 @@ def _planet_star(size, top, left, dur, delay, mo):
     )
 
 
+def _hero_browser_mockup():
+    return Div(
+        Div(
+            Div(
+                Div(cls="hb-dot hb-dot-red"),
+                Div(cls="hb-dot hb-dot-yel"),
+                Div(cls="hb-dot hb-dot-grn"),
+                cls="hb-dots",
+            ),
+            Div("okenaba.com/my-site", cls="hb-urlbar"),
+            cls="hb-chrome",
+        ),
+        Div(Div(cls="hb-progress-fill"), cls="hb-progress"),
+        Div(
+            Div(cls="hb-nav-bar"),
+            Div(
+                Div(cls="hb-text-line hb-text-lg"),
+                Div(cls="hb-text-line hb-text-md"),
+                Div(cls="hb-cta-btn"),
+                cls="hb-hero-section",
+            ),
+            Div(
+                Div(cls="hb-card"),
+                Div(cls="hb-card"),
+                Div(cls="hb-card"),
+                cls="hb-cards-row",
+            ),
+            cls="hb-body",
+        ),
+        Div(cls="hb-cursor"),
+        cls="hero-browser-float",
+    )
+
+
+def _hero_stats_badge():
+    return Div(
+        Div(
+            Div(cls="hsb-live-dot"),
+            Span("LIVE", cls="hsb-live-text"),
+            cls="hsb-live-row",
+        ),
+        Div(
+            Span("60s", cls="hsb-num"),
+            cls="hsb-metric",
+        ),
+        P("avg. time to go live", cls="hsb-label"),
+        cls="hero-stats-badge",
+    )
+
+
 def _cosmic_planet():
     return Div(
         Div(cls="planet-glow"),
@@ -47,6 +97,8 @@ def _cosmic_planet():
             cls="planet-container",
         ),
         Div(*[_planet_star(*s) for s in _PLANET_STARS], cls="planet-stars"),
+        _hero_browser_mockup(),
+        _hero_stats_badge(),
         cls="hero-visual",
     )
 
@@ -66,7 +118,7 @@ def landing_page():
             Link(rel="icon", type="image/svg+xml", href="/static/img/favicon.svg"),
             Link(rel="apple-touch-icon", href="/static/img/favicon.svg"),
             Link(rel="manifest", href="/static/manifest.json"),
-            Link(rel="stylesheet", href="/static/css/landing.css?v=11"),
+            Link(rel="stylesheet", href="/static/css/landing.css?v=12"),
             Link(rel="preconnect", href="https://fonts.googleapis.com"),
             Link(rel="preconnect", href="https://fonts.gstatic.com", crossorigin=""),
             Link(href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap", rel="stylesheet"),
@@ -607,7 +659,7 @@ def landing_page():
                                     cls="survey-footer",
                                 ),
                                 cls="survey-form-inner",
-                                onclick="surveySubmit(event)",
+                                onsubmit="surveySubmit(event)",
                             ),
                             cls="survey-card",
                         ),

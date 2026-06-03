@@ -51,6 +51,7 @@ bw = Beforeware(
         r'/logout',
         r'/sw.js',
         r'/health',
+        r'/api/survey',
     ],
 )
 
@@ -173,7 +174,23 @@ async def post(req, sess):
 
 
 # --- Routes: Landing page (public, no auth) ---
-# TODO: Import and wire up your landing page here.
+
+@rt("/api/survey")
+async def post(req):
+    try:
+        body = dict(await req.form())
+    except Exception:
+        body = {}
+    from user_app.db import get_client
+    try:
+        get_client().table("survey_submissions").insert({
+            "business_name": body.get("business_name", "").strip()[:200],
+            "industry":      body.get("industry",      "").strip()[:100],
+            "description":   body.get("description",   "").strip()[:2000],
+        }).execute()
+    except Exception as exc:
+        _log.warning("[survey] insert failed: %s", exc)
+    return JSONResponse({"status": "ok"})
 
 # --- Routes: Pages ---
 

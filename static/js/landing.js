@@ -475,10 +475,19 @@ document.getElementById('cookie-decline').addEventListener('click', function () 
 });
 
 // Survey Submit
-function surveySubmit(e) {
+async function surveySubmit(e) {
     e.preventDefault();
+    var form = e.currentTarget;
     var card = document.querySelector('.survey-card');
     if (!card) return;
+
+    var btn = form.querySelector('.survey-submit');
+    if (btn) { btn.disabled = true; btn.style.opacity = '0.6'; }
+
+    try {
+        await fetch('/api/survey', { method: 'POST', body: new FormData(form) });
+    } catch (_) {}
+
     card.classList.add('survey--sent');
     card.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
