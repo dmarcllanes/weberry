@@ -211,4 +211,4 @@ __marimo__/
 *.tar.gz
 *.tar.bz2
 *.rar
-*.7z
+*.7ztemplate/**/*.mp4
