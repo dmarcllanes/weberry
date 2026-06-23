@@ -5,22 +5,9 @@
 .sidebar-layout {
     display: flex;
     min-height: 100vh;
-    background: var(--color-background-alt);
     position: relative;
 }
 
-/* Fixed nebula blobs behind the whole layout */
-.sidebar-layout::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 0;
-    background:
-        radial-gradient(ellipse at 5% 50%,  rgba(37, 99, 235, 0.09) 0%, transparent 45%),
-        radial-gradient(ellipse at 95% 20%,  rgba(37, 99, 235, 0.07) 0%, transparent 40%),
-        radial-gradient(ellipse at 55% 90%,  rgba(37, 99, 235, 0.05) 0%, transparent 40%);
-}
 
 /* --- Sidebar --- */
 .sidebar {
@@ -364,10 +351,6 @@
     border-color: #e2e8f0;
     color: #64748b;
     box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-}
-
-[data-theme="light"] .sidebar-layout::before {
-    display: none;
 }
 
 /* --- Responsive --- */

@@ -25,8 +25,8 @@
     --color-text-light: #8b9fc1;
     --color-text-lighter: #556080;
     --color-border: rgba(59, 130, 246, 0.18);
-    --color-background: #07070f;       /* Deep void */
-    --color-background-alt: #0b0b18;
+    --color-background: #05050f;       /* Deep void */
+    --color-background-alt: #08080f;
     --color-surface: #0f0f24;          /* Card / panel bg */
     --color-surface-hover: #0a1535;
     --color-success: #10b981;
@@ -164,8 +164,64 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    background-color: var(--color-background-alt);
+    position: relative;
 }
+
+/* ── Cosmic Nebula Layer (all app pages) ── */
+.app-nebula-layer {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+}
+
+.app-nebula {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(120px);
+    animation: app-nebula-drift var(--dur, 28s) ease-in-out infinite alternate;
+    will-change: transform;
+}
+
+.app-nebula.violet {
+    width: 700px;
+    height: 700px;
+    background: #2563eb;
+    top: -150px;
+    left: -100px;
+    opacity: 0.08;
+    --dur: 28s;
+}
+
+.app-nebula.blue {
+    width: 600px;
+    height: 600px;
+    background: #1d4ed8;
+    top: 35%;
+    right: -120px;
+    opacity: 0.06;
+    --dur: 34s;
+    animation-delay: -12s;
+}
+
+.app-nebula.cyan {
+    width: 450px;
+    height: 450px;
+    background: #0284c7;
+    bottom: 0;
+    left: 30%;
+    opacity: 0.05;
+    --dur: 22s;
+    animation-delay: -7s;
+}
+
+@keyframes app-nebula-drift {
+    0%   { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(40px, 30px) scale(1.1); }
+}
+
+[data-theme="light"] .app-nebula-layer { display: none; }
 
 /* Header */
 .header {
@@ -550,6 +606,8 @@ body {
     margin: 0 auto;
     gap: var(--spacing-xl);
     padding: var(--spacing-xl) var(--spacing-md);
+    position: relative;
+    z-index: 1;
 }
 
 /* Step Indicator (numbered circles) */
@@ -1733,6 +1791,8 @@ select.input {
     border-top: 1px solid var(--color-border);
     background-color: var(--color-background);
     padding: var(--spacing-md);
+    position: relative;
+    z-index: 1;
 }
 
 .footer-content {

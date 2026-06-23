@@ -525,15 +525,9 @@ function submitDeleteAndRedirect(deleteUrl, redirectTo) {
 // --- Theme Toggle ---
 
 function initTheme() {
-    // Default is cosmic dark; only switch to light if explicitly saved
-    var storedTheme = localStorage.getItem('theme');
-    if (storedTheme === 'light') {
-        document.documentElement.setAttribute('data-theme', 'light');
-        updateThemeIcon('light');
-    } else {
-        document.documentElement.removeAttribute('data-theme');
-        updateThemeIcon('dark');
-    }
+    // Theme toggle removed — always cosmic dark. Clear any stale light preference.
+    localStorage.removeItem('theme');
+    document.documentElement.removeAttribute('data-theme');
 }
 
 function toggleTheme() {

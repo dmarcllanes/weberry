@@ -145,6 +145,13 @@ def page_layout(content, user=None, title="Okenaba", step_indicator=None, projec
             Script(src="/static/app.js", defer=True),
         ),
         Body(
+            Div(
+                Div(cls="app-nebula violet"),
+                Div(cls="app-nebula blue"),
+                Div(cls="app-nebula cyan"),
+                cls="app-nebula-layer",
+                aria_hidden="true",
+            ),
             Div(header, main, cls="app"),
             footer if footer else "",
         ),
@@ -321,6 +328,13 @@ def sidebar_layout(content, user=None, title="Okenaba", active_nav=None, analyti
             Script(src="/static/app.js", defer=True),
         ),
         Body(
+            Div(
+                Div(cls="app-nebula violet"),
+                Div(cls="app-nebula blue"),
+                Div(cls="app-nebula cyan"),
+                cls="app-nebula-layer",
+                aria_hidden="true",
+            ),
             overlay,
             mobile_toggle,
             Div(sidebar, Main(content, cls="sidebar-main"), cls="sidebar-layout"),
